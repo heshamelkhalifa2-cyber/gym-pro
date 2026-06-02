@@ -6,139 +6,184 @@
 <title>GymPro - نظام إدارة الجيم</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
-:root{--p:#FF6B35;--pd:#E55A25;--pg:rgba(255,107,53,0.15);--bg:#0D0F12;--bc:#161A20;--bch:#1C2028;--bi:#1E2430;--bs:#111318;--t1:#F0F2F5;--t2:#8A9BB0;--tm:#4A5568;--br:#252B38;--brh:#3A4455;--su:#22C55E;--sul:rgba(34,197,94,0.15);--wa:#F59E0B;--wal:rgba(245,158,11,0.15);--da:#EF4444;--dal:rgba(239,68,68,0.15);--in:#3B82F6;--inl:rgba(59,130,246,0.15);--sw:260px;--hh:64px;--r:12px;--rs:8px;--rl:16px;--sm:0 4px 16px rgba(0,0,0,.4);--sl:0 8px 32px rgba(0,0,0,.5)}
+:root{--p:#FF6B35;--pd:#E55A25;--pg:rgba(255,107,53,0.15);--bg:#0D0F12;--bc:#161A20;--bch:#1C2028;--bi:#1E2430;--bs:#111318;--t1:#F0F2F5;--t2:#8A9BB0;--tm:#4A5568;--br:#252B38;--brh:#3A4455;--su:#22C55E;--sul:rgba(34,197,94,0.15);--wa:#F59E0B;--wal:rgba(245,158,11,0.15);--da:#EF4444;--dal:rgba(239,68,68,0.15);--in:#3B82F6;--inl:rgba(59,130,246,0.15);--pu:#8B5CF6;--pul:rgba(139,92,246,0.15);--sw:260px;--hh:64px;--r:12px;--rs:8px;--rl:16px;--sm:0 4px 16px rgba(0,0,0,.4);--sl:0 8px 32px rgba(0,0,0,.5)}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{font-size:15px}
 body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--t1);line-height:1.6;min-height:100vh;overflow-x:hidden}
 body.rtl{direction:rtl}body.ltr{direction:ltr}
 button{cursor:pointer;font-family:inherit}input,select,textarea{font-family:inherit}
 #app{display:flex;min-height:100vh}
-.sb{width:var(--sw);background:var(--bs);border-inline-end:1px solid var(--br);display:flex;flex-direction:column;position:fixed;top:0;inset-inline-start:0;height:100vh;z-index:100;transition:transform .3s ease}
-.sb-logo{padding:1.5rem 1.25rem;border-bottom:1px solid var(--br);display:flex;align-items:center;gap:.75rem}
+.sb{width:var(--sw);background:var(--bs);border-inline-end:1px solid var(--br);display:flex;flex-direction:column;position:fixed;top:0;inset-inline-start:0;height:100vh;z-index:100;transition:transform .3s ease;overflow-y:auto}
+.sb-logo{padding:1.25rem;border-bottom:1px solid var(--br);display:flex;align-items:center;gap:.75rem;flex-shrink:0}
 .sb-icon{width:40px;height:40px;background:var(--p);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
 .sb-title{font-size:1.1rem;font-weight:800;color:var(--t1);line-height:1}
 .sb-sub{font-size:.7rem;color:var(--tm);margin-top:2px}
-.sb-nav{flex:1;padding:1rem .75rem;overflow-y:auto}
-.nav-lbl{font-size:.65rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--tm);padding:.5rem .75rem;margin-top:.5rem}
-.ni{display:flex;align-items:center;gap:.75rem;padding:.7rem .875rem;border-radius:var(--rs);color:var(--t2);font-size:.9rem;font-weight:500;cursor:pointer;transition:all .2s;margin-bottom:2px;border:1px solid transparent}
+.sb-nav{flex:1;padding:.75rem}
+.nav-lbl{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tm);padding:.5rem .75rem;margin-top:.5rem}
+.ni{display:flex;align-items:center;gap:.75rem;padding:.65rem .875rem;border-radius:var(--rs);color:var(--t2);font-size:.875rem;font-weight:500;cursor:pointer;transition:all .2s;margin-bottom:2px;border:1px solid transparent}
 .ni:hover{background:var(--bc);color:var(--t1);border-color:var(--br)}
 .ni.active{background:var(--pg);color:var(--p);border-color:rgba(255,107,53,.3)}
-.ni-ic{font-size:1.1rem;width:20px;text-align:center;flex-shrink:0}
-.sb-ft{padding:1rem .75rem;border-top:1px solid var(--br)}
+.ni-ic{font-size:1rem;width:20px;text-align:center;flex-shrink:0}
+.sb-ft{padding:.75rem;border-top:1px solid var(--br);flex-shrink:0}
 .mc{margin-inline-start:var(--sw);flex:1;min-height:100vh;display:flex;flex-direction:column}
-.hdr{height:var(--hh);background:var(--bc);border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;padding:0 1.75rem;position:sticky;top:0;z-index:50}
+.hdr{height:var(--hh);background:var(--bc);border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;position:sticky;top:0;z-index:50}
 .hdr-l{display:flex;align-items:center;gap:1rem}
-.pg-title{font-size:1.15rem;font-weight:700;color:var(--t1)}
+.pg-title{font-size:1.1rem;font-weight:700;color:var(--t1)}
 .hdr-r{display:flex;align-items:center;gap:.75rem}
 .lang-sw{position:relative}
-.lang-btn{display:flex;align-items:center;gap:.4rem;padding:.45rem .75rem;background:var(--bi);border:1px solid var(--br);border-radius:var(--rs);color:var(--t2);font-size:.82rem;font-weight:500;transition:all .2s}
+.lang-btn{display:flex;align-items:center;gap:.4rem;padding:.4rem .7rem;background:var(--bi);border:1px solid var(--br);border-radius:var(--rs);color:var(--t2);font-size:.8rem;font-weight:500;transition:all .2s}
 .lang-btn:hover{border-color:var(--brh);color:var(--t1)}
-.lang-dd{position:absolute;top:calc(100% + 8px);inset-inline-end:0;background:var(--bc);border:1px solid var(--br);border-radius:var(--rs);min-width:160px;box-shadow:var(--sm);display:none;z-index:200;overflow:hidden}
+.lang-dd{position:absolute;top:calc(100% + 8px);inset-inline-end:0;background:var(--bc);border:1px solid var(--br);border-radius:var(--rs);min-width:155px;box-shadow:var(--sm);display:none;z-index:200;overflow:hidden}
 .lang-dd.open{display:block}
-.lo{display:flex;align-items:center;gap:.6rem;padding:.65rem 1rem;font-size:.85rem;color:var(--t2);cursor:pointer;transition:all .15s}
+.lo{display:flex;align-items:center;gap:.6rem;padding:.6rem 1rem;font-size:.83rem;color:var(--t2);cursor:pointer;transition:all .15s}
 .lo:hover{background:var(--bi);color:var(--t1)}.lo.cur{color:var(--p);background:var(--pg)}
-.pc{flex:1;padding:1.75rem;max-width:1400px;width:100%}
+.pc{flex:1;padding:1.5rem;max-width:1400px;width:100%}
 .card{background:var(--bc);border:1px solid var(--br);border-radius:var(--r);padding:1.5rem}
 .ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}
-.ct{font-size:1rem;font-weight:700;color:var(--t1)}
-.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:1.5rem}
-.sc{background:var(--bc);border:1px solid var(--br);border-radius:var(--r);padding:1.25rem 1.5rem;display:flex;align-items:center;gap:1rem;transition:all .2s;position:relative;overflow:hidden}
+.ct{font-size:.95rem;font-weight:700;color:var(--t1)}
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1rem;margin-bottom:1.5rem}
+.sc{background:var(--bc);border:1px solid var(--br);border-radius:var(--r);padding:1.2rem 1.4rem;display:flex;align-items:center;gap:1rem;transition:all .2s;position:relative;overflow:hidden}
 .sc::before{content:'';position:absolute;top:0;inset-inline-start:0;width:3px;height:100%}
-.sc.cp::before{background:var(--p)}.sc.cs::before{background:var(--su)}.sc.cd::before{background:var(--da)}.sc.ci::before{background:var(--in)}
+.sc.cp::before{background:var(--p)}.sc.cs::before{background:var(--su)}.sc.cd::before{background:var(--da)}.sc.ci2::before{background:var(--in)}.sc.cp2::before{background:var(--pu)}
 .sc:hover{border-color:var(--brh);transform:translateY(-2px);box-shadow:var(--sm)}
-.si{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0}
-.sc.cp .si{background:var(--pg)}.sc.cs .si{background:var(--sul)}.sc.cd .si{background:var(--dal)}.sc.ci .si{background:var(--inl)}
-.sv{font-size:1.75rem;font-weight:800;color:var(--t1);line-height:1;font-family:'IBM Plex Mono',monospace}
-.sl{font-size:.8rem;color:var(--t2);margin-top:.25rem}
-.btn{display:inline-flex;align-items:center;gap:.4rem;padding:.55rem 1.1rem;border-radius:var(--rs);font-size:.875rem;font-weight:600;border:1px solid transparent;transition:all .2s;white-space:nowrap}
+.si{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+.sc.cp .si{background:var(--pg)}.sc.cs .si{background:var(--sul)}.sc.cd .si{background:var(--dal)}.sc.ci2 .si{background:var(--inl)}.sc.cp2 .si{background:var(--pul)}
+.sv{font-size:1.6rem;font-weight:800;color:var(--t1);line-height:1;font-family:'IBM Plex Mono',monospace}
+.sl2{font-size:.78rem;color:var(--t2);margin-top:.25rem}
+.btn{display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border-radius:var(--rs);font-size:.85rem;font-weight:600;border:1px solid transparent;transition:all .2s;white-space:nowrap}
 .bp{background:var(--p);color:#fff;border-color:var(--p)}.bp:hover{background:var(--pd);transform:translateY(-1px);box-shadow:0 4px 12px rgba(255,107,53,.3)}
 .bs2{background:var(--bi);color:var(--t1);border-color:var(--br)}.bs2:hover{border-color:var(--brh)}
 .bd{background:var(--dal);color:var(--da);border-color:rgba(239,68,68,.3)}.bd:hover{background:var(--da);color:#fff}
-.btn-sm{padding:.35rem .7rem;font-size:.8rem}
+.bg{background:var(--sul);color:var(--su);border-color:rgba(34,197,94,.3)}.bg:hover{background:var(--su);color:#fff}
+.bpu{background:var(--pul);color:var(--pu);border-color:rgba(139,92,246,.3)}.bpu:hover{background:var(--pu);color:#fff}
+.bi2{background:var(--inl);color:var(--in);border-color:rgba(59,130,246,.3)}.bi2:hover{background:var(--in);color:#fff}
+.btn-sm{padding:.3rem .65rem;font-size:.78rem}
 .btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
-.badge{display:inline-flex;align-items:center;padding:.2rem .6rem;border-radius:999px;font-size:.72rem;font-weight:600}
-.bgs{background:var(--sul);color:var(--su)}.bgd{background:var(--dal);color:var(--da)}.bgw{background:var(--wal);color:var(--wa)}.bgi{background:var(--inl);color:var(--in)}
+.badge{display:inline-flex;align-items:center;padding:.2rem .55rem;border-radius:999px;font-size:.7rem;font-weight:600}
+.bgs{background:var(--sul);color:var(--su)}.bgd{background:var(--dal);color:var(--da)}.bgw{background:var(--wal);color:var(--wa)}.bgi{background:var(--inl);color:var(--in)}.bgp{background:var(--pul);color:var(--pu)}
 .tw{overflow-x:auto;border-radius:var(--r);border:1px solid var(--br)}
-table{width:100%;border-collapse:collapse;font-size:.875rem}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
 thead{background:var(--bi)}
-th{padding:.875rem 1rem;text-align:start;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--tm);white-space:nowrap;border-bottom:1px solid var(--br)}
-td{padding:.875rem 1rem;color:var(--t1);border-bottom:1px solid var(--br);vertical-align:middle}
+th{padding:.8rem 1rem;text-align:start;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--tm);white-space:nowrap;border-bottom:1px solid var(--br)}
+td{padding:.8rem 1rem;color:var(--t1);border-bottom:1px solid var(--br);vertical-align:middle}
 tbody tr:last-child td{border-bottom:none}
 tbody tr:hover{background:var(--bch)}
 body.rtl th,body.rtl td{text-align:right}
 .fg{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-.fg2{display:flex;flex-direction:column;gap:.4rem}
-.fg2.full{grid-column:1/-1}
-label{font-size:.8rem;font-weight:600;color:var(--t2)}
+.fg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
+.f2{display:flex;flex-direction:column;gap:.35rem}
+.f2.full{grid-column:1/-1}
+label{font-size:.78rem;font-weight:600;color:var(--t2)}
 .req{color:var(--da)}
-input,select,textarea{width:100%;padding:.65rem .875rem;background:var(--bi);border:1px solid var(--br);border-radius:var(--rs);color:var(--t1);font-size:.9rem;transition:all .2s}
+input,select,textarea{width:100%;padding:.6rem .8rem;background:var(--bi);border:1px solid var(--br);border-radius:var(--rs);color:var(--t1);font-size:.875rem;transition:all .2s}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--p);box-shadow:0 0 0 3px var(--pg)}
 input::placeholder{color:var(--tm)}
 select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238A9BB0' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .75rem center;padding-inline-end:2rem}
 body.rtl select{background-position:left .75rem center}
 select option{background:var(--bc)}
-textarea{resize:vertical;min-height:80px}
+textarea{resize:vertical;min-height:75px}
 .srch{display:flex;align-items:center;gap:.5rem;background:var(--bi);border:1px solid var(--br);border-radius:var(--rs);padding:0 .875rem;transition:all .2s;position:relative}
 .srch:focus-within{border-color:var(--p);box-shadow:0 0 0 3px var(--pg)}
-.srch input{border:none;background:none;box-shadow:none;padding:.65rem 0;flex:1}
+.srch input{border:none;background:none;box-shadow:none;padding:.6rem 0;flex:1}
 .srch input:focus{box-shadow:none}
-.si2{color:var(--tm)}
-/* Autocomplete */
+.si3{color:var(--tm);font-size:.9rem}
 .ac-list{position:absolute;top:100%;inset-inline-start:0;inset-inline-end:0;background:var(--bc);border:1px solid var(--br);border-top:none;border-radius:0 0 var(--rs) var(--rs);z-index:500;max-height:260px;overflow-y:auto;box-shadow:var(--sl)}
-.ac-item{display:flex;align-items:center;gap:.75rem;padding:.65rem 1rem;cursor:pointer;transition:background .15s}
+.ac-item{display:flex;align-items:center;gap:.75rem;padding:.6rem 1rem;cursor:pointer;transition:background .15s;border-bottom:1px solid var(--br)}
+.ac-item:last-child{border-bottom:none}
 .ac-item:hover{background:var(--bi)}
-.ac-name{font-weight:600;font-size:.875rem}
-.ac-ph{font-size:.75rem;color:var(--tm);font-family:'IBM Plex Mono',monospace}
+.ac-n{font-weight:600;font-size:.875rem}.ac-p{font-size:.72rem;color:var(--tm);font-family:'IBM Plex Mono',monospace}
 .tb{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:1.25rem}
 .tbl{flex:1;display:flex;gap:.75rem;align-items:center;flex-wrap:wrap}
-.tbr{display:flex;gap:.5rem;align-items:center}
-.mo{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:1000;padding:1rem}
+.tbr{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:1000;padding:1rem}
 .mo.active{display:flex}
-.md{background:var(--bc);border:1px solid var(--br);border-radius:var(--rl);width:100%;max-width:600px;box-shadow:var(--sl);animation:mIn .25s ease;max-height:90vh;overflow-y:auto}
+.md{background:var(--bc);border:1px solid var(--br);border-radius:var(--rl);width:100%;max-width:620px;box-shadow:var(--sl);animation:mIn .25s ease;max-height:92vh;overflow-y:auto}
+.md-sm{max-width:440px}
+.md-lg{max-width:780px}
 @keyframes mIn{from{opacity:0;transform:translateY(-20px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
-.mh{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid var(--br);position:sticky;top:0;background:var(--bc);z-index:1}
-.mt{font-size:1.05rem;font-weight:700;color:var(--t1)}
+.mh{display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.5rem;border-bottom:1px solid var(--br);position:sticky;top:0;background:var(--bc);z-index:1}
+.mt{font-size:1rem;font-weight:700;color:var(--t1)}
 .mc2{padding:1.5rem}
-.mf{display:flex;gap:.75rem;justify-content:flex-end;padding:1.25rem 1.5rem;border-top:1px solid var(--br);position:sticky;bottom:0;background:var(--bc)}
-.btn.mc3{background:none;border:none;color:var(--tm);font-size:1.3rem;padding:.25rem}
-.btn.mc3:hover{color:var(--t1)}
-.toast{position:fixed;bottom:1.5rem;inset-inline-end:1.5rem;display:flex;align-items:center;gap:.75rem;padding:.875rem 1.25rem;background:var(--bc);border:1px solid var(--br);border-radius:var(--r);box-shadow:var(--sl);font-size:.9rem;font-weight:500;color:var(--t1);transform:translateX(120%);transition:transform .3s ease;z-index:9999;max-width:400px}
+.mft{display:flex;gap:.75rem;justify-content:flex-end;padding:1.2rem 1.5rem;border-top:1px solid var(--br);position:sticky;bottom:0;background:var(--bc)}
+.xbtn{background:none;border:none;color:var(--tm);font-size:1.3rem;padding:.25rem;cursor:pointer;transition:color .2s}
+.xbtn:hover{color:var(--t1)}
+.toast{position:fixed;bottom:1.5rem;inset-inline-end:1.5rem;display:flex;align-items:center;gap:.75rem;padding:.875rem 1.25rem;background:var(--bc);border:1px solid var(--br);border-radius:var(--r);box-shadow:var(--sl);font-size:.875rem;font-weight:500;color:var(--t1);transform:translateX(120%);transition:transform .3s ease;z-index:9999;max-width:380px}
 .toast.show{transform:translateX(0)}
-.ts .ti{color:var(--su)}.te .ti{color:var(--da)}.tw2 .ti{color:var(--wa)}.tif .ti{color:var(--in)}
-.ts{border-color:rgba(34,197,94,.3)}.te{border-color:rgba(239,68,68,.3)}.tw2{border-color:rgba(245,158,11,.3)}.tif{border-color:rgba(59,130,246,.3)}
-/* Alert banners */
-.ab{display:none;align-items:center;gap:1rem;padding:1rem 1.25rem;border-radius:var(--rs);margin-bottom:1rem;font-weight:600;font-size:.9rem}
+.ts{border-color:rgba(34,197,94,.3)}.ts .ti{color:var(--su)}
+.te{border-color:rgba(239,68,68,.3)}.te .ti{color:var(--da)}
+.tw2{border-color:rgba(245,158,11,.3)}.tw2 .ti{color:var(--wa)}
+.tif{border-color:rgba(59,130,246,.3)}.tif .ti{color:var(--in)}
+.ab{display:none;align-items:center;gap:1rem;padding:1rem 1.25rem;border-radius:var(--rs);margin-bottom:1rem;font-weight:600;font-size:.875rem}
 .ab.vis{display:flex}
 .ab-exp{background:var(--dal);border:1px solid rgba(239,68,68,.4);color:var(--da)}
 .ab-soon{background:var(--wal);border:1px solid rgba(245,158,11,.4);color:var(--wa)}
 .es{text-align:center;padding:3rem 2rem;color:var(--tm)}
-.ei{font-size:3rem;margin-bottom:1rem}
-.et{font-size:1rem;font-weight:600;color:var(--t2);margin-bottom:.5rem}
-.spn{width:36px;height:36px;border:3px solid var(--br);border-top-color:var(--p);border-radius:50%;animation:spin .7s linear infinite;margin:2rem auto}
+.ei{font-size:3rem;margin-bottom:.75rem}
+.et{font-size:.95rem;font-weight:600;color:var(--t2)}
+.spn{width:32px;height:32px;border:3px solid var(--br);border-top-color:var(--p);border-radius:50%;animation:spin .7s linear infinite;margin:2rem auto}
 @keyframes spin{to{transform:rotate(360deg)}}
-.lc{display:flex;justify-content:center;padding:3rem}
-.av{width:36px;height:36px;background:var(--pg);border:1px solid rgba(255,107,53,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:var(--p);flex-shrink:0}
+.lc{display:flex;justify-content:center;padding:2.5rem}
+.av{width:36px;height:36px;background:var(--pg);border:1px solid rgba(255,107,53,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;color:var(--p);flex-shrink:0;overflow:hidden}
+.av img{width:100%;height:100%;object-fit:cover}
+.av-lg{width:72px;height:72px;font-size:1.4rem}
 .mc4{display:flex;align-items:center;gap:.75rem}
 .mn{font-weight:600}
-.mi{font-size:.72rem;color:var(--tm);font-family:'IBM Plex Mono',monospace}
+.mi{font-size:.7rem;color:var(--tm);font-family:'IBM Plex Mono',monospace}
 .ei2{display:flex;align-items:center;justify-content:space-between;padding:.75rem;background:var(--wal);border:1px solid rgba(245,158,11,.2);border-radius:var(--rs);margin-bottom:.5rem}
 .dg{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-top:1.25rem}
-.cw{position:relative;height:220px;display:flex;align-items:center;justify-content:center}
+.cw{position:relative;height:210px;display:flex;align-items:center;justify-content:center}
+/* Photo upload */
+.photo-upload{border:2px dashed var(--br);border-radius:var(--r);padding:1.5rem;text-align:center;cursor:pointer;transition:all .2s;position:relative}
+.photo-upload:hover{border-color:var(--p);background:var(--pg)}
+.photo-upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.photo-preview{width:80px;height:80px;border-radius:50%;object-fit:cover;margin:0 auto .5rem;display:block;border:2px solid var(--p)}
+/* QR Modal */
+.qr-wrap{display:flex;flex-direction:column;align-items:center;gap:1rem;padding:1rem}
+.qr-wrap canvas{border-radius:var(--rs);background:white;padding:.75rem}
+/* Receipt print styles */
+@media print{
+  body *{visibility:hidden}
+  #receipt-content,#receipt-content *{visibility:visible}
+  #receipt-content{position:fixed;left:0;top:0;width:100%;background:white;color:black;padding:2rem;font-family:'Outfit',sans-serif}
+  .no-print{display:none!important}
+}
+.receipt{background:white;color:#1a1a1a;border-radius:var(--r);padding:2rem;max-width:400px;margin:0 auto;font-family:'Outfit',sans-serif}
+.receipt-logo{text-align:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px dashed #ddd}
+.receipt-logo h2{font-size:1.5rem;font-weight:800;color:#FF6B35;margin:.5rem 0}
+.receipt-row{display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid #f0f0f0;font-size:.9rem}
+.receipt-row.total{font-weight:700;font-size:1rem;border-top:2px solid #ddd;border-bottom:none;margin-top:.5rem;padding-top:.75rem}
+.receipt-footer{text-align:center;margin-top:1.5rem;padding-top:1rem;border-top:2px dashed #ddd;color:#666;font-size:.8rem}
+/* Progress bars for measurements */
+.prog-bar{height:6px;background:var(--br);border-radius:3px;overflow:hidden;margin-top:.3rem}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--p),var(--su));border-radius:3px;transition:width .5s ease}
+/* Tabs */
+.tabs{display:flex;gap:.25rem;border-bottom:1px solid var(--br);margin-bottom:1.5rem}
+.tab{padding:.6rem 1rem;font-size:.85rem;font-weight:600;color:var(--t2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s}
+.tab.active{color:var(--p);border-bottom-color:var(--p)}
+.tab:hover{color:var(--t1)}
+.tab-content{display:none}.tab-content.active{display:block}
+/* Report */
+.report-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1.5rem}
+.report-stat{background:var(--bi);border:1px solid var(--br);border-radius:var(--rs);padding:1rem;text-align:center}
+.report-val{font-size:1.5rem;font-weight:800;font-family:'IBM Plex Mono',monospace;color:var(--p)}
+.report-lbl{font-size:.75rem;color:var(--t2);margin-top:.25rem}
+/* Login */
 #lp{display:none;min-height:100vh;background:var(--bg);align-items:center;justify-content:center;padding:2rem}
 #lp.active{display:flex}
 .lcon{width:100%;max-width:420px}
 .ll{text-align:center;margin-bottom:2.5rem}
 .lli{width:72px;height:72px;background:var(--p);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:2.2rem;margin:0 auto 1rem;box-shadow:0 8px 24px rgba(255,107,53,.35)}
 .lt{font-size:2rem;font-weight:800;color:var(--t1);letter-spacing:-.03em}
-.ls{color:var(--t2);font-size:.9rem;margin-top:.25rem}
 .lcard{background:var(--bc);border:1px solid var(--br);border-radius:var(--rl);padding:2rem}
-.lcard .fg2{margin-bottom:1rem}
+.lcard .f2{margin-bottom:1rem}
 .cr{margin-top:1rem;padding:1.25rem;background:var(--bi);border:1px solid var(--br);border-radius:var(--r);display:none}
 .cr.vis{display:block}
-.ca{width:56px;height:56px;background:var(--pg);border:2px solid rgba(255,107,53,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:700;color:var(--p)}
-.mtg{display:none;background:none;border:none;color:var(--t1);font-size:1.4rem;padding:.25rem}
+.ca{width:56px;height:56px;background:var(--pg);border:2px solid rgba(255,107,53,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:700;color:var(--p);overflow:hidden}
+.ca img{width:100%;height:100%;object-fit:cover}
+.mtg{display:none;background:none;border:none;color:var(--t1);font-size:1.4rem;padding:.25rem;cursor:pointer}
 .sov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99}
 .pg2{display:none;animation:fIn .25s ease}
 .pg2.active{display:block}
@@ -147,7 +192,6 @@ textarea{resize:vertical;min-height:80px}
 ::-webkit-scrollbar{width:6px;height:6px}
 ::-webkit-scrollbar-track{background:var(--bg)}
 ::-webkit-scrollbar-thumb{background:var(--br);border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:var(--brh)}
 @media(max-width:900px){
 .sb{transform:translateX(-100%)}
 body.rtl .sb{transform:translateX(100%)}
@@ -157,10 +201,11 @@ body.rtl .sb{transform:translateX(100%)}
 .sov.vis{display:block}
 .sg{grid-template-columns:1fr 1fr}
 .dg{grid-template-columns:1fr}
-.fg{grid-template-columns:1fr}
+.fg,.fg3{grid-template-columns:1fr}
+.report-grid{grid-template-columns:1fr 1fr}
 .tb{flex-direction:column;align-items:stretch}
 }
-@media(max-width:500px){.sg{grid-template-columns:1fr}.pc{padding:1rem}.md{max-width:100%}}
+@media(max-width:500px){.sg{grid-template-columns:1fr}.pc{padding:1rem}.report-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body class="rtl">
@@ -168,15 +213,11 @@ body.rtl .sb{transform:translateX(100%)}
 <!-- LOGIN -->
 <div id="lp" class="active">
   <div class="lcon">
-    <div class="ll">
-      <div class="lli">🏋️</div>
-      <h1 class="lt">GymPro</h1>
-      <p class="ls" id="l-sub">سجّل دخولك لإدارة جيمك</p>
-    </div>
+    <div class="ll"><div class="lli">🏋️</div><h1 class="lt">GymPro</h1><p style="color:var(--t2);font-size:.9rem;margin-top:.25rem" id="l-sub">سجّل دخولك لإدارة جيمك</p></div>
     <div class="lcard">
       <div id="l-err" style="display:none;background:var(--dal);border:1px solid rgba(239,68,68,.3);border-radius:var(--rs);padding:.75rem 1rem;margin-bottom:1rem;color:var(--da);font-size:.875rem"></div>
-      <div class="fg2"><label id="l-el">البريد الإلكتروني</label><input type="email" id="l-e" placeholder="admin@gym.com"/></div>
-      <div class="fg2" style="margin-bottom:1.25rem"><label id="l-pl">كلمة المرور</label><input type="password" id="l-p" placeholder="••••••••"/></div>
+      <div class="f2"><label id="l-el">البريد الإلكتروني</label><input type="email" id="l-e" placeholder="admin@gym.com"/></div>
+      <div class="f2" style="margin-bottom:1.25rem"><label id="l-pl">كلمة المرور</label><input type="password" id="l-p" placeholder="••••••••"/></div>
       <button id="l-btn" class="btn bp" style="width:100%;justify-content:center;padding:.85rem;font-size:.95rem">دخول</button>
     </div>
   </div>
@@ -186,28 +227,23 @@ body.rtl .sb{transform:translateX(100%)}
 <div id="app" style="display:none">
   <div class="sov" id="sov"></div>
   <aside class="sb" id="sbar">
-    <div class="sb-logo">
-      <div class="sb-icon">🏋️</div>
-      <div><div class="sb-title">GymPro</div><div class="sb-sub" id="n-tag">نظام إدارة الجيم</div></div>
-    </div>
+    <div class="sb-logo"><div class="sb-icon">🏋️</div><div><div class="sb-title">GymPro</div><div class="sb-sub" id="n-tag">نظام إدارة الجيم</div></div></div>
     <nav class="sb-nav">
-      <div class="nav-lbl" id="n-lbl">القائمة الرئيسية</div>
+      <div class="nav-lbl" id="n-lbl">الرئيسية</div>
       <div class="ni active" data-page="dashboard"><span class="ni-ic">📊</span><span id="n-dash">لوحة التحكم</span></div>
       <div class="ni" data-page="members"><span class="ni-ic">👥</span><span id="n-mem">الأعضاء</span></div>
       <div class="ni" data-page="checkin"><span class="ni-ic">✅</span><span id="n-ci">تسجيل الحضور</span></div>
       <div class="ni" data-page="payments"><span class="ni-ic">💰</span><span id="n-pay">المدفوعات</span></div>
+      <div class="nav-lbl" style="margin-top:1rem">التقارير</div>
+      <div class="ni" data-page="report"><span class="ni-ic">📈</span><span id="n-rep">التقرير الشهري</span></div>
+      <div class="ni" data-page="measurements"><span class="ni-ic">📏</span><span id="n-meas">القياسات</span></div>
     </nav>
-    <div class="sb-ft">
-      <div class="ni" id="logout-btn"><span class="ni-ic">🚪</span><span id="n-out">تسجيل الخروج</span></div>
-    </div>
+    <div class="sb-ft"><div class="ni" id="logout-btn"><span class="ni-ic">🚪</span><span id="n-out">تسجيل الخروج</span></div></div>
   </aside>
 
   <main class="mc">
     <header class="hdr">
-      <div class="hdr-l">
-        <button class="mtg" id="mtg">☰</button>
-        <h2 class="pg-title" id="pg-t">لوحة التحكم</h2>
-      </div>
+      <div class="hdr-l"><button class="mtg" id="mtg">☰</button><h2 class="pg-title" id="pg-t">لوحة التحكم</h2></div>
       <div class="hdr-r">
         <div class="lang-sw">
           <button class="lang-btn" id="l-btn2"><span id="lf">🇸🇦</span><span id="ln">العربية</span><span>▾</span></button>
@@ -218,21 +254,20 @@ body.rtl .sb{transform:translateX(100%)}
             <div class="lo" data-lang="hi">🇮🇳 हिंदी</div>
           </div>
         </div>
-        <div style="display:flex;align-items:center;gap:.5rem;padding:.4rem .75rem;background:var(--bi);border:1px solid var(--br);border-radius:var(--rs)">
-          <span>👤</span><span id="u-em" style="font-size:.8rem;color:var(--t2)">admin</span>
-        </div>
+        <div style="display:flex;align-items:center;gap:.5rem;padding:.4rem .75rem;background:var(--bi);border:1px solid var(--br);border-radius:var(--rs)"><span>👤</span><span id="u-em" style="font-size:.8rem;color:var(--t2)">admin</span></div>
       </div>
     </header>
 
     <div class="pc">
 
-      <!-- DASHBOARD -->
+      <!-- ===== DASHBOARD ===== -->
       <div id="pg-dashboard" class="pg2 active">
         <div class="sg">
-          <div class="sc cp"><div class="si">👥</div><div><div class="sv" id="s-tot">0</div><div class="sl" id="s-tot-l">إجمالي الأعضاء</div></div></div>
-          <div class="sc cs"><div class="si">✅</div><div><div class="sv" id="s-act">0</div><div class="sl" id="s-act-l">الأعضاء النشطون</div></div></div>
-          <div class="sc cd"><div class="si">⚠️</div><div><div class="sv" id="s-exp">0</div><div class="sl" id="s-exp-l">الاشتراكات المنتهية</div></div></div>
-          <div class="sc ci"><div class="si">💰</div><div><div class="sv mono" id="s-rev">0</div><div class="sl" id="s-rev-l">إجمالي الإيرادات</div></div></div>
+          <div class="sc cp"><div class="si">👥</div><div><div class="sv" id="s-tot">0</div><div class="sl2" id="s-tot-l">إجمالي الأعضاء</div></div></div>
+          <div class="sc cs"><div class="si">✅</div><div><div class="sv" id="s-act">0</div><div class="sl2" id="s-act-l">الأعضاء النشطون</div></div></div>
+          <div class="sc cd"><div class="si">⚠️</div><div><div class="sv" id="s-exp">0</div><div class="sl2" id="s-exp-l">الاشتراكات المنتهية</div></div></div>
+          <div class="sc ci2"><div class="si">💰</div><div><div class="sv mono" id="s-rev">0</div><div class="sl2" id="s-rev-l">إجمالي الإيرادات</div></div></div>
+          <div class="sc cp2"><div class="si">🏃</div><div><div class="sv" id="s-ci">0</div><div class="sl2" id="s-ci-l">حضور اليوم</div></div></div>
         </div>
         <div class="dg">
           <div class="card"><div class="ch"><h3 class="ct" id="ch-st">📊 توزيع الأعضاء</h3></div><div class="cw"><canvas id="c-donut"></canvas></div></div>
@@ -244,73 +279,56 @@ body.rtl .sb{transform:translateX(100%)}
         </div>
       </div>
 
-      <!-- MEMBERS -->
+      <!-- ===== MEMBERS ===== -->
       <div id="pg-members" class="pg2">
         <div class="tb">
           <div class="tbl">
-            <div class="srch" style="min-width:240px"><span class="si2">🔍</span><input type="text" id="m-srch" placeholder="البحث..."/></div>
-            <select id="m-flt" style="min-width:140px">
-              <option value="all" id="f-all">الكل</option>
-              <option value="active" id="f-act">نشط</option>
-              <option value="expired" id="f-exp">منتهي</option>
-            </select>
+            <div class="srch" style="min-width:230px"><span class="si3">🔍</span><input type="text" id="m-srch" placeholder="البحث..."/></div>
+            <select id="m-flt" style="min-width:130px"><option value="all" id="f-all">الكل</option><option value="active" id="f-act">نشط</option><option value="expired" id="f-exp">منتهي</option></select>
           </div>
           <div class="tbr"><button class="btn bp" id="add-m-btn">+ <span id="add-m-t">إضافة عضو</span></button></div>
         </div>
         <div class="tw">
           <table>
-            <thead><tr>
-              <th id="th-n">الاسم</th><th id="th-ph">الهاتف</th><th id="th-sb">الاشتراك</th>
-              <th id="th-en">انتهاء</th><th id="th-wt">الوزن</th><th id="th-gf">هدية/إيقاف</th>
-              <th id="th-st">الحالة</th><th id="th-ac">إجراءات</th>
-            </tr></thead>
-            <tbody id="m-tbody"><tr><td colspan="8"><div class="lc"><div class="spn"></div></div></td></tr></tbody>
+            <thead><tr><th id="th-n">الاسم</th><th id="th-ph">الهاتف</th><th id="th-sb">الاشتراك</th><th id="th-en">انتهاء</th><th id="th-wt">الوزن</th><th id="th-st">الحالة</th><th id="th-ac">إجراءات</th></tr></thead>
+            <tbody id="m-tbody"><tr><td colspan="7"><div class="lc"><div class="spn"></div></div></td></tr></tbody>
           </table>
         </div>
       </div>
 
-      <!-- CHECKIN -->
+      <!-- ===== CHECKIN ===== -->
       <div id="pg-checkin" class="pg2">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
           <div class="card">
             <h3 class="ct" id="ci-ttl" style="margin-bottom:1.25rem">تسجيل الحضور</h3>
-            <div class="fg2" style="margin-bottom:1rem">
+            <div class="f2" style="margin-bottom:1rem">
               <label id="ci-lbl">ابحث بالاسم أو رقم الهاتف</label>
-              <div class="srch" id="ci-wrap">
-                <span class="si2">🔍</span>
-                <input type="text" id="ci-in" placeholder="اكتب الاسم أو أول 4 أرقام..." autocomplete="off"/>
-                <div class="ac-list" id="ac-ls" style="display:none"></div>
-              </div>
+              <div class="srch" id="ci-wrap"><span class="si3">🔍</span><input type="text" id="ci-in" placeholder="اكتب الاسم أو أول 4 أرقام..." autocomplete="off"/><div class="ac-list" id="ac-ls" style="display:none"></div></div>
             </div>
-            <div class="ab ab-exp" id="ab-exp"><span style="font-size:1.4rem">🚫</span><span id="ab-exp-t">اشتراك هذا العضو منتهٍ!</span></div>
+            <div class="ab ab-exp" id="ab-exp"><span style="font-size:1.4rem">🚫</span><span id="ab-exp-t">اشتراك منتهٍ!</span></div>
             <div class="ab ab-soon" id="ab-soon"><span style="font-size:1.4rem">⚠️</span><span id="ab-soon-t">الاشتراك سينتهي قريباً!</span></div>
             <button class="btn bp" id="ci-btn" style="width:100%;justify-content:center;padding:.75rem">✅ <span id="ci-btn-t">تسجيل دخول</span></button>
             <div class="cr" id="ci-res">
               <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem">
                 <div class="ca" id="ci-av">?</div>
-                <div><div style="font-weight:700;font-size:1.05rem" id="ci-nm">-</div><div style="color:var(--tm);font-size:.8rem" id="ci-ph">-</div></div>
+                <div><div style="font-weight:700;font-size:1.05rem" id="ci-nm">-</div><div style="color:var(--tm);font-size:.8rem" id="ci-ph2">-</div></div>
               </div>
               <div id="ci-msg" style="font-size:.875rem"></div>
             </div>
           </div>
-          <div class="card">
-            <div class="ch"><h3 class="ct" id="ci-td-t">حضور اليوم</h3><span class="badge bgi" id="td-cnt">0</span></div>
-            <div id="td-ci"><div class="lc"><div class="spn"></div></div></div>
-          </div>
+          <div class="card"><div class="ch"><h3 class="ct" id="ci-td-t">حضور اليوم</h3><span class="badge bgi" id="td-cnt">0</span></div><div id="td-ci"><div class="lc"><div class="spn"></div></div></div></div>
         </div>
       </div>
 
-      <!-- PAYMENTS -->
+      <!-- ===== PAYMENTS ===== -->
       <div id="pg-payments" class="pg2">
         <div class="tb">
-          <div class="tbl"><div class="srch" style="min-width:240px"><span class="si2">🔍</span><input type="text" id="p-srch" placeholder="بحث..."/></div></div>
+          <div class="tbl"><div class="srch" style="min-width:230px"><span class="si3">🔍</span><input type="text" id="p-srch" placeholder="بحث..."/></div></div>
           <div class="tbr"><button class="btn bp" id="add-p-btn">+ <span id="add-p-t">تسجيل دفعة</span></button></div>
         </div>
         <div class="tw">
-          <table>
-            <thead><tr><th id="tp-m">العضو</th><th id="tp-a">المبلغ</th><th id="tp-d">التاريخ</th><th id="tp-n">ملاحظات</th><th>⚙️</th></tr></thead>
-            <tbody id="p-tbody"><tr><td colspan="5"><div class="lc"><div class="spn"></div></div></td></tr></tbody>
-          </table>
+          <table><thead><tr><th id="tp-m">العضو</th><th id="tp-a">المبلغ</th><th id="tp-d">التاريخ</th><th id="tp-n">ملاحظات</th><th>إجراءات</th></tr></thead>
+          <tbody id="p-tbody"><tr><td colspan="5"><div class="lc"><div class="spn"></div></div></td></tr></tbody></table>
         </div>
         <div style="margin-top:1rem;display:flex;justify-content:flex-end">
           <div class="card" style="padding:.875rem 1.5rem;display:inline-flex;align-items:center;gap:1rem">
@@ -320,21 +338,58 @@ body.rtl .sb{transform:translateX(100%)}
         </div>
       </div>
 
+      <!-- ===== MONTHLY REPORT ===== -->
+      <div id="pg-report" class="pg2">
+        <div class="card" style="margin-bottom:1.25rem">
+          <div class="ch">
+            <h3 class="ct" id="rep-title">📈 التقرير الشهري</h3>
+            <div style="display:flex;gap:.75rem;align-items:center">
+              <input type="month" id="rep-month" style="width:auto;min-width:160px"/>
+              <button class="btn bp" id="rep-load-btn">عرض التقرير</button>
+              <button class="btn bs2" onclick="printReport()">🖨️ طباعة</button>
+            </div>
+          </div>
+        </div>
+        <div id="rep-content">
+          <div class="es"><div class="ei">📅</div><div class="et">اختر شهراً لعرض التقرير</div></div>
+        </div>
+      </div>
+
+      <!-- ===== MEASUREMENTS ===== -->
+      <div id="pg-measurements" class="pg2">
+        <div class="tb">
+          <div class="tbl">
+            <div class="srch" style="min-width:230px"><span class="si3">🔍</span><input type="text" id="ms-srch" placeholder="ابحث عن عضو..."/><div class="ac-list" id="ms-ac" style="display:none"></div></div>
+          </div>
+          <div class="tbr"><button class="btn bp" id="add-ms-btn">+ <span id="add-ms-t">إضافة قياسات</span></button></div>
+        </div>
+        <div id="ms-content"><div class="es"><div class="ei">📏</div><div class="et">ابحث عن عضو لعرض قياساته</div></div></div>
+      </div>
+
     </div>
   </main>
 </div>
 
-<!-- MEMBER MODAL -->
+<!-- ===== MEMBER MODAL ===== -->
 <div class="mo" id="m-mo">
   <div class="md">
-    <div class="mh"><h3 class="mt" id="m-mo-t">إضافة عضو</h3><button class="btn mc3" data-close="m-mo">✕</button></div>
+    <div class="mh"><h3 class="mt" id="m-mo-t">إضافة عضو</h3><button class="xbtn" data-close="m-mo">✕</button></div>
     <div class="mc2">
       <input type="hidden" id="m-id"/>
+      <!-- Photo upload -->
+      <div style="margin-bottom:1.25rem">
+        <label style="display:block;margin-bottom:.5rem">📸 صورة العضو</label>
+        <div class="photo-upload" id="photo-drop">
+          <img id="photo-preview" src="" style="display:none;width:80px;height:80px;border-radius:50%;object-fit:cover;margin:0 auto .5rem;display:none;border:2px solid var(--p)"/>
+          <input type="file" id="m-photo" accept="image/*" style="opacity:0;position:absolute;inset:0;cursor:pointer;width:100%;height:100%"/>
+          <div id="photo-placeholder"><div style="font-size:2rem;margin-bottom:.5rem">📷</div><div style="font-size:.8rem;color:var(--t2)">اضغط لاختيار صورة</div></div>
+        </div>
+      </div>
       <div class="fg">
-        <div class="fg2"><label>الاسم <span class="req">*</span></label><input type="text" id="m-nm" placeholder="الاسم الكامل"/></div>
-        <div class="fg2"><label>رقم الهاتف <span class="req">*</span></label><input type="tel" id="m-ph" placeholder="+96550000000"/></div>
-        <div class="fg2"><label>البريد الإلكتروني</label><input type="email" id="m-em" placeholder="email@example.com"/></div>
-        <div class="fg2">
+        <div class="f2"><label>الاسم <span class="req">*</span></label><input type="text" id="m-nm" placeholder="الاسم الكامل"/></div>
+        <div class="f2"><label>رقم الهاتف <span class="req">*</span></label><input type="tel" id="m-ph" placeholder="+96550000000"/></div>
+        <div class="f2"><label>البريد الإلكتروني</label><input type="email" id="m-em" placeholder="email@example.com"/></div>
+        <div class="f2">
           <label>نوع الاشتراك <span class="req">*</span></label>
           <select id="m-ty">
             <option value="1">شهر واحد</option><option value="2">شهران</option><option value="3">3 شهور</option>
@@ -343,31 +398,160 @@ body.rtl .sb{transform:translateX(100%)}
             <option value="10">10 شهور</option><option value="11">11 شهر</option><option value="12">سنة كاملة (12 شهر)</option>
           </select>
         </div>
-        <div class="fg2"><label>تاريخ البداية <span class="req">*</span></label><input type="date" id="m-st"/></div>
-        <div class="fg2"><label>تاريخ الانتهاء</label><input type="date" id="m-en" readonly style="opacity:.6"/></div>
-        <div class="fg2"><label>⚖️ الوزن الابتدائي (كجم)</label><input type="number" id="m-wt" placeholder="70.5" min="0" step="0.1"/></div>
-        <div class="fg2"><label>🎁 شهور الهدية المجانية</label><input type="number" id="m-fm" placeholder="0" min="0" value="0"/></div>
-        <div class="fg2"><label>⏸️ شهور الإيقاف</label><input type="number" id="m-pm" placeholder="0" min="0" value="0"/></div>
-        <div class="fg2 full"><label>ملاحظات</label><textarea id="m-nt" placeholder="ملاحظات إضافية..."></textarea></div>
+        <div class="f2"><label>تاريخ البداية <span class="req">*</span></label><input type="date" id="m-st"/></div>
+        <div class="f2"><label>تاريخ الانتهاء</label><input type="date" id="m-en" readonly style="opacity:.6"/></div>
+        <div class="f2"><label>⚖️ الوزن الابتدائي (كجم)</label><input type="number" id="m-wt" placeholder="70.5" min="0" step="0.1"/></div>
+        <div class="f2"><label>🎁 شهور الهدية</label><input type="number" id="m-fm" value="0" min="0"/></div>
+        <div class="f2"><label>⏸️ شهور الإيقاف</label><input type="number" id="m-pm" value="0" min="0"/></div>
+        <div class="f2 full"><label>ملاحظات</label><textarea id="m-nt" placeholder="ملاحظات إضافية..."></textarea></div>
       </div>
     </div>
-    <div class="mf"><button class="btn bs2" data-close="m-mo" id="m-can">إلغاء</button><button class="btn bp" id="m-save">حفظ العضو</button></div>
+    <div class="mft"><button class="btn bs2" data-close="m-mo" id="m-can">إلغاء</button><button class="btn bp" id="m-save">حفظ العضو</button></div>
   </div>
 </div>
 
-<!-- PAYMENT MODAL -->
-<div class="mo" id="p-mo">
-  <div class="md" style="max-width:480px">
-    <div class="mh"><h3 class="mt" id="p-mo-t">تسجيل دفعة</h3><button class="btn mc3" data-close="p-mo">✕</button></div>
+<!-- ===== MEMBER PROFILE MODAL ===== -->
+<div class="mo" id="prof-mo">
+  <div class="md md-lg">
+    <div class="mh"><h3 class="mt" id="prof-name">ملف العضو</h3><button class="xbtn" data-close="prof-mo">✕</button></div>
     <div class="mc2">
-      <div class="fg">
-        <div class="fg2 full"><label>العضو <span class="req">*</span></label><select id="p-mem"><option value="">-- اختر عضو --</option></select></div>
-        <div class="fg2"><label>المبلغ (KWD) <span class="req">*</span></label><input type="number" id="p-amt" placeholder="0.000" min="0" step="0.001"/></div>
-        <div class="fg2"><label>التاريخ <span class="req">*</span></label><input type="date" id="p-dt"/></div>
-        <div class="fg2 full"><label>ملاحظات</label><input type="text" id="p-nt" placeholder="سبب الدفعة..."/></div>
+      <div style="display:flex;align-items:center;gap:1.5rem;margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--br)">
+        <div class="av av-lg" id="prof-av">?</div>
+        <div style="flex:1">
+          <div style="font-size:1.3rem;font-weight:800" id="prof-nm">-</div>
+          <div style="color:var(--tm);font-size:.85rem;margin-top:.25rem" id="prof-ph">-</div>
+          <div style="margin-top:.5rem;display:flex;gap:.5rem;flex-wrap:wrap" id="prof-badges"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:.5rem">
+          <button class="btn bpu btn-sm" id="prof-qr-btn">📱 QR Code</button>
+          <button class="btn bg btn-sm" id="prof-renew-btn">🔄 تجديد</button>
+          <button class="btn bs2 btn-sm" id="prof-edit-btn">✏️ تعديل</button>
+        </div>
+      </div>
+      <div class="tabs">
+        <div class="tab active" data-tab="info">📋 البيانات</div>
+        <div class="tab" data-tab="payments">💰 المدفوعات</div>
+        <div class="tab" data-tab="checkins">✅ الحضور</div>
+        <div class="tab" data-tab="progress">📏 التقدم</div>
+      </div>
+      <div id="tab-info" class="tab-content active">
+        <div class="fg" id="prof-info-grid"></div>
+      </div>
+      <div id="tab-payments" class="tab-content">
+        <div id="prof-pays-list"></div>
+      </div>
+      <div id="tab-checkins" class="tab-content">
+        <div id="prof-ci-list"></div>
+      </div>
+      <div id="tab-progress" class="tab-content">
+        <div id="prof-prog-list"></div>
       </div>
     </div>
-    <div class="mf"><button class="btn bs2" data-close="p-mo">إلغاء</button><button class="btn bp" id="p-save">تسجيل الدفعة</button></div>
+    <div class="mft"><button class="btn bs2" data-close="prof-mo">إغلاق</button></div>
+  </div>
+</div>
+
+<!-- ===== QR MODAL ===== -->
+<div class="mo" id="qr-mo">
+  <div class="md md-sm">
+    <div class="mh"><h3 class="mt" id="qr-title">QR Code</h3><button class="xbtn" data-close="qr-mo">✕</button></div>
+    <div class="mc2">
+      <div class="qr-wrap">
+        <canvas id="qr-canvas"></canvas>
+        <div style="text-align:center">
+          <div style="font-weight:700;font-size:1.1rem" id="qr-name">-</div>
+          <div style="color:var(--tm);font-size:.85rem" id="qr-phone">-</div>
+        </div>
+        <button class="btn bp" onclick="downloadQR()">⬇️ تحميل QR</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== RENEW MODAL ===== -->
+<div class="mo" id="renew-mo">
+  <div class="md md-sm">
+    <div class="mh"><h3 class="mt">🔄 تجديد الاشتراك</h3><button class="xbtn" data-close="renew-mo">✕</button></div>
+    <div class="mc2">
+      <input type="hidden" id="renew-id"/>
+      <div style="background:var(--bi);border-radius:var(--rs);padding:1rem;margin-bottom:1rem">
+        <div style="font-weight:700" id="renew-name">-</div>
+        <div style="font-size:.8rem;color:var(--tm)">الاشتراك الحالي: <span id="renew-current">-</span></div>
+      </div>
+      <div class="fg" style="grid-template-columns:1fr">
+        <div class="f2"><label>نوع الاشتراك الجديد <span class="req">*</span></label>
+          <select id="renew-type">
+            <option value="1">شهر واحد</option><option value="2">شهران</option><option value="3">3 شهور</option>
+            <option value="4">4 شهور</option><option value="5">5 شهور</option><option value="6">6 شهور</option>
+            <option value="7">7 شهور</option><option value="8">8 شهور</option><option value="9">9 شهور</option>
+            <option value="10">10 شهور</option><option value="11">11 شهر</option><option value="12">سنة كاملة</option>
+          </select>
+        </div>
+        <div class="f2"><label>مبلغ التجديد (KWD)</label><input type="number" id="renew-amount" placeholder="0.000" min="0" step="0.001"/></div>
+        <div class="f2"><label>تاريخ بداية التجديد</label><input type="date" id="renew-start"/></div>
+      </div>
+      <div style="background:var(--sul);border:1px solid rgba(34,197,94,.3);border-radius:var(--rs);padding:.75rem;margin-top:.75rem;font-size:.85rem">
+        ✅ سينتهي الاشتراك في: <strong id="renew-end-preview">-</strong>
+      </div>
+    </div>
+    <div class="mft"><button class="btn bs2" data-close="renew-mo">إلغاء</button><button class="btn bg" id="renew-save">🔄 تجديد</button></div>
+  </div>
+</div>
+
+<!-- ===== RECEIPT MODAL ===== -->
+<div class="mo" id="rec-mo">
+  <div class="md md-sm">
+    <div class="mh no-print"><h3 class="mt">🧾 إيصال الدفع</h3><button class="xbtn" data-close="rec-mo">✕</button></div>
+    <div class="mc2">
+      <div id="receipt-content">
+        <div class="receipt">
+          <div class="receipt-logo"><div style="font-size:2rem">🏋️</div><h2>GymPro</h2><div style="font-size:.8rem;color:#666" id="rc-date">-</div></div>
+          <div id="rc-rows"></div>
+          <div class="receipt-footer"><p>شكراً لاختيارك GymPro</p><p style="margin-top:.25rem;font-size:.75rem" id="rc-id">-</p></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:.75rem;margin-top:1rem;justify-content:center" class="no-print">
+        <button class="btn bp" onclick="window.print()">🖨️ طباعة</button>
+        <button class="btn bs2" data-close="rec-mo">إغلاق</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAYMENT MODAL ===== -->
+<div class="mo" id="p-mo">
+  <div class="md md-sm">
+    <div class="mh"><h3 class="mt" id="p-mo-t">تسجيل دفعة</h3><button class="xbtn" data-close="p-mo">✕</button></div>
+    <div class="mc2">
+      <div class="fg" style="grid-template-columns:1fr">
+        <div class="f2"><label>العضو <span class="req">*</span></label><select id="p-mem"><option value="">-- اختر عضو --</option></select></div>
+        <div class="f2"><label>المبلغ (KWD) <span class="req">*</span></label><input type="number" id="p-amt" placeholder="0.000" min="0" step="0.001"/></div>
+        <div class="f2"><label>التاريخ <span class="req">*</span></label><input type="date" id="p-dt"/></div>
+        <div class="f2"><label>ملاحظات</label><input type="text" id="p-nt" placeholder="سبب الدفعة..."/></div>
+      </div>
+    </div>
+    <div class="mft"><button class="btn bs2" data-close="p-mo">إلغاء</button><button class="btn bp" id="p-save">تسجيل الدفعة</button></div>
+  </div>
+</div>
+
+<!-- ===== MEASUREMENTS MODAL ===== -->
+<div class="mo" id="ms-mo">
+  <div class="md md-sm">
+    <div class="mh"><h3 class="mt">📏 إضافة قياسات</h3><button class="xbtn" data-close="ms-mo">✕</button></div>
+    <div class="mc2">
+      <input type="hidden" id="ms-mid"/>
+      <div class="f2" style="margin-bottom:1rem"><label>العضو <span class="req">*</span></label><select id="ms-mem"><option value="">-- اختر عضو --</option></select></div>
+      <div class="fg3">
+        <div class="f2"><label>⚖️ الوزن (كجم)</label><input type="number" id="ms-wt" placeholder="70.0" step="0.1"/></div>
+        <div class="f2"><label>📐 الصدر (سم)</label><input type="number" id="ms-ch" placeholder="95" step="0.5"/></div>
+        <div class="f2"><label>📐 الخصر (سم)</label><input type="number" id="ms-wa" placeholder="80" step="0.5"/></div>
+        <div class="f2"><label>📐 الأرداف (سم)</label><input type="number" id="ms-hi" placeholder="95" step="0.5"/></div>
+        <div class="f2"><label>💪 الذراع (سم)</label><input type="number" id="ms-ar" placeholder="35" step="0.5"/></div>
+        <div class="f2"><label>📅 التاريخ</label><input type="date" id="ms-dt"/></div>
+      </div>
+      <div class="f2" style="margin-top:1rem"><label>ملاحظات</label><textarea id="ms-nt" placeholder="ملاحظات..."></textarea></div>
+    </div>
+    <div class="mft"><button class="btn bs2" data-close="ms-mo">إلغاء</button><button class="btn bp" id="ms-save">حفظ القياسات</button></div>
   </div>
 </div>
 
@@ -376,62 +560,66 @@ const sb=supabase.createClient('https://dpabrokcapjvcalasemk.supabase.co','eyJhb
 
 // ============ i18n ============
 const TX={
-  ar:{f:'🇸🇦',n:'العربية',d:'rtl',tag:'نظام إدارة الجيم',ml:'القائمة الرئيسية',
-    nav:['لوحة التحكم','الأعضاء','تسجيل الحضور','المدفوعات','تسجيل الخروج'],
-    ls:'سجّل دخولك لإدارة جيمك',le:'البريد الإلكتروني',lp:'كلمة المرور',lb:'دخول',ll:'جاري الدخول...',lerr:'بيانات الدخول غير صحيحة',
-    ds:['إجمالي الأعضاء','الأعضاء النشطون','الاشتراكات المنتهية','إجمالي الإيرادات'],
+  ar:{f:'🇸🇦',n:'العربية',d:'rtl',tag:'نظام إدارة الجيم',ml:'الرئيسية',
+    nav:['لوحة التحكم','الأعضاء','تسجيل الحضور','المدفوعات','تسجيل الخروج','التقرير الشهري','القياسات'],
+    ds:['إجمالي الأعضاء','الأعضاء النشطون','الاشتراكات المنتهية','إجمالي الإيرادات','حضور اليوم'],
     dc:['📊 توزيع الأعضاء','📋 أنواع الاشتراكات','⏰ تنتهي خلال 10 أيام','🏃 آخر تسجيلات الحضور'],
     noexp:'لا توجد اشتراكات تنتهي قريباً 🎉',noci:'لا يوجد حضور اليوم',days:'يوم',
-    madd:'إضافة عضو',msrch:'البحث بالاسم أو الهاتف...',mall:'الكل',mact:'نشط',mexp:'منتهي',
-    mth:['الاسم','الهاتف','الاشتراك','انتهاء','الوزن','هدية/إيقاف','الحالة','إجراءات'],
+    madd:'إضافة عضو',mact:'نشط',mexp:'منتهي',mall:'الكل',
+    mth:['الاسم','الهاتف','الاشتراك','انتهاء','الوزن','الحالة','إجراءات'],
     nomen:'لا يوجد أعضاء',cdel:'هل أنت متأكد من الحذف؟',addtit:'إضافة عضو',edtit:'تعديل العضو',msave:'حفظ العضو',mcan:'إلغاء',
-    sub:['شهر واحد','شهران','3 شهور','4 شهور','5 شهور','6 شهور','7 شهور','8 شهور','9 شهور','10 شهور','11 شهر','سنة كاملة'],
-    cttl:'تسجيل الحضور',clbl:'ابحث بالاسم أو رقم الهاتف',cph:'اكتب الاسم أو أول 4 أرقام...',cbtn:'تسجيل دخول',ctd:'حضور اليوم',
-    cok:'تم تسجيل الحضور ✅',calr:'تم تسجيل الحضور مسبقاً اليوم ℹ️',cnf:'العضو غير موجود ❌',cexp:'🚫 اشتراك هذا العضو منتهٍ!',csoon:'⚠️ الاشتراك سينتهي خلال {d} أيام!',noci2:'لا يوجد حضور اليوم',
-    padd:'تسجيل دفعة',pth:['العضو','المبلغ','التاريخ','ملاحظات'],ptot:'المجموع',nopay:'لا توجد مدفوعات',pdel:'هل تريد حذف هذه الدفعة؟',
-    saved:'تم الحفظ ✅',deleted:'تم الحذف',payed:'تم تسجيل الدفعة ✅',req:'يرجى ملء الحقول المطلوبة',err:'حدث خطأ'},
-  en:{f:'🇺🇸',n:'English',d:'ltr',tag:'Gym Management System',ml:'Main Menu',
-    nav:['Dashboard','Members','Check-in','Payments','Logout'],
-    ls:'Sign in to manage your gym',le:'Email',lp:'Password',lb:'Sign In',ll:'Signing in...',lerr:'Invalid credentials',
-    ds:['Total Members','Active Members','Expired Subscriptions','Total Revenue'],
+    sub:['شهر','شهران','3 شهور','4 شهور','5 شهور','6 شهور','7 شهور','8 شهور','9 شهور','10 شهور','11 شهر','سنة'],
+    cttl:'تسجيل الحضور',cph:'اكتب الاسم أو أول 4 أرقام...',cbtn:'تسجيل دخول',ctd:'حضور اليوم',
+    cok:'تم تسجيل الحضور ✅',calr:'تم تسجيل الحضور مسبقاً ℹ️',cnf:'العضو غير موجود ❌',
+    cexp:'🚫 اشتراك منتهٍ!',csoon:'⚠️ الاشتراك سينتهي خلال {d} أيام!',
+    padd:'تسجيل دفعة',pth:['العضو','المبلغ','التاريخ','ملاحظات'],ptot:'المجموع',nopay:'لا توجد مدفوعات',
+    saved:'تم الحفظ ✅',deleted:'تم الحذف',payed:'تم تسجيل الدفعة ✅',req:'يرجى ملء الحقول المطلوبة',err:'حدث خطأ',
+    renew:'تجديد الاشتراك',renewed:'تم التجديد بنجاح 🎉'},
+  en:{f:'🇺🇸',n:'English',d:'ltr',tag:'Gym Management',ml:'Menu',
+    nav:['Dashboard','Members','Check-in','Payments','Logout','Monthly Report','Measurements'],
+    ds:['Total Members','Active Members','Expired','Total Revenue',"Today's Check-ins"],
     dc:['📊 Member Status','📋 Subscription Types','⏰ Expiring in 10 Days','🏃 Recent Check-ins'],
     noexp:'No expiring subscriptions 🎉',noci:'No check-ins today',days:'days',
-    madd:'Add Member',msrch:'Search by name or phone...',mall:'All',mact:'Active',mexp:'Expired',
-    mth:['Name','Phone','Subscription','Expires','Weight','Gift/Pause','Status','Actions'],
-    nomen:'No members found',cdel:'Are you sure you want to delete?',addtit:'Add Member',edtit:'Edit Member',msave:'Save Member',mcan:'Cancel',
-    sub:['1 Month','2 Months','3 Months','4 Months','5 Months','6 Months','7 Months','8 Months','9 Months','10 Months','11 Months','Full Year (12M)'],
-    cttl:'Check-in',clbl:'Search by name or phone',cph:'Type name or first 4 digits...',cbtn:'Check In',ctd:"Today's Check-ins",
-    cok:'Checked in ✅',calr:'Already checked in today ℹ️',cnf:'Member not found ❌',cexp:"🚫 This member's subscription has expired!",csoon:'⚠️ Subscription expires in {d} days!',noci2:'No check-ins today',
-    padd:'Record Payment',pth:['Member','Amount','Date','Notes'],ptot:'Total',nopay:'No payments found',pdel:'Delete this payment?',
-    saved:'Saved ✅',deleted:'Deleted',payed:'Payment recorded ✅',req:'Please fill required fields',err:'An error occurred'},
-  tl:{f:'🇵🇭',n:'Tagalog',d:'ltr',tag:'Sistema ng Gym',ml:'Pangunahing Menu',
-    nav:['Dashboard','Mga Miyembro','Check-in','Mga Bayad','Mag-logout'],
-    ls:'Mag-login para pamahalaan ang iyong gym',le:'Email',lp:'Password',lb:'Mag-login',ll:'Naglo-login...',lerr:'Maling kredensyal',
-    ds:['Kabuuang Miyembro','Mga Aktibo','Nag-expire','Kabuuang Kita'],
+    madd:'Add Member',mact:'Active',mexp:'Expired',mall:'All',
+    mth:['Name','Phone','Subscription','Expires','Weight','Status','Actions'],
+    nomen:'No members found',cdel:'Are you sure?',addtit:'Add Member',edtit:'Edit Member',msave:'Save Member',mcan:'Cancel',
+    sub:['1 Month','2 Months','3 Months','4 Months','5 Months','6 Months','7 Months','8 Months','9 Months','10 Months','11 Months','Full Year'],
+    cttl:'Check-in',cph:'Type name or first 4 digits...',cbtn:'Check In',ctd:"Today's Check-ins",
+    cok:'Checked in ✅',calr:'Already checked in ℹ️',cnf:'Member not found ❌',
+    cexp:'🚫 Subscription expired!',csoon:'⚠️ Expires in {d} days!',
+    padd:'Record Payment',pth:['Member','Amount','Date','Notes'],ptot:'Total',nopay:'No payments',
+    saved:'Saved ✅',deleted:'Deleted',payed:'Payment recorded ✅',req:'Fill required fields',err:'Error occurred',
+    renew:'Renew Subscription',renewed:'Renewed successfully 🎉'},
+  tl:{f:'🇵🇭',n:'Tagalog',d:'ltr',tag:'Sistema ng Gym',ml:'Menu',
+    nav:['Dashboard','Mga Miyembro','Check-in','Mga Bayad','Mag-logout','Ulat sa Buwan','Mga Sukat'],
+    ds:['Kabuuang Miyembro','Mga Aktibo','Nag-expire','Kabuuang Kita','Check-in Ngayon'],
     dc:['📊 Katayuan','📋 Uri ng Sub','⏰ Mag-e-expire sa 10 Araw','🏃 Kamakailang Check-ins'],
     noexp:'Walang malapit na mag-expire 🎉',noci:'Walang check-in ngayon',days:'araw',
-    madd:'Magdagdag ng Miyembro',msrch:'Maghanap...',mall:'Lahat',mact:'Aktibo',mexp:'Nag-expire',
-    mth:['Pangalan','Telepono','Subscription','Magtatapos','Timbang','Regalo/Pause','Katayuan','Aksyon'],
-    nomen:'Walang miyembro',cdel:'Sigurado ka bang gusto mong burahin?',addtit:'Magdagdag',edtit:'I-edit',msave:'I-save',mcan:'Kanselahin',
+    madd:'Magdagdag',mact:'Aktibo',mexp:'Nag-expire',mall:'Lahat',
+    mth:['Pangalan','Telepono','Subscription','Magtatapos','Timbang','Katayuan','Aksyon'],
+    nomen:'Walang miyembro',cdel:'Sigurado ka?',addtit:'Magdagdag ng Miyembro',edtit:'I-edit',msave:'I-save',mcan:'Kanselahin',
     sub:['1 Buwan','2 Buwan','3 Buwan','4 Buwan','5 Buwan','6 Buwan','7 Buwan','8 Buwan','9 Buwan','10 Buwan','11 Buwan','Isang Taon'],
-    cttl:'Check-in',clbl:'Maghanap sa pangalan o telepono',cph:'I-type ang pangalan...',cbtn:'Mag-check in',ctd:'Mga Check-in Ngayon',
-    cok:'Naka-check in ✅',calr:'Naka-check in na ℹ️',cnf:'Hindi nahanap ❌',cexp:'🚫 Nag-expire na ang subscription!',csoon:'⚠️ Mag-e-expire sa {d} araw!',noci2:'Walang check-in ngayon',
-    padd:'Itala ang Bayad',pth:['Miyembro','Halaga','Petsa','Tala'],ptot:'Kabuuan',nopay:'Walang bayad',pdel:'Burahin ang bayad?',
-    saved:'Na-save ✅',deleted:'Nabura',payed:'Naitala ✅',req:'Punan ang mga kinakailangan',err:'May error'},
-  hi:{f:'🇮🇳',n:'हिंदी',d:'ltr',tag:'जिम प्रबंधन',ml:'मुख्य मेनू',
-    nav:['डैशबोर्ड','सदस्य','चेक-इन','भुगतान','लॉगआउट'],
-    ls:'साइन इन करें',le:'ईमेल',lp:'पासवर्ड',lb:'साइन इन',ll:'लॉगिन...',lerr:'गलत क्रेडेंशियल',
-    ds:['कुल सदस्य','सक्रिय सदस्य','समाप्त सदस्यताएं','कुल राजस्व'],
+    cttl:'Check-in',cph:'I-type ang pangalan...',cbtn:'Mag-check in',ctd:'Check-in Ngayon',
+    cok:'Naka-check in ✅',calr:'Naka-check in na ℹ️',cnf:'Hindi nahanap ❌',
+    cexp:'🚫 Nag-expire na!',csoon:'⚠️ Mag-e-expire sa {d} araw!',
+    padd:'Itala ang Bayad',pth:['Miyembro','Halaga','Petsa','Tala'],ptot:'Kabuuan',nopay:'Walang bayad',
+    saved:'Na-save ✅',deleted:'Nabura',payed:'Naitala ✅',req:'Punan ang mga field',err:'May error',
+    renew:'I-renew ang Subscription',renewed:'Na-renew na 🎉'},
+  hi:{f:'🇮🇳',n:'हिंदी',d:'ltr',tag:'जिम प्रबंधन',ml:'मेनू',
+    nav:['डैशबोर्ड','सदस्य','चेक-इन','भुगतान','लॉगआउट','मासिक रिपोर्ट','माप'],
+    ds:['कुल सदस्य','सक्रिय सदस्य','समाप्त','कुल राजस्व','आज के चेक-इन'],
     dc:['📊 सदस्य स्थिति','📋 सदस्यता प्रकार','⏰ 10 दिनों में समाप्त','🏃 हाल के चेक-इन'],
     noexp:'कोई समाप्त होने वाला नहीं 🎉',noci:'आज कोई चेक-इन नहीं',days:'दिन',
-    madd:'सदस्य जोड़ें',msrch:'नाम या फोन से खोजें...',mall:'सभी',mact:'सक्रिय',mexp:'समाप्त',
-    mth:['नाम','फोन','सदस्यता','समाप्ति','वजन','उपहार/रोक','स्थिति','कार्रवाई'],
+    madd:'सदस्य जोड़ें',mact:'सक्रिय',mexp:'समाप्त',mall:'सभी',
+    mth:['नाम','फोन','सदस्यता','समाप्ति','वजन','स्थिति','कार्रवाई'],
     nomen:'कोई सदस्य नहीं',cdel:'क्या आप वाकई हटाना चाहते हैं?',addtit:'सदस्य जोड़ें',edtit:'संपादित करें',msave:'सहेजें',mcan:'रद्द करें',
     sub:['1 महीना','2 महीने','3 महीने','4 महीने','5 महीने','6 महीने','7 महीने','8 महीने','9 महीने','10 महीने','11 महीने','पूरा साल'],
-    cttl:'चेक-इन',clbl:'नाम या फोन से खोजें',cph:'नाम या पहले 4 अंक...',cbtn:'चेक इन',ctd:'आज के चेक-इन',
-    cok:'चेक-इन सफल ✅',calr:'पहले से चेक-इन ℹ️',cnf:'सदस्य नहीं मिला ❌',cexp:'🚫 सदस्यता समाप्त हो गई!',csoon:'⚠️ सदस्यता {d} दिनों में समाप्त!',noci2:'आज कोई चेक-इन नहीं',
-    padd:'भुगतान दर्ज करें',pth:['सदस्य','राशि','तारीख','नोट्स'],ptot:'कुल',nopay:'कोई भुगतान नहीं',pdel:'यह भुगतान हटाएं?',
-    saved:'सहेजा गया ✅',deleted:'हटाया गया',payed:'भुगतान दर्ज ✅',req:'आवश्यक फ़ील्ड भरें',err:'त्रुटि हुई'}
+    cttl:'चेक-इन',cph:'नाम या पहले 4 अंक...',cbtn:'चेक इन',ctd:'आज के चेक-इन',
+    cok:'चेक-इन सफल ✅',calr:'पहले से चेक-इन ℹ️',cnf:'सदस्य नहीं मिला ❌',
+    cexp:'🚫 सदस्यता समाप्त!',csoon:'⚠️ {d} दिनों में समाप्त!',
+    padd:'भुगतान दर्ज',pth:['सदस्य','राशि','तारीख','नोट्स'],ptot:'कुल',nopay:'कोई भुगतान नहीं',
+    saved:'सहेजा गया ✅',deleted:'हटाया गया',payed:'भुगतान दर्ज ✅',req:'आवश्यक फ़ील्ड भरें',err:'त्रुटि हुई',
+    renew:'सदस्यता नवीनीकरण',renewed:'नवीनीकृत ✅'}
 };
 let lang=localStorage.getItem('g_lang')||'ar';
 const T=()=>TX[lang];
@@ -441,33 +629,24 @@ function applyLang(l){
   const x=TX[l];
   document.documentElement.lang=l;document.documentElement.dir=x.d;
   document.body.classList.toggle('rtl',x.d==='rtl');document.body.classList.toggle('ltr',x.d==='ltr');
-  // lang btn
   document.getElementById('lf').textContent=x.f;document.getElementById('ln').textContent=x.n;
   document.querySelectorAll('.lo').forEach(o=>o.classList.toggle('cur',o.dataset.lang===l));
-  // sidebar
   document.getElementById('n-tag').textContent=x.tag;document.getElementById('n-lbl').textContent=x.ml;
-  ['n-dash','n-mem','n-ci','n-pay','n-out'].forEach((id,i)=>document.getElementById(id).textContent=x.nav[i]);
-  // login
-  document.getElementById('l-sub').textContent=x.ls;document.getElementById('l-el').textContent=x.le;
-  document.getElementById('l-pl').textContent=x.lp;document.getElementById('l-btn').textContent=x.lb;
-  // dash stats
-  ['s-tot-l','s-act-l','s-exp-l','s-rev-l'].forEach((id,i)=>document.getElementById(id).textContent=x.ds[i]);
-  ['ch-st','ch-sb','ch-ex','ch-ci'].forEach((id,i)=>document.getElementById(id).textContent=x.dc[i]);
-  // members
-  document.getElementById('add-m-t').textContent=x.madd;document.getElementById('m-srch').placeholder=x.msrch;
-  document.getElementById('f-all').textContent=x.mall;document.getElementById('f-act').textContent=x.mact;document.getElementById('f-exp').textContent=x.mexp;
-  ['th-n','th-ph','th-sb','th-en','th-wt','th-gf','th-st','th-ac'].forEach((id,i)=>document.getElementById(id).textContent=x.mth[i]);
-  document.getElementById('m-mo-t').textContent=x.addtit;document.getElementById('m-save').textContent=x.msave;document.getElementById('m-can').textContent=x.mcan;
-  // sub options
+  ['n-dash','n-mem','n-ci','n-pay','n-out','n-rep','n-meas'].forEach((id,i)=>{const el=document.getElementById(id);if(el)el.textContent=x.nav[i]});
+  ['s-tot-l','s-act-l','s-exp-l','s-rev-l','s-ci-l'].forEach((id,i)=>{const el=document.getElementById(id);if(el)el.textContent=x.ds[i]});
+  ['ch-st','ch-sb','ch-ex','ch-ci'].forEach((id,i)=>{const el=document.getElementById(id);if(el)el.textContent=x.dc[i]});
+  const els={
+    'add-m-t':x.madd,'f-all':x.mall,'f-act':x.mact,'f-exp':x.mexp,
+    'th-n':x.mth[0],'th-ph':x.mth[1],'th-sb':x.mth[2],'th-en':x.mth[3],'th-wt':x.mth[4],'th-st':x.mth[5],'th-ac':x.mth[6],
+    'm-mo-t':x.addtit,'m-save':x.msave,'m-can':x.mcan,
+    'ci-ttl':x.cttl,'ci-btn-t':x.cbtn,'ci-td-t':x.ctd,'ab-exp-t':x.cexp,
+    'add-p-t':x.padd,'p-mo-t':x.padd,'tp-m':x.pth[0],'tp-a':x.pth[1],'tp-d':x.pth[2],'tp-n':x.pth[3],'tp-tot':x.ptot,
+    'add-ms-t':'إضافة قياسات'
+  };
+  Object.entries(els).forEach(([id,txt])=>{const el=document.getElementById(id);if(el)el.textContent=txt});
+  document.getElementById('ci-in').placeholder=x.cph;
   Array.from(document.getElementById('m-ty').options).forEach((o,i)=>{if(x.sub[i])o.textContent=x.sub[i]});
-  // checkin
-  document.getElementById('ci-ttl').textContent=x.cttl;document.getElementById('ci-lbl').textContent=x.clbl;
-  document.getElementById('ci-in').placeholder=x.cph;document.getElementById('ci-btn-t').textContent=x.cbtn;
-  document.getElementById('ci-td-t').textContent=x.ctd;document.getElementById('ab-exp-t').textContent=x.cexp;
-  // payments
-  document.getElementById('add-p-t').textContent=x.padd;document.getElementById('p-mo-t').textContent=x.padd;
-  ['tp-m','tp-a','tp-d','tp-n'].forEach((id,i)=>document.getElementById(id).textContent=x.pth[i]);
-  document.getElementById('tp-tot').textContent=x.ptot;
+  Array.from(document.getElementById('renew-type').options).forEach((o,i)=>{if(x.sub[i])o.textContent=x.sub[i]});
 }
 
 // ============ UTILS ============
@@ -479,70 +658,46 @@ const ce=(s,m)=>{const d=new Date(s);d.setMonth(d.getMonth()+parseInt(m));return
 const dl=e=>Math.ceil((new Date(e)-new Date())/(864e5));
 const ini=n=>{if(!n)return'?';const p=n.trim().split(/\s+/);return p.length>=2?(p[0][0]+p[1][0]).toUpperCase():n.substring(0,2).toUpperCase()};
 const sid=id=>id?'#'+id.split('-')[0].toUpperCase():'';
+const subLbl=m=>T().sub[(parseInt(m)||1)-1]||`${m}M`;
+
+function mkAv(name,photoUrl,cls=''){
+  if(photoUrl)return`<div class="av ${cls}"><img src="${photoUrl}" alt="${name}"/></div>`;
+  return`<div class="av ${cls}">${ini(name)}</div>`;
+}
 
 function toast(msg,type='success'){
   const ex=document.querySelector('.toast');if(ex)ex.remove();
-  const t=document.createElement('div');
-  const cls={success:'ts',error:'te',warning:'tw2',info:'tif'};
+  const t=document.createElement('div'),cls={success:'ts',error:'te',warning:'tw2',info:'tif'};
   t.className=`toast ${cls[type]||'ts'}`;
-  t.innerHTML=`<span class="ti">${{success:'✓',error:'✕',warning:'⚠',info:'ℹ'}[type]||'✓'}</span><span>${msg}</span>`;
-  document.body.appendChild(t);
-  setTimeout(()=>t.classList.add('show'),10);
+  t.innerHTML=`<span class="ti">${{success:'✓',error:'✕',warning:'⚠',info:'ℹ'}[type]}</span><span>${msg}</span>`;
+  document.body.appendChild(t);setTimeout(()=>t.classList.add('show'),10);
   setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),300)},4000);
 }
 
-function soundWarn(){
-  try{const c=new(AudioContext||webkitAudioContext)();
-    [[523,0,.15],[392,.2,.15],[330,.4,.3]].forEach(([f,s,d])=>{
-      const o=c.createOscillator(),g=c.createGain();
-      o.connect(g);g.connect(c.destination);o.frequency.value=f;o.type='sine';
-      g.gain.setValueAtTime(.4,c.currentTime+s);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+s+d);
-      o.start(c.currentTime+s);o.stop(c.currentTime+s+d);
-    });
-  }catch(e){}
-}
+function soundWarn(){try{const c=new AudioContext();[[523,0,.15],[392,.2,.15],[330,.4,.3]].forEach(([f,s,d])=>{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=f;o.type='sine';g.gain.setValueAtTime(.4,c.currentTime+s);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+s+d);o.start(c.currentTime+s);o.stop(c.currentTime+s+d)});}catch(e){}}
+function soundOk(){try{const c=new AudioContext(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=880;o.type='sine';g.gain.setValueAtTime(.3,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.25);o.start(c.currentTime);o.stop(c.currentTime+.25);}catch(e){}}
 
-function soundOk(){
-  try{const c=new(AudioContext||webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();
-    o.connect(g);g.connect(c.destination);o.frequency.value=880;o.type='sine';
-    g.gain.setValueAtTime(.3,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.25);
-    o.start(c.currentTime);o.stop(c.currentTime+.25);
-  }catch(e){}
-}
-
-function confirm_(msg){
-  return new Promise(res=>{
-    const o=document.createElement('div');o.className='mo active';
-    o.innerHTML=`<div class="md" style="max-width:380px"><div class="mc2" style="text-align:center;padding:2rem"><div style="font-size:2.5rem;margin-bottom:1rem">⚠️</div><p style="font-size:1.05rem;margin-bottom:1.5rem">${msg}</p><div style="display:flex;gap:1rem;justify-content:center"><button class="btn bd cy">🗑️ ${T().mcan==='إلغاء'?'حذف':'Delete'}</button><button class="btn bs2 cn">${T().mcan}</button></div></div></div>`;
-    document.body.appendChild(o);
-    o.querySelector('.cy').onclick=()=>{o.remove();res(true)};
-    o.querySelector('.cn').onclick=()=>{o.remove();res(false)};
-    o.onclick=e=>{if(e.target===o){o.remove();res(false)}};
-  });
-}
+function confirm_(msg){return new Promise(res=>{
+  const o=document.createElement('div');o.className='mo active';
+  o.innerHTML=`<div class="md md-sm"><div class="mc2" style="text-align:center;padding:2rem"><div style="font-size:2.5rem;margin-bottom:1rem">⚠️</div><p style="font-size:1rem;margin-bottom:1.5rem">${msg}</p><div style="display:flex;gap:1rem;justify-content:center"><button class="btn bd cy">🗑️ ${lang==='ar'?'حذف':'Delete'}</button><button class="btn bs2 cn">${T().mcan}</button></div></div></div>`;
+  document.body.appendChild(o);
+  o.querySelector('.cy').onclick=()=>{o.remove();res(true)};
+  o.querySelector('.cn').onclick=()=>{o.remove();res(false)};
+  o.onclick=e=>{if(e.target===o){o.remove();res(false)}};
+})}
 
 const openMo=id=>document.getElementById(id).classList.add('active');
 const closeMo=id=>document.getElementById(id).classList.remove('active');
 
 // ============ CHARTS ============
-let dc=null,bc=null;
+let dc2=null,bc2=null;
 function initCharts(){Chart.defaults.color='#8A9BB0';Chart.defaults.borderColor='#252B38';}
-
 function updateCharts(act,exp,subs){
-  if(dc)dc.destroy();
-  dc=new Chart(document.getElementById('c-donut').getContext('2d'),{
-    type:'doughnut',
-    data:{labels:[T().mact,T().mexp],datasets:[{data:[act,exp],backgroundColor:['rgba(34,197,94,.8)','rgba(239,68,68,.8)'],borderColor:['#22C55E','#EF4444'],borderWidth:2,hoverOffset:8}]},
-    options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{position:'bottom',labels:{padding:14,font:{size:12,family:"'Outfit',sans-serif"}}},tooltip:{callbacks:{label:c=>`${c.label}: ${c.raw}`}}}}
-  });
-  if(bc)bc.destroy();
-  const subKeys=Object.keys(subs).sort((a,b)=>a-b);
-  const subLbls=subKeys.map(k=>T().sub[parseInt(k)-1]||`${k}M`);
-  bc=new Chart(document.getElementById('c-bar').getContext('2d'),{
-    type:'bar',
-    data:{labels:subLbls,datasets:[{data:subKeys.map(k=>subs[k]),backgroundColor:'rgba(255,107,53,.7)',borderColor:'#FF6B35',borderWidth:2,borderRadius:6}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'#252B38'}},y:{grid:{color:'#252B38'},ticks:{stepSize:1,font:{size:11}}}}}
-  });
+  if(dc2)dc2.destroy();
+  dc2=new Chart(document.getElementById('c-donut').getContext('2d'),{type:'doughnut',data:{labels:[T().mact,T().mexp],datasets:[{data:[act,exp],backgroundColor:['rgba(34,197,94,.8)','rgba(239,68,68,.8)'],borderColor:['#22C55E','#EF4444'],borderWidth:2,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{position:'bottom',labels:{padding:14,font:{size:12,family:"'Outfit',sans-serif"}}},tooltip:{callbacks:{label:c=>`${c.label}: ${c.raw}`}}}}});
+  if(bc2)bc2.destroy();
+  const ks=Object.keys(subs).sort((a,b)=>a-b);
+  bc2=new Chart(document.getElementById('c-bar').getContext('2d'),{type:'bar',data:{labels:ks.map(k=>subLbl(k)),datasets:[{data:ks.map(k=>subs[k]),backgroundColor:'rgba(255,107,53,.7)',borderColor:'#FF6B35',borderWidth:2,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'#252B38'}},y:{grid:{color:'#252B38'},ticks:{stepSize:1,font:{size:11}}}}}});
 }
 
 // ============ ROUTING ============
@@ -551,14 +706,11 @@ function nav(page){
   document.querySelectorAll('.ni[data-page]').forEach(e=>e.classList.toggle('active',e.dataset.page===page));
   document.querySelectorAll('.pg2').forEach(e=>e.classList.remove('active'));
   document.getElementById('pg-'+page).classList.add('active');
-  const titles={dashboard:T().nav[0],members:T().nav[1],checkin:T().nav[2],payments:T().nav[3]};
-  document.getElementById('pg-t').textContent=titles[page]||page;
-  document.getElementById('sbar').classList.remove('open');
-  document.getElementById('sov').classList.remove('vis');
-  if(page==='dashboard')loadDash();
-  else if(page==='members')loadMems();
-  else if(page==='checkin')loadCI();
-  else if(page==='payments')loadPays();
+  const t2={dashboard:T().nav[0],members:T().nav[1],checkin:T().nav[2],payments:T().nav[3],report:T().nav[5],measurements:T().nav[6]};
+  document.getElementById('pg-t').textContent=t2[page]||page;
+  document.getElementById('sbar').classList.remove('open');document.getElementById('sov').classList.remove('vis');
+  if(page==='dashboard')loadDash();else if(page==='members')loadMems();else if(page==='checkin')loadCI();
+  else if(page==='payments')loadPays();else if(page==='report')initReport();else if(page==='measurements')initMeas();
 }
 
 // ============ DASHBOARD ============
@@ -568,91 +720,111 @@ async function loadDash(){
     const[mr,pr,er,cr]=await Promise.all([
       sb.from('members').select('id,status,subscription_type'),
       sb.from('payments').select('amount'),
-      sb.from('members').select('id,name,phone,subscription_end').eq('status','active').gte('subscription_end',t).lte('subscription_end',in10.toISOString().split('T')[0]),
-      sb.from('checkins').select('*,members(name,phone)').eq('date',t).order('checkin_time',{ascending:false})
+      sb.from('members').select('id,name,phone,subscription_end,photo_url').eq('status','active').gte('subscription_end',t).lte('subscription_end',in10.toISOString().split('T')[0]),
+      sb.from('checkins').select('*,members(name,phone,photo_url)').eq('date',t).order('checkin_time',{ascending:false})
     ]);
     const mems=mr.data||[],act=mems.filter(m=>m.status==='active').length,exp=mems.filter(m=>m.status==='expired').length;
-    document.getElementById('s-tot').textContent=mems.length;
-    document.getElementById('s-act').textContent=act;
-    document.getElementById('s-exp').textContent=exp;
-    document.getElementById('s-rev').textContent=fc((pr.data||[]).reduce((s,p)=>s+Number(p.amount||0),0));
+    document.getElementById('s-tot').textContent=mems.length;document.getElementById('s-act').textContent=act;
+    document.getElementById('s-exp').textContent=exp;document.getElementById('s-rev').textContent=fc((pr.data||[]).reduce((s,p)=>s+Number(p.amount||0),0));
+    document.getElementById('s-ci').textContent=(cr.data||[]).length;document.getElementById('ci-bdg').textContent=(cr.data||[]).length;
     const subs={};mems.forEach(m=>{const k=m.subscription_type||1;subs[k]=(subs[k]||0)+1});
     updateCharts(act,exp,subs);
-    document.getElementById('ci-bdg').textContent=(cr.data||[]).length;
     const el=document.getElementById('exp-list'),ex=er.data||[];
-    el.innerHTML=ex.length?ex.map(m=>`<div class="ei2"><div style="display:flex;align-items:center;gap:.75rem"><div class="av" style="background:var(--wal);color:var(--wa);border-color:rgba(245,158,11,.3)">${ini(m.name)}</div><div><div style="font-weight:600;font-size:.9rem">${m.name}</div><div style="font-size:.75rem;color:var(--tm)">${m.phone}</div></div></div><span class="badge bgw">${dl(m.subscription_end)} ${T().days}</span></div>`).join(''):`<div class="es"><div class="ei">🎉</div><div class="et">${T().noexp}</div></div>`;
+    el.innerHTML=ex.length?ex.map(m=>`<div class="ei2"><div style="display:flex;align-items:center;gap:.75rem">${mkAv(m.name,m.photo_url)}<div><div style="font-weight:600;font-size:.875rem">${m.name}</div><div style="font-size:.72rem;color:var(--tm)">${m.phone}</div></div></div><span class="badge bgw">${dl(m.subscription_end)} ${T().days}</span></div>`).join(''):`<div class="es"><div class="ei">🎉</div><div class="et">${T().noexp}</div></div>`;
     const cl=document.getElementById('rec-ci'),cis=cr.data||[];
-    cl.innerHTML=cis.length?cis.slice(0,8).map(c=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem 0;border-bottom:1px solid var(--br)"><div style="display:flex;align-items:center;gap:.75rem"><div class="av">${ini(c.members?.name)}</div><div><div style="font-weight:600;font-size:.875rem">${c.members?.name||'?'}</div><div style="font-size:.72rem;color:var(--tm)">${c.members?.phone||''}</div></div></div><div style="font-family:'IBM Plex Mono',monospace;font-size:.8rem;color:var(--t2)">${ft(c.checkin_time)}</div></div>`).join(''):`<div class="es"><div class="ei">🏃</div><div class="et">${T().noci}</div></div>`;
+    cl.innerHTML=cis.length?cis.slice(0,8).map(c=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:.6rem 0;border-bottom:1px solid var(--br)">${mkAv(c.members?.name,c.members?.photo_url)}<div style="flex:1;margin-inline-start:.75rem"><div style="font-weight:600;font-size:.875rem">${c.members?.name||'?'}</div><div style="font-size:.72rem;color:var(--tm)">${c.members?.phone||''}</div></div><div style="font-family:'IBM Plex Mono',monospace;font-size:.8rem;color:var(--t2)">${ft(c.checkin_time)}</div></div>`).join(''):`<div class="es"><div class="ei">🏃</div><div class="et">${T().noci}</div></div>`;
   }catch(e){console.error(e);toast(T().err,'error')}
 }
 
 // ============ MEMBERS ============
-const subLbl=m=>T().sub[(parseInt(m)||1)-1]||`${m}M`;
-
 async function loadMems(){
   const srch=document.getElementById('m-srch').value,flt=document.getElementById('m-flt').value;
   const tbody=document.getElementById('m-tbody');
-  tbody.innerHTML='<tr><td colspan="8"><div class="lc"><div class="spn"></div></div></td></tr>';
+  tbody.innerHTML='<tr><td colspan="7"><div class="lc"><div class="spn"></div></div></td></tr>';
   try{
     let q=sb.from('members').select('*').order('created_at',{ascending:false});
     if(flt!=='all')q=q.eq('status',flt);
     if(srch)q=q.or(`name.ilike.%${srch}%,phone.ilike.%${srch}%`);
     const{data,error}=await q;if(error)throw error;
     allM=data||[];
-    if(!allM.length){tbody.innerHTML=`<tr><td colspan="8"><div class="es"><div class="ei">👥</div><div class="et">${T().nomen}</div></div></td></tr>`;return}
+    if(!allM.length){tbody.innerHTML=`<tr><td colspan="7"><div class="es"><div class="ei">👥</div><div class="et">${T().nomen}</div></div></td></tr>`;return}
     tbody.innerHTML=allM.map(m=>{
       const days=dl(m.subscription_end),isE=m.status==='expired',isS=!isE&&days<=10;
-      return`<tr>
-        <td><div class="mc4"><div class="av">${ini(m.name)}</div><div><div class="mn">${m.name}</div><div class="mi">${sid(m.id)}</div></div></div></td>
+      return`<tr style="cursor:pointer" onclick="openProfile('${m.id}')">
+        <td><div class="mc4">${mkAv(m.name,m.photo_url)}<div><div class="mn">${m.name}</div><div class="mi">${sid(m.id)}</div></div></div></td>
         <td><span class="mono">${m.phone}</span></td>
         <td><span class="badge bgi">${subLbl(m.subscription_type)}</span></td>
-        <td><div style="display:flex;align-items:center;gap:.5rem">${fd(m.subscription_end)}${isS?`<span class="badge bgw">${days}d</span>`:''}</div></td>
+        <td><div style="display:flex;align-items:center;gap:.4rem">${fd(m.subscription_end)}${isS?`<span class="badge bgw">${days}d</span>`:''}</div></td>
         <td>${m.weight?`<span class="mono">${m.weight}kg</span>`:'-'}</td>
-        <td style="font-size:.78rem">${m.free_months?`<span style="color:var(--su)">🎁${m.free_months}</span> `:''}${m.pause_months?`<span style="color:var(--wa)">⏸️${m.pause_months}</span>`:(!m.free_months?'-':'')}</td>
         <td><span class="badge ${isE?'bgd':'bgs'}">${isE?T().mexp:T().mact}</span></td>
-        <td><div style="display:flex;gap:.4rem"><button class="btn btn-sm bs2" onclick="editM('${m.id}')">✏️</button><button class="btn btn-sm bd" onclick="delM('${m.id}')">🗑️</button></div></td>
+        <td onclick="event.stopPropagation()"><div style="display:flex;gap:.4rem">
+          <button class="btn btn-sm bg" onclick="openRenew('${m.id}')" title="${T().renew}">🔄</button>
+          <button class="btn btn-sm bpu" onclick="openQR('${m.id}')" title="QR">📱</button>
+          <button class="btn btn-sm bs2" onclick="editM('${m.id}')">✏️</button>
+          <button class="btn btn-sm bd" onclick="delM('${m.id}')">🗑️</button>
+        </div></td>
       </tr>`}).join('');
   }catch(e){toast(T().err,'error')}
 }
 
+// Photo handling
+let photoBase64='';
+document.getElementById('m-photo').addEventListener('change',function(){
+  const file=this.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    photoBase64=e.target.result;
+    const prev=document.getElementById('photo-preview');
+    prev.src=photoBase64;prev.style.display='block';
+    document.getElementById('photo-placeholder').style.display='none';
+  };
+  reader.readAsDataURL(file);
+});
+
 function openAddM(){
-  document.getElementById('m-id').value='';
+  document.getElementById('m-id').value='';photoBase64='';
   ['m-nm','m-ph','m-em','m-nt'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('m-ty').value='1';document.getElementById('m-st').value=td();
   document.getElementById('m-en').value=ce(td(),1);document.getElementById('m-wt').value='';
   document.getElementById('m-fm').value='0';document.getElementById('m-pm').value='0';
+  document.getElementById('photo-preview').style.display='none';
+  document.getElementById('photo-placeholder').style.display='block';
   document.getElementById('m-mo-t').textContent=T().addtit;document.getElementById('m-save').textContent=T().msave;
   openMo('m-mo');
 }
 
 function editM(id){
   const m=allM.find(x=>x.id===id);if(!m)return;
+  photoBase64=m.photo_url||'';
   document.getElementById('m-id').value=m.id;document.getElementById('m-nm').value=m.name;
   document.getElementById('m-ph').value=m.phone;document.getElementById('m-em').value=m.email||'';
   document.getElementById('m-ty').value=m.subscription_type||'1';document.getElementById('m-st').value=m.subscription_start;
   document.getElementById('m-en').value=m.subscription_end;document.getElementById('m-wt').value=m.weight||'';
   document.getElementById('m-fm').value=m.free_months||0;document.getElementById('m-pm').value=m.pause_months||0;
   document.getElementById('m-nt').value=m.notes||'';
+  const prev=document.getElementById('photo-preview');
+  if(m.photo_url){prev.src=m.photo_url;prev.style.display='block';document.getElementById('photo-placeholder').style.display='none';}
+  else{prev.style.display='none';document.getElementById('photo-placeholder').style.display='block';}
   document.getElementById('m-mo-t').textContent=T().edtit;document.getElementById('m-save').textContent=T().msave;
-  openMo('m-mo');
+  closeMo('prof-mo');openMo('m-mo');
 }
 
 async function saveM(){
   const id=document.getElementById('m-id').value;
   const name=document.getElementById('m-nm').value.trim(),phone=document.getElementById('m-ph').value.trim();
-  const email=document.getElementById('m-em').value.trim(),type=document.getElementById('m-ty').value;
-  const start=document.getElementById('m-st').value,end=document.getElementById('m-en').value;
-  const notes=document.getElementById('m-nt').value.trim(),weight=document.getElementById('m-wt').value;
-  const freeM=parseInt(document.getElementById('m-fm').value||0),pauseM=parseInt(document.getElementById('m-pm').value||0);
-  if(!name||!phone||!start){toast(T().req,'error');return}
+  if(!name||!phone){toast(T().req,'error');return}
+  const type=document.getElementById('m-ty').value,start=document.getElementById('m-st').value;
+  const end=document.getElementById('m-en').value,freeM=parseInt(document.getElementById('m-fm').value||0);
   let finalEnd=end;
   if(freeM>0){const d=new Date(end);d.setMonth(d.getMonth()+freeM);finalEnd=d.toISOString().split('T')[0]}
   const btn=document.getElementById('m-save');btn.disabled=true;
   try{
-    const data={name,phone,email,subscription_type:type,subscription_start:start,subscription_end:finalEnd,notes,weight:weight?parseFloat(weight):null,free_months:freeM,pause_months:pauseM};
+    const data={name,phone,email:document.getElementById('m-em').value.trim(),subscription_type:type,subscription_start:start,subscription_end:finalEnd,
+      notes:document.getElementById('m-nt').value.trim(),weight:document.getElementById('m-wt').value?parseFloat(document.getElementById('m-wt').value):null,
+      free_months:freeM,pause_months:parseInt(document.getElementById('m-pm').value||0),photo_url:photoBase64||null};
     if(id){const{error}=await sb.from('members').update(data).eq('id',id);if(error)throw error;}
     else{const{error}=await sb.from('members').insert([data]);if(error)throw error;}
-    toast(T().saved);closeMo('m-mo');loadMems();
+    toast(T().saved);closeMo('m-mo');loadMems();photoBase64='';
   }catch(e){toast(T().err+': '+(e.message||''),'error')}finally{btn.disabled=false}
 }
 
@@ -662,17 +834,164 @@ async function delM(id){
   catch(e){toast(T().err,'error')}
 }
 
+// ============ MEMBER PROFILE ============
+let currentProfileId=null;
+async function openProfile(id){
+  currentProfileId=id;
+  const{data:m}=await sb.from('members').select('*').eq('id',id).single();
+  if(!m)return;
+  // Header
+  const avEl=document.getElementById('prof-av');
+  if(m.photo_url){avEl.innerHTML=`<img src="${m.photo_url}" style="width:100%;height:100%;object-fit:cover"/>`;}
+  else{avEl.textContent=ini(m.name);}
+  document.getElementById('prof-name').textContent=m.name;
+  document.getElementById('prof-nm').textContent=m.name;
+  document.getElementById('prof-ph').textContent=m.phone;
+  const days=dl(m.subscription_end),isE=m.status==='expired',isS=!isE&&days<=10;
+  document.getElementById('prof-badges').innerHTML=`
+    <span class="badge ${isE?'bgd':'bgs'}">${isE?T().mexp:T().mact}</span>
+    <span class="badge bgi">${subLbl(m.subscription_type)}</span>
+    ${isS?`<span class="badge bgw">⏰ ${days} ${T().days}</span>`:''}
+  `;
+  // Info tab
+  document.getElementById('prof-info-grid').innerHTML=`
+    <div style="background:var(--bi);border-radius:var(--rs);padding:1rem"><div style="font-size:.72rem;color:var(--tm);margin-bottom:.25rem">📱 ${T().mth[1]}</div><div style="font-weight:600;font-family:'IBM Plex Mono',monospace">${m.phone}</div></div>
+    <div style="background:var(--bi);border-radius:var(--rs);padding:1rem"><div style="font-size:.72rem;color:var(--tm);margin-bottom:.25rem">📅 ${T().mth[3]}</div><div style="font-weight:600">${fd(m.subscription_end)}</div></div>
+    <div style="background:var(--bi);border-radius:var(--rs);padding:1rem"><div style="font-size:.72rem;color:var(--tm);margin-bottom:.25rem">📋 ${T().mth[2]}</div><div style="font-weight:600">${subLbl(m.subscription_type)}</div></div>
+    <div style="background:var(--bi);border-radius:var(--rs);padding:1rem"><div style="font-size:.72rem;color:var(--tm);margin-bottom:.25rem">⚖️ ${T().mth[4]}</div><div style="font-weight:600">${m.weight?m.weight+' kg':'-'}</div></div>
+    ${m.free_months?`<div style="background:var(--sul);border-radius:var(--rs);padding:1rem"><div style="font-size:.72rem;color:var(--su);margin-bottom:.25rem">🎁 شهور الهدية</div><div style="font-weight:600;color:var(--su)">${m.free_months}</div></div>`:''}
+    ${m.notes?`<div style="background:var(--bi);border-radius:var(--rs);padding:1rem;grid-column:1/-1"><div style="font-size:.72rem;color:var(--tm);margin-bottom:.25rem">📝 ملاحظات</div><div>${m.notes}</div></div>`:''}
+  `;
+  // Payments tab
+  const{data:pays}=await sb.from('payments').select('*').eq('member_id',id).order('payment_date',{ascending:false});
+  const totalPay=(pays||[]).reduce((s,p)=>s+Number(p.amount||0),0);
+  document.getElementById('prof-pays-list').innerHTML=(pays&&pays.length)?`
+    <div style="display:flex;justify-content:space-between;margin-bottom:1rem;padding:.75rem;background:var(--sul);border-radius:var(--rs)">
+      <span style="color:var(--su);font-weight:600">إجمالي المدفوعات</span><span class="mono" style="color:var(--su);font-weight:700">${fc(totalPay)}</span>
+    </div>
+    ${pays.map(p=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:.75rem;border-bottom:1px solid var(--br)">
+      <div><div style="font-weight:600">${fc(p.amount)}</div><div style="font-size:.78rem;color:var(--tm)">${fd(p.payment_date)} ${p.notes?'• '+p.notes:''}</div></div>
+      <button class="btn btn-sm bp" onclick="showReceipt('${p.id}','${m.name}','${m.phone}')">🧾</button>
+    </div>`).join('')}`:`<div class="es"><div class="ei">💰</div><div class="et">${T().nopay}</div></div>`;
+  // Checkins tab
+  const{data:cis}=await sb.from('checkins').select('*').eq('member_id',id).order('checkin_time',{ascending:false}).limit(30);
+  document.getElementById('prof-ci-list').innerHTML=(cis&&cis.length)?cis.map((c,i)=>`<div style="display:flex;justify-content:space-between;padding:.65rem 0;border-bottom:1px solid var(--br)"><span style="color:var(--t2);font-size:.85rem">${fd(c.date)}</span><span style="font-family:'IBM Plex Mono',monospace;font-size:.82rem;color:var(--t2)">${ft(c.checkin_time)}</span></div>`).join(''):`<div class="es"><div class="ei">🏃</div><div class="et">لا يوجد حضور</div></div>`;
+  // Progress tab
+  const{data:ms}=await sb.from('measurements').select('*').eq('member_id',id).order('measured_at',{ascending:false});
+  if(ms&&ms.length){
+    const first=ms[ms.length-1],last=ms[0];
+    const wdiff=last.weight&&first.weight?(last.weight-first.weight).toFixed(1):null;
+    document.getElementById('prof-prog-list').innerHTML=`
+      ${wdiff!==null?`<div style="background:${parseFloat(wdiff)<0?'var(--sul)':'var(--dal)'};border-radius:var(--rs);padding:1rem;margin-bottom:1rem;text-align:center">
+        <div style="font-size:2rem;font-weight:800;font-family:'IBM Plex Mono',monospace;color:${parseFloat(wdiff)<0?'var(--su)':'var(--da)'}">${parseFloat(wdiff)>0?'+':''}${wdiff} kg</div>
+        <div style="font-size:.8rem;margin-top:.25rem">تغير الوزن منذ أول قياس</div>
+      </div>`:''}
+      ${ms.map(m2=>`<div style="background:var(--bi);border-radius:var(--rs);padding:1rem;margin-bottom:.75rem">
+        <div style="display:flex;justify-content:space-between;margin-bottom:.75rem"><span style="font-weight:600">📅 ${fd(m2.measured_at)}</span><span class="badge bgi">${m2.weight?m2.weight+' kg':''}</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;font-size:.8rem">
+          ${m2.chest?`<div style="text-align:center"><div style="color:var(--tm)">صدر</div><div style="font-weight:700">${m2.chest} سم</div></div>`:''}
+          ${m2.waist?`<div style="text-align:center"><div style="color:var(--tm)">خصر</div><div style="font-weight:700">${m2.waist} سم</div></div>`:''}
+          ${m2.hips?`<div style="text-align:center"><div style="color:var(--tm)">أرداف</div><div style="font-weight:700">${m2.hips} سم</div></div>`:''}
+          ${m2.arms?`<div style="text-align:center"><div style="color:var(--tm)">ذراع</div><div style="font-weight:700">${m2.arms} سم</div></div>`:''}
+        </div>
+        ${m2.notes?`<div style="margin-top:.5rem;font-size:.8rem;color:var(--t2)">${m2.notes}</div>`:''}
+      </div>`).join('')}`;
+  }else{document.getElementById('prof-prog-list').innerHTML=`<div class="es"><div class="ei">📏</div><div class="et">لا توجد قياسات</div><button class="btn bp" style="margin-top:1rem" onclick="openMsForMember('${id}')">+ إضافة قياسات</button></div>`;}
+  // Buttons
+  document.getElementById('prof-qr-btn').onclick=()=>openQR(id);
+  document.getElementById('prof-renew-btn').onclick=()=>{closeMo('prof-mo');openRenew(id)};
+  document.getElementById('prof-edit-btn').onclick=()=>editM(id);
+  openMo('prof-mo');
+}
+
+// Tabs
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    const container=tab.closest('.mc2');
+    container.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    container.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+    tab.classList.add('active');
+    const target=container.querySelector('#tab-'+tab.dataset.tab);
+    if(target)target.classList.add('active');
+  });
+});
+
+// ============ QR CODE ============
+function openQR(id){
+  const m=allM.find(x=>x.id===id)||{name:'?',phone:'?'};
+  document.getElementById('qr-name').textContent=m.name;
+  document.getElementById('qr-phone').textContent=m.phone;
+  document.getElementById('qr-title').textContent='QR — '+m.name;
+  QRCode.toCanvas(document.getElementById('qr-canvas'),`GYMPRO:${id}:${m.phone}`,{width:220,margin:2,color:{dark:'#1a1a1a',light:'#ffffff'}},()=>{});
+  openMo('qr-mo');
+}
+
+function downloadQR(){
+  const canvas=document.getElementById('qr-canvas');
+  const link=document.createElement('a');
+  link.download=`qr-${document.getElementById('qr-name').textContent}.png`;
+  link.href=canvas.toDataURL();link.click();
+}
+
+// ============ RENEW ============
+function openRenew(id){
+  const m=allM.find(x=>x.id===id);if(!m)return;
+  document.getElementById('renew-id').value=id;
+  document.getElementById('renew-name').textContent=m.name;
+  document.getElementById('renew-current').textContent=`${subLbl(m.subscription_type)} — ينتهي ${fd(m.subscription_end)}`;
+  document.getElementById('renew-type').value=m.subscription_type||'1';
+  document.getElementById('renew-start').value=td();
+  updateRenewPreview();
+  openMo('renew-mo');
+}
+
+function updateRenewPreview(){
+  const type=document.getElementById('renew-type').value;
+  const start=document.getElementById('renew-start').value;
+  if(start&&type)document.getElementById('renew-end-preview').textContent=fd(ce(start,type));
+}
+
+document.getElementById('renew-type').addEventListener('change',updateRenewPreview);
+document.getElementById('renew-start').addEventListener('change',updateRenewPreview);
+
+async function saveRenew(){
+  const id=document.getElementById('renew-id').value;
+  const type=document.getElementById('renew-type').value;
+  const start=document.getElementById('renew-start').value;
+  const amount=document.getElementById('renew-amount').value;
+  if(!start){toast(T().req,'error');return}
+  const newEnd=ce(start,type);
+  const btn=document.getElementById('renew-save');btn.disabled=true;
+  try{
+    await sb.from('members').update({subscription_type:type,subscription_start:start,subscription_end:newEnd}).eq('id',id);
+    if(amount&&parseFloat(amount)>0){
+      await sb.from('payments').insert([{member_id:id,amount:parseFloat(amount),payment_date:start,notes:'تجديد اشتراك'}]);
+    }
+    toast(T().renewed);closeMo('renew-mo');loadMems();
+  }catch(e){toast(T().err,'error')}finally{btn.disabled=false}
+}
+
+// ============ RECEIPT ============
+async function showReceipt(payId,memberName,memberPhone){
+  const{data:p}=await sb.from('payments').select('*').eq('id',payId).single();
+  if(!p)return;
+  const receiptId='RCP-'+payId.split('-')[0].toUpperCase();
+  document.getElementById('rc-date').textContent=fd(p.payment_date)+' | '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('rc-id').textContent=receiptId;
+  document.getElementById('rc-rows').innerHTML=`
+    <div class="receipt-row"><span>👤 العضو</span><strong>${memberName}</strong></div>
+    <div class="receipt-row"><span>📱 الهاتف</span><span>${memberPhone}</span></div>
+    <div class="receipt-row"><span>📅 التاريخ</span><span>${fd(p.payment_date)}</span></div>
+    ${p.notes?`<div class="receipt-row"><span>📝 الملاحظات</span><span>${p.notes}</span></div>`:''}
+    <div class="receipt-row total"><span>💰 المبلغ المدفوع</span><strong style="color:#FF6B35;font-size:1.1rem">${fc(p.amount)}</strong></div>
+  `;
+  openMo('rec-mo');
+}
+
 // ============ CHECKIN ============
 let acMs=[],selM=null;
-
-async function loadCI(){
-  await loadAC();await refreshTdCI();
-}
-
-async function loadAC(){
-  const{data}=await sb.from('members').select('id,name,phone,status,subscription_end').order('name');
-  acMs=data||[];
-}
+async function loadCI(){await loadAC();await refreshTdCI();}
+async function loadAC(){const{data}=await sb.from('members').select('id,name,phone,status,subscription_end,photo_url').order('name');acMs=data||[];}
 
 function showAC(q){
   const list=document.getElementById('ac-ls');
@@ -683,11 +1002,7 @@ function showAC(q){
   list.innerHTML=matches.map(m=>{
     const days=dl(m.subscription_end),isE=m.status==='expired',isS=!isE&&days<=10;
     const badge=isE?`<span class="badge bgd">${T().mexp}</span>`:isS?`<span class="badge bgw">${days}d</span>`:`<span class="badge bgs">${T().mact}</span>`;
-    return`<div class="ac-item" data-id="${m.id}">
-      <div class="av" style="width:30px;height:30px;font-size:.7rem">${ini(m.name)}</div>
-      <div style="flex:1"><div class="ac-name">${m.name}</div><div class="ac-ph">${m.phone}</div></div>
-      ${badge}
-    </div>`;
+    return`<div class="ac-item" data-id="${m.id}">${mkAv(m.name,m.photo_url)}<div style="flex:1"><div class="ac-n">${m.name}</div><div class="ac-p">${m.phone}</div></div>${badge}</div>`;
   }).join('');
   list.querySelectorAll('.ac-item').forEach(el=>el.addEventListener('click',()=>{
     const m=acMs.find(x=>x.id===el.dataset.id);
@@ -696,55 +1011,45 @@ function showAC(q){
 }
 
 function showAlerts(m){
-  document.getElementById('ab-exp').classList.remove('vis');
-  document.getElementById('ab-soon').classList.remove('vis');
+  document.getElementById('ab-exp').classList.remove('vis');document.getElementById('ab-soon').classList.remove('vis');
   if(m.status==='expired'){document.getElementById('ab-exp').classList.add('vis');soundWarn();}
   else{const d=dl(m.subscription_end);if(d<=10){document.getElementById('ab-soon-t').textContent=T().csoon.replace('{d}',d);document.getElementById('ab-soon').classList.add('vis');}}
 }
 
 async function doCI(){
   if(!selM){
-    const q=document.getElementById('ci-in').value.trim();
-    if(!q){toast(T().req,'error');return}
+    const q=document.getElementById('ci-in').value.trim();if(!q){toast(T().req,'error');return}
     const{data}=await sb.from('members').select('*').or(`name.ilike.%${q}%,phone.ilike.%${q}%`);
     if(!data||!data.length){
-      document.getElementById('ci-res').classList.add('vis');
-      document.getElementById('ci-av').textContent='?';
-      document.getElementById('ci-nm').textContent=T().cnf;
-      document.getElementById('ci-ph').textContent='';
-      document.getElementById('ci-msg').innerHTML=`<span style="color:var(--da)">${T().cnf}</span>`;
-      return;
+      document.getElementById('ci-res').classList.add('vis');document.getElementById('ci-av').textContent='?';
+      document.getElementById('ci-nm').textContent=T().cnf;document.getElementById('ci-ph2').textContent='';
+      document.getElementById('ci-msg').innerHTML=`<span style="color:var(--da)">${T().cnf}</span>`;return;
     }
     selM=data[0];
   }
   const m=selM;const btn=document.getElementById('ci-btn');btn.disabled=true;
-  document.getElementById('ci-av').textContent=ini(m.name);
-  document.getElementById('ci-nm').textContent=m.name;
-  document.getElementById('ci-ph').textContent=m.phone;
-  document.getElementById('ci-res').classList.add('vis');
-  showAlerts(m);
+  const avEl=document.getElementById('ci-av');
+  if(m.photo_url){avEl.innerHTML=`<img src="${m.photo_url}" style="width:100%;height:100%;object-fit:cover"/>`;}
+  else{avEl.textContent=ini(m.name);}
+  document.getElementById('ci-nm').textContent=m.name;document.getElementById('ci-ph2').textContent=m.phone;
+  document.getElementById('ci-res').classList.add('vis');showAlerts(m);
   try{
-    const t=td();
-    const{data:ex}=await sb.from('checkins').select('id').eq('member_id',m.id).eq('date',t);
-    if(ex&&ex.length){
-      document.getElementById('ci-msg').innerHTML=`<span style="color:var(--in)">${T().calr}</span>`;
-      toast(T().calr,'info');
-    }else{
+    const{data:ex}=await sb.from('checkins').select('id').eq('member_id',m.id).eq('date',td());
+    if(ex&&ex.length){document.getElementById('ci-msg').innerHTML=`<span style="color:var(--in)">${T().calr}</span>`;toast(T().calr,'info');}
+    else{
       await sb.from('checkins').insert([{member_id:m.id}]);
       document.getElementById('ci-msg').innerHTML=`<span style="color:var(--su)">${T().cok} — ${ft(new Date().toISOString())}</span>`;
-      toast(T().cok);
-      if(m.status!=='expired')soundOk();
+      toast(T().cok);if(m.status!=='expired')soundOk();
       await refreshTdCI();await loadAC();
     }
   }catch(e){toast(T().err,'error')}finally{btn.disabled=false;selM=null;document.getElementById('ci-in').value='';}
 }
 
 async function refreshTdCI(){
-  const{data}=await sb.from('checkins').select('*,members(name,phone)').eq('date',td()).order('checkin_time',{ascending:false});
-  const list=data||[];
-  document.getElementById('td-cnt').textContent=list.length;
+  const{data}=await sb.from('checkins').select('*,members(name,phone,photo_url)').eq('date',td()).order('checkin_time',{ascending:false});
+  const list=data||[];document.getElementById('td-cnt').textContent=list.length;
   const el=document.getElementById('td-ci');
-  el.innerHTML=list.length?list.map((c,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem 0;border-bottom:1px solid var(--br)"><div style="display:flex;align-items:center;gap:.75rem"><div style="font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--tm);width:22px">${i+1}</div><div class="av">${ini(c.members?.name)}</div><div><div style="font-weight:600;font-size:.875rem">${c.members?.name||'?'}</div><div style="font-size:.72rem;color:var(--tm)">${c.members?.phone||''}</div></div></div><div style="font-family:'IBM Plex Mono',monospace;font-size:.8rem;color:var(--t2)">${ft(c.checkin_time)}</div></div>`).join(''):`<div class="es"><div class="ei">🏃</div><div class="et">${T().noci2}</div></div>`;
+  el.innerHTML=list.length?list.map((c,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:.6rem 0;border-bottom:1px solid var(--br)"><div style="display:flex;align-items:center;gap:.75rem"><div style="font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--tm);width:20px">${i+1}</div>${mkAv(c.members?.name,c.members?.photo_url)}<div><div style="font-weight:600;font-size:.875rem">${c.members?.name||'?'}</div><div style="font-size:.7rem;color:var(--tm)">${c.members?.phone||''}</div></div></div><div style="font-family:'IBM Plex Mono',monospace;font-size:.8rem;color:var(--t2)">${ft(c.checkin_time)}</div></div>`).join(''):`<div class="es"><div class="ei">🏃</div><div class="et">${T().noci}</div></div>`;
 }
 
 // ============ PAYMENTS ============
@@ -759,35 +1064,158 @@ async function loadPays(){
     if(srch)pays=pays.filter(p=>(p.members?.name||'').toLowerCase().includes(srch)||(p.notes||'').toLowerCase().includes(srch));
     document.getElementById('p-total').textContent=fc(pays.reduce((s,p)=>s+Number(p.amount||0),0));
     tbody.innerHTML=pays.length?pays.map(p=>`<tr>
-      <td><div class="mc4"><div class="av">${ini(p.members?.name)}</div><div><div class="mn">${p.members?.name||'?'}</div><div style="font-size:.75rem;color:var(--tm)">${p.members?.phone||''}</div></div></div></td>
+      <td><div class="mc4">${mkAv(p.members?.name,null)}<div><div class="mn">${p.members?.name||'?'}</div><div style="font-size:.72rem;color:var(--tm)">${p.members?.phone||''}</div></div></div></td>
       <td><span class="mono" style="color:var(--su);font-weight:700">${fc(p.amount)}</span></td>
       <td>${fd(p.payment_date)}</td><td style="color:var(--t2)">${p.notes||'-'}</td>
-      <td><button class="btn btn-sm bd" onclick="delP('${p.id}')">🗑️</button></td>
+      <td><div style="display:flex;gap:.4rem">
+        <button class="btn btn-sm bp" onclick="showReceipt('${p.id}','${p.members?.name||''}','${p.members?.phone||''}')">🧾</button>
+        <button class="btn btn-sm bd" onclick="delP('${p.id}')">🗑️</button>
+      </div></td>
     </tr>`).join(''):`<tr><td colspan="5"><div class="es"><div class="ei">💰</div><div class="et">${T().nopay}</div></div></td></tr>`;
   }catch(e){toast(T().err,'error')}
 }
 
 async function openAddP(){
   const{data}=await sb.from('members').select('id,name,phone').order('name');
-  document.getElementById('p-mem').innerHTML=`<option value="">-- ${T().pth[0]} --</option>`+(data||[]).map(m=>`<option value="${m.id}">${m.name} (${m.phone})</option>`).join('');
-  document.getElementById('p-amt').value='';document.getElementById('p-dt').value=td();document.getElementById('p-nt').value='';
-  openMo('p-mo');
+  document.getElementById('p-mem').innerHTML=`<option value="">--</option>`+(data||[]).map(m=>`<option value="${m.id}">${m.name} (${m.phone})</option>`).join('');
+  ['p-amt','p-nt'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('p-dt').value=td();openMo('p-mo');
 }
 
 async function saveP(){
-  const mid=document.getElementById('p-mem').value,amt=document.getElementById('p-amt').value,dt=document.getElementById('p-dt').value,nt=document.getElementById('p-nt').value.trim();
+  const mid=document.getElementById('p-mem').value,amt=document.getElementById('p-amt').value,dt=document.getElementById('p-dt').value;
   if(!mid||!amt||!dt){toast(T().req,'error');return}
   const btn=document.getElementById('p-save');btn.disabled=true;
   try{
-    const{error}=await sb.from('payments').insert([{member_id:mid,amount:parseFloat(amt),payment_date:dt,notes:nt}]);
+    const{error}=await sb.from('payments').insert([{member_id:mid,amount:parseFloat(amt),payment_date:dt,notes:document.getElementById('p-nt').value.trim()}]);
     if(error)throw error;toast(T().payed);closeMo('p-mo');loadPays();
+    // Auto show receipt
+    const{data}=await sb.from('payments').select('*,members(name,phone)').eq('member_id',mid).order('created_at',{ascending:false}).limit(1);
+    if(data&&data[0])showReceipt(data[0].id,data[0].members?.name,data[0].members?.phone);
   }catch(e){toast(T().err,'error')}finally{btn.disabled=false}
 }
 
 async function delP(id){
-  const ok=await confirm_(T().pdel);if(!ok)return;
+  const ok=await confirm_(T().cdel);if(!ok)return;
   try{const{error}=await sb.from('payments').delete().eq('id',id);if(error)throw error;toast(T().deleted);loadPays();}
   catch(e){toast(T().err,'error')}
+}
+
+// ============ MONTHLY REPORT ============
+function initReport(){
+  const now=new Date();
+  document.getElementById('rep-month').value=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+}
+
+async function loadReport(){
+  const month=document.getElementById('rep-month').value;
+  if(!month)return;
+  const[year,mon]=month.split('-');
+  const start=`${year}-${mon}-01`;
+  const endDate=new Date(year,mon,0);
+  const end=`${year}-${mon}-${String(endDate.getDate()).padStart(2,'0')}`;
+  const rc=document.getElementById('rep-content');
+  rc.innerHTML='<div class="lc"><div class="spn"></div></div>';
+  try{
+    const[pays,newM,renewals,cis]=await Promise.all([
+      sb.from('payments').select('amount,notes,payment_date,members(name)').gte('payment_date',start).lte('payment_date',end).order('payment_date',{ascending:false}),
+      sb.from('members').select('id,name,phone,subscription_type,subscription_start').gte('subscription_start',start).lte('subscription_start',end),
+      sb.from('members').select('id').eq('status','active'),
+      sb.from('checkins').select('id,date').gte('date',start).lte('date',end)
+    ]);
+    const totalRev=(pays.data||[]).reduce((s,p)=>s+Number(p.amount||0),0);
+    const totalCis=(cis.data||[]).length;
+    const uniqDays=[...new Set((cis.data||[]).map(c=>c.date))].length;
+    rc.innerHTML=`
+      <div id="rep-print-area">
+        <div style="text-align:center;margin-bottom:1.5rem;display:none" class="print-header">
+          <h2 style="font-size:1.5rem;font-weight:800;color:#FF6B35">🏋️ GymPro</h2>
+          <p style="color:#666">التقرير الشهري — ${month}</p>
+        </div>
+        <div class="report-grid">
+          <div class="report-stat"><div class="report-val">${fc(totalRev)}</div><div class="report-lbl">💰 إجمالي الإيرادات</div></div>
+          <div class="report-stat"><div class="report-val">${(newM.data||[]).length}</div><div class="report-lbl">👥 أعضاء جدد</div></div>
+          <div class="report-stat"><div class="report-val">${totalCis}</div><div class="report-lbl">✅ إجمالي الحضور</div></div>
+          <div class="report-stat"><div class="report-val">${uniqDays}</div><div class="report-lbl">📅 أيام مفتوحة</div></div>
+          <div class="report-stat"><div class="report-val">${uniqDays>0?(totalCis/uniqDays).toFixed(1):0}</div><div class="report-lbl">📊 متوسط الحضور/يوم</div></div>
+          <div class="report-stat"><div class="report-val">${(renewals.data||[]).length}</div><div class="report-lbl">✅ إجمالي الأعضاء النشطين</div></div>
+        </div>
+        ${(newM.data||[]).length?`
+        <div class="card" style="margin-bottom:1rem">
+          <div class="ch"><h3 class="ct">👥 الأعضاء الجدد (${(newM.data||[]).length})</h3></div>
+          ${(newM.data||[]).map(m=>`<div style="display:flex;justify-content:space-between;padding:.65rem 0;border-bottom:1px solid var(--br)"><div style="display:flex;align-items:center;gap:.75rem">${mkAv(m.name,null)}<div><div style="font-weight:600">${m.name}</div><div style="font-size:.78rem;color:var(--tm)">${m.phone}</div></div></div><span class="badge bgi">${subLbl(m.subscription_type)}</span></div>`).join('')}
+        </div>`:''}
+        ${(pays.data||[]).length?`
+        <div class="card">
+          <div class="ch"><h3 class="ct">💰 المدفوعات (${(pays.data||[]).length})</h3><span class="mono" style="color:var(--su);font-weight:700">${fc(totalRev)}</span></div>
+          ${(pays.data||[]).map(p=>`<div style="display:flex;justify-content:space-between;padding:.6rem 0;border-bottom:1px solid var(--br)"><div><div style="font-weight:600">${p.members?.name||'?'}</div><div style="font-size:.78rem;color:var(--tm)">${fd(p.payment_date)} ${p.notes?'• '+p.notes:''}</div></div><span class="mono" style="color:var(--su)">${fc(p.amount)}</span></div>`).join('')}
+        </div>`:''}
+      </div>`;
+  }catch(e){toast(T().err,'error')}
+}
+
+function printReport(){
+  window.print();
+}
+
+// ============ MEASUREMENTS ============
+let msAcMs=[];
+async function initMeas(){
+  const{data}=await sb.from('members').select('id,name,phone').order('name');
+  msAcMs=data||[];
+  document.getElementById('ms-mem').innerHTML=`<option value="">--</option>`+(data||[]).map(m=>`<option value="${m.id}">${m.name} (${m.phone})</option>`).join('');
+  setupMsAc();
+}
+
+function setupMsAc(){
+  const inp=document.getElementById('ms-srch'),list=document.getElementById('ms-ac');
+  inp.addEventListener('input',()=>{
+    const q=inp.value.toLowerCase();
+    if(!q||q.length<2){list.style.display='none';return}
+    const matches=msAcMs.filter(m=>m.name.toLowerCase().includes(q)||m.phone.includes(q)).slice(0,6);
+    if(!matches.length){list.style.display='none';return}
+    list.style.display='block';
+    list.innerHTML=matches.map(m=>`<div class="ac-item" data-id="${m.id}">${mkAv(m.name,null)}<div><div class="ac-n">${m.name}</div><div class="ac-p">${m.phone}</div></div></div>`).join('');
+    list.querySelectorAll('.ac-item').forEach(el=>el.addEventListener('click',()=>{
+      inp.value=msAcMs.find(x=>x.id===el.dataset.id)?.name||'';
+      list.style.display='none';loadMsForMember(el.dataset.id);
+    }));
+  });
+}
+
+async function loadMsForMember(id){
+  const{data:ms}=await sb.from('measurements').select('*').eq('member_id',id).order('measured_at',{ascending:false});
+  const{data:m}=await sb.from('members').select('name,phone').eq('id',id).single();
+  const el=document.getElementById('ms-content');
+  if(!ms||!ms.length){
+    el.innerHTML=`<div class="es"><div class="ei">📏</div><div class="et">لا توجد قياسات لـ ${m?.name||'هذا العضو'}</div><button class="btn bp" style="margin-top:1rem" onclick="openMsForMember('${id}')">+ إضافة قياسات</button></div>`;
+    return;
+  }
+  el.innerHTML=`<div class="card"><div class="ch"><h3 class="ct">📏 قياسات ${m?.name||''}</h3><button class="btn bp btn-sm" onclick="openMsForMember('${id}')">+ إضافة</button></div>${ms.map(r=>`<div style="background:var(--bi);border-radius:var(--rs);padding:1rem;margin-bottom:.75rem"><div style="display:flex;justify-content:space-between;margin-bottom:.75rem"><span style="font-weight:600">📅 ${fd(r.measured_at)}</span>${r.weight?`<span class="badge bgi">⚖️ ${r.weight} kg</span>`:''}</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;font-size:.8rem">${r.chest?`<div style="text-align:center;background:var(--bc);border-radius:6px;padding:.4rem"><div style="color:var(--tm)">صدر</div><div style="font-weight:700">${r.chest}</div></div>`:''}${r.waist?`<div style="text-align:center;background:var(--bc);border-radius:6px;padding:.4rem"><div style="color:var(--tm)">خصر</div><div style="font-weight:700">${r.waist}</div></div>`:''}${r.hips?`<div style="text-align:center;background:var(--bc);border-radius:6px;padding:.4rem"><div style="color:var(--tm)">أرداف</div><div style="font-weight:700">${r.hips}</div></div>`:''}${r.arms?`<div style="text-align:center;background:var(--bc);border-radius:6px;padding:.4rem"><div style="color:var(--tm)">ذراع</div><div style="font-weight:700">${r.arms}</div></div>`:''}</div>${r.notes?`<div style="margin-top:.5rem;font-size:.8rem;color:var(--t2)">${r.notes}</div>`:''}</div>`).join('')}</div>`;
+}
+
+function openMsForMember(id){
+  document.getElementById('ms-mid').value=id;
+  document.getElementById('ms-mem').value=id;
+  document.getElementById('ms-dt').value=td();
+  ['ms-wt','ms-ch','ms-wa','ms-hi','ms-ar','ms-nt'].forEach(i=>document.getElementById(i).value='');
+  openMo('ms-mo');
+}
+
+async function saveMs(){
+  const mid=document.getElementById('ms-mem').value||document.getElementById('ms-mid').value;
+  if(!mid){toast(T().req,'error');return}
+  const btn=document.getElementById('ms-save');btn.disabled=true;
+  const get=id=>document.getElementById(id).value;
+  try{
+    const{error}=await sb.from('measurements').insert([{
+      member_id:mid,weight:get('ms-wt')?parseFloat(get('ms-wt')):null,
+      chest:get('ms-ch')?parseFloat(get('ms-ch')):null,waist:get('ms-wa')?parseFloat(get('ms-wa')):null,
+      hips:get('ms-hi')?parseFloat(get('ms-hi')):null,arms:get('ms-ar')?parseFloat(get('ms-ar')):null,
+      measured_at:get('ms-dt')||td(),notes:get('ms-nt')
+    }]);
+    if(error)throw error;toast(T().saved);closeMo('ms-mo');loadMsForMember(mid);
+  }catch(e){toast(T().err,'error')}finally{btn.disabled=false}
 }
 
 // ============ AUTH ============
@@ -796,33 +1224,29 @@ async function login(){
   const err=document.getElementById('l-err'),btn=document.getElementById('l-btn');
   err.style.display='none';
   if(!email||!pass){err.textContent=T().req;err.style.display='block';return}
-  btn.disabled=true;btn.textContent=T().ll;
+  btn.disabled=true;btn.textContent='...';
   try{
     const{data,error}=await sb.auth.signInWithPassword({email,password:pass});
     if(error)throw error;showApp(data.user.email);
-  }catch(e){err.textContent=T().lerr;err.style.display='block';}
-  finally{btn.disabled=false;btn.textContent=T().lb}
+  }catch(e){err.textContent='بيانات الدخول غير صحيحة';err.style.display='block';}
+  finally{btn.disabled=false;btn.textContent='دخول'}
 }
 
 function showApp(email){
-  document.getElementById('lp').classList.remove('active');
-  document.getElementById('app').style.display='flex';
+  document.getElementById('lp').classList.remove('active');document.getElementById('app').style.display='flex';
   document.getElementById('u-em').textContent=email||'admin';
   applyLang(lang);initCharts();nav('dashboard');loadAC();
 }
-
 async function logout(){await sb.auth.signOut();document.getElementById('app').style.display='none';document.getElementById('lp').classList.add('active');}
 
 // ============ INIT ============
 (async()=>{
   applyLang(lang);
   const upEnd=()=>{const s=document.getElementById('m-st').value,t=document.getElementById('m-ty').value;if(s)document.getElementById('m-en').value=ce(s,t)};
-  document.getElementById('m-st').addEventListener('change',upEnd);
-  document.getElementById('m-ty').addEventListener('change',upEnd);
+  document.getElementById('m-st').addEventListener('change',upEnd);document.getElementById('m-ty').addEventListener('change',upEnd);
   document.getElementById('ci-in').addEventListener('input',e=>{selM=null;document.getElementById('ab-exp').classList.remove('vis');document.getElementById('ab-soon').classList.remove('vis');showAC(e.target.value)});
-  document.addEventListener('click',e=>{if(!e.target.closest('#ci-wrap'))document.getElementById('ac-ls').style.display='none'});
-  const{data:{session}}=await sb.auth.getSession();
-  if(session)showApp(session.user.email);
+  document.addEventListener('click',e=>{if(!e.target.closest('#ci-wrap'))document.getElementById('ac-ls').style.display='none';if(!e.target.closest('#ms-srch')?.parentElement)document.getElementById('ms-ac').style.display='none';});
+  const{data:{session}}=await sb.auth.getSession();if(session)showApp(session.user.email);
   document.getElementById('l-btn').addEventListener('click',login);
   document.getElementById('l-p').addEventListener('keydown',e=>{if(e.key==='Enter')login()});
   document.getElementById('logout-btn').addEventListener('click',logout);
@@ -830,20 +1254,18 @@ async function logout(){await sb.auth.signOut();document.getElementById('app').s
   document.getElementById('mtg').addEventListener('click',()=>{document.getElementById('sbar').classList.toggle('open');document.getElementById('sov').classList.toggle('vis')});
   document.getElementById('sov').addEventListener('click',()=>{document.getElementById('sbar').classList.remove('open');document.getElementById('sov').classList.remove('vis')});
   document.getElementById('l-btn2').addEventListener('click',e=>{e.stopPropagation();document.getElementById('l-dd').classList.toggle('open')});
-  document.querySelectorAll('.lo').forEach(el=>el.addEventListener('click',()=>{
-    document.getElementById('l-dd').classList.remove('open');applyLang(el.dataset.lang);
-    const p=document.querySelector('.ni.active[data-page]')?.dataset?.page||'dashboard';nav(p);
-  }));
+  document.querySelectorAll('.lo').forEach(el=>el.addEventListener('click',()=>{document.getElementById('l-dd').classList.remove('open');applyLang(el.dataset.lang);const p=document.querySelector('.ni.active[data-page]')?.dataset?.page||'dashboard';nav(p);}));
   document.addEventListener('click',()=>document.getElementById('l-dd').classList.remove('open'));
-  document.getElementById('add-m-btn').addEventListener('click',openAddM);
-  document.getElementById('m-save').addEventListener('click',saveM);
-  document.getElementById('m-srch').addEventListener('input',loadMems);
-  document.getElementById('m-flt').addEventListener('change',loadMems);
+  document.getElementById('add-m-btn').addEventListener('click',openAddM);document.getElementById('m-save').addEventListener('click',saveM);
+  document.getElementById('m-srch').addEventListener('input',loadMems);document.getElementById('m-flt').addEventListener('change',loadMems);
   document.getElementById('ci-btn').addEventListener('click',doCI);
   document.getElementById('ci-in').addEventListener('keydown',e=>{if(e.key==='Enter'){document.getElementById('ac-ls').style.display='none';doCI()}});
-  document.getElementById('add-p-btn').addEventListener('click',openAddP);
-  document.getElementById('p-save').addEventListener('click',saveP);
+  document.getElementById('add-p-btn').addEventListener('click',openAddP);document.getElementById('p-save').addEventListener('click',saveP);
   document.getElementById('p-srch').addEventListener('input',loadPays);
+  document.getElementById('renew-save').addEventListener('click',saveRenew);
+  document.getElementById('rep-load-btn').addEventListener('click',loadReport);
+  document.getElementById('add-ms-btn').addEventListener('click',()=>{document.getElementById('ms-mid').value='';document.getElementById('ms-dt').value=td();openMo('ms-mo')});
+  document.getElementById('ms-save').addEventListener('click',saveMs);
   document.querySelectorAll('[data-close]').forEach(btn=>btn.addEventListener('click',()=>closeMo(btn.dataset.close)));
   document.querySelectorAll('.mo').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('active')}));
 })();
