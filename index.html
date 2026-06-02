@@ -278,7 +278,7 @@ textarea{resize:vertical;min-height:80px}
             <h3 class="card-title" style="margin-bottom:1.25rem">تسجيل الحضور</h3>
             <div class="form-group" style="margin-bottom:1rem">
               <label>ابحث برقم الهاتف أو ID</label>
-              <div class="search-bar"><span class="search-icon">🔍</span><input type="text" id="ci-search" placeholder="+966501234567"/></div>
+              <div class="search-bar"><span class="search-icon">🔍</span><input type="text" id="ci-search" placeholder="اكتب الاسم أو رقم الهاتف..."/></div>
             </div>
             <button class="btn btn-primary" id="ci-btn" style="width:100%;justify-content:center;padding:0.75rem">✅ تسجيل دخول</button>
             <div class="checkin-result" id="ci-result">
@@ -325,7 +325,7 @@ textarea{resize:vertical;min-height:80px}
       <input type="hidden" id="m-id"/>
       <div class="form-grid">
         <div class="form-group"><label>الاسم <span class="req">*</span></label><input type="text" id="m-name" placeholder="الاسم الكامل"/></div>
-        <div class="form-group"><label>رقم الهاتف <span class="req">*</span></label><input type="tel" id="m-phone" placeholder="+966501234567"/></div>
+        <div class="form-group"><label>رقم الهاتف <span class="req">*</span></label><input type="tel" id="m-phone" placeholder="اكتب الاسم أو رقم الهاتف..."/></div>
         <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="m-email" placeholder="email@example.com"/></div>
         <div class="form-group"><label>نوع الاشتراك <span class="req">*</span></label><select id="m-type"><option value="monthly">شهري</option><option value="quarterly">3 شهور</option><option value="yearly">سنوي</option></select></div>
         <div class="form-group"><label>تاريخ البداية <span class="req">*</span></label><input type="date" id="m-start"/></div>
@@ -571,7 +571,7 @@ async function doCheckin(){
   const btn=document.getElementById('ci-btn');btn.disabled=true;
   const res=document.getElementById('ci-result');
   try{
-    const{data:members}=await sb.from('members').select('*').or(`phone.eq.${q},id.eq.${q}`);
+    const{data:members}=await sb.from('members').select('*').or(`name.ilike.%${q}%,phone.ilike.%${q}%`);
     const member=members&&members[0];
     if(!member){
       res.classList.add('visible');
