@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GymPro - نظام إدارة الجيم</title>
+  <meta name="description" content="نظام إدارة الجيم - GymPro" />
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/src/styles/main.css" />
+
+  <!-- Env config: injected by Vercel or set manually -->
+  <script>
+    window.ENV = {
+      SUPABASE_URL: 'https://dpabrokcapjvcalasemk.supabase.co',
+      SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwYWJyb2tjYXBqdmNhbGFzZW1rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MDMwMDksImV4cCI6MjA5NTk3OTAwOX0.SAAp6GIJttkCF0ZOcPElxZEUIiCZHBXgN5EgQb_w9mc'
+    };
+  </script>
+</head>
+<body class="rtl">
+
+<!-- ============================================
+     LOGIN PAGE
+     ============================================ -->
+<div id="login-page" class="active">
+  <div class="login-container">
+    <div class="login-logo">
+      <div class="login-logo-icon">🏋️</div>
+      <h1 class="login-title" data-i18n="app_name">GymPro</h1>
+      <p class="login-subtitle" data-i18n="auth.login_subtitle">سجّل دخولك لإدارة جيمك</p>
+    </div>
+
+    <div class="login-card">
+      <div id="login-error" style="display:none;background:var(--danger-light);border:1px solid rgba(239,68,68,0.3);border-radius:var(--radius-sm);padding:0.75rem 1rem;margin-bottom:1rem;color:var(--danger);font-size:0.875rem;"></div>
+
+      <div class="login-form">
+        <div class="form-group">
+          <label for="login-email" data-i18n="auth.email">البريد الإلكتروني</label>
+          <input type="email" id="login-email" placeholder="admin@gym.com" autocomplete="email" />
+        </div>
+        <div class="form-group" style="margin-bottom:1.25rem">
+          <label for="login-password" data-i18n="auth.password">كلمة المرور</label>
+          <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" />
+        </div>
+        <button id="login-btn" class="btn btn-primary login-submit" data-i18n="auth.login_btn">دخول</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================
+     MAIN APP
+     ============================================ -->
+<div id="app" style="display:none">
+
+  <!-- Sidebar Overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🏋️</div>
+      <div class="logo-text">
+        <span class="logo-title" data-i18n="app_name">GymPro</span>
+        <span class="logo-sub" data-i18n="app_tagline">Gym Management</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">القائمة الرئيسية</div>
+
+      <div class="nav-item active" data-page="dashboard">
+        <span class="nav-icon">📊</span>
+        <span data-i18n="nav.dashboard">لوحة التحكم</span>
+      </div>
+      <div class="nav-item" data-page="members">
+        <span class="nav-icon">👥</span>
+        <span data-i18n="nav.members">الأعضاء</span>
+      </div>
+      <div class="nav-item" data-page="checkin">
+        <span class="nav-icon">✅</span>
+        <span data-i18n="nav.checkin">تسجيل الحضور</span>
+      </div>
+      <div class="nav-item" data-page="payments">
+        <span class="nav-icon">💰</span>
+        <span data-i18n="nav.payments">المدفوعات</span>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="nav-item" id="logout-btn">
+        <span class="nav-icon">🚪</span>
+        <span data-i18n="nav.logout">تسجيل الخروج</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="header-left">
+        <button class="menu-toggle" id="menu-toggle">☰</button>
+        <h2 class="page-title" id="header-title">لوحة التحكم</h2>
+      </div>
+      <div class="header-right">
+        <!-- Language Switcher -->
+        <div class="lang-switcher">
+          <button class="lang-btn" id="lang-btn">
+            <span id="current-lang-flag">🇸🇦</span>
+            <span id="current-lang-name">العربية</span>
+            <span>▾</span>
+          </button>
+          <div class="lang-dropdown" id="lang-dropdown">
+            <div class="lang-option current" data-lang="ar">🇸🇦 العربية</div>
+            <div class="lang-option" data-lang="en">🇺🇸 English</div>
+            <div class="lang-option" data-lang="tl">🇵🇭 Tagalog</div>
+            <div class="lang-option" data-lang="hi">🇮🇳 हिंदी</div>
+          </div>
+        </div>
+
+        <!-- User Badge -->
+        <div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0.75rem;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm)">
+          <span style="font-size:0.9rem">👤</span>
+          <span id="user-email" style="font-size:0.8rem;color:var(--text-secondary)">admin</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Pages -->
+    <div class="page-content">
+
+      <!-- ==================== DASHBOARD ==================== -->
+      <div id="page-dashboard" class="page active">
+        <div class="stats-grid">
+          <div class="stat-card primary">
+            <div class="stat-icon">👥</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-total">0</div>
+              <div class="stat-label" data-i18n="dashboard.total_members">إجمالي الأعضاء</div>
+            </div>
+          </div>
+          <div class="stat-card success">
+            <div class="stat-icon">✅</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-active">0</div>
+              <div class="stat-label" data-i18n="dashboard.active_members">الأعضاء النشطون</div>
+            </div>
+          </div>
+          <div class="stat-card danger">
+            <div class="stat-icon">⚠️</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-expired">0</div>
+              <div class="stat-label" data-i18n="dashboard.expired_subscriptions">الاشتراكات المنتهية</div>
+            </div>
+          </div>
+          <div class="stat-card info">
+            <div class="stat-icon">💰</div>
+            <div class="stat-info">
+              <div class="stat-value mono" id="stat-revenue">0</div>
+              <div class="stat-label" data-i18n="dashboard.total_revenue">إجمالي الإيرادات</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <!-- Expiring Soon -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title" data-i18n="dashboard.expiring_soon">⏰ تنتهي قريباً</h3>
+            </div>
+            <div id="expiring-soon-list">
+              <div class="loading-center"><div class="spinner"></div></div>
+            </div>
+          </div>
+
+          <!-- Today's Checkins -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title" data-i18n="dashboard.recent_checkins">🏃 آخر تسجيلات الحضور</h3>
+              <span class="badge badge-info" id="checkin-count-badge">0</span>
+            </div>
+            <div id="recent-checkins-list">
+              <div class="loading-center"><div class="spinner"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== MEMBERS ==================== -->
+      <div id="page-members" class="page">
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <div class="search-bar" style="min-width:240px">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="member-search" data-i18n-placeholder="members.search" placeholder="البحث بالاسم أو الهاتف..." />
+            </div>
+            <select id="member-filter" style="min-width:150px">
+              <option value="all" data-i18n="members.all">الكل</option>
+              <option value="active" data-i18n="members.active">نشط</option>
+              <option value="expired" data-i18n="members.expired">منتهي</option>
+            </select>
+          </div>
+          <div class="toolbar-right">
+            <button class="btn btn-primary" id="add-member-btn">
+              <span>+</span> <span data-i18n="members.add_member">إضافة عضو</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <table id="members-table">
+            <thead>
+              <tr>
+                <th data-i18n="members.name">الاسم</th>
+                <th data-i18n="members.phone">الهاتف</th>
+                <th data-i18n="members.sub_type">الاشتراك</th>
+                <th data-i18n="members.sub_end">انتهاء</th>
+                <th data-i18n="members.status">الحالة</th>
+                <th data-i18n="members.actions">الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="members-tbody">
+              <tr><td colspan="6"><div class="loading-center"><div class="spinner"></div></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ==================== CHECK-IN ==================== -->
+      <div id="page-checkin" class="page">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+          <!-- Check-in Form -->
+          <div class="card">
+            <h3 class="card-title" style="margin-bottom:1.25rem" data-i18n="checkin.title">تسجيل الحضور</h3>
+
+            <div class="form-group" style="margin-bottom:1rem">
+              <label data-i18n="checkin.search_member">ابحث برقم الهاتف أو ID</label>
+              <div class="search-bar">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="checkin-search" placeholder="+966501234567" />
+              </div>
+            </div>
+
+            <button class="btn btn-primary" id="checkin-btn" style="width:100%;justify-content:center;padding:0.75rem">
+              ✅ <span data-i18n="checkin.checkin_btn">تسجيل دخول</span>
+            </button>
+
+            <!-- Result -->
+            <div class="checkin-result" id="checkin-result">
+              <div class="checkin-member-info">
+                <div class="checkin-member-avatar" id="checkin-avatar">?</div>
+                <div>
+                  <div style="font-weight:700;font-size:1.05rem" id="checkin-name">-</div>
+                  <div style="color:var(--text-muted);font-size:0.8rem" id="checkin-phone">-</div>
+                </div>
+              </div>
+              <div id="checkin-status-msg" style="font-size:0.875rem"></div>
+            </div>
+          </div>
+
+          <!-- Today's Checkins -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title" data-i18n="checkin.today_checkins">حضور اليوم</h3>
+              <span class="badge badge-info" id="today-count">0</span>
+            </div>
+            <div id="today-checkins-list">
+              <div class="loading-center"><div class="spinner"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== PAYMENTS ==================== -->
+      <div id="page-payments" class="page">
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <div class="search-bar" style="min-width:240px">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="payment-search" placeholder="بحث..." />
+            </div>
+          </div>
+          <div class="toolbar-right">
+            <button class="btn btn-primary" id="add-payment-btn">
+              <span>+</span> <span data-i18n="payments.add_payment">تسجيل دفعة</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th data-i18n="payments.member">العضو</th>
+                <th data-i18n="payments.amount">المبلغ</th>
+                <th data-i18n="payments.date">التاريخ</th>
+                <th data-i18n="payments.notes">ملاحظات</th>
+                <th>إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="payments-tbody">
+              <tr><td colspan="5"><div class="loading-center"><div class="spinner"></div></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Total Row -->
+        <div style="margin-top:1rem;display:flex;justify-content:flex-end">
+          <div class="card" style="padding:0.875rem 1.5rem;display:inline-flex;align-items:center;gap:1rem">
+            <span style="color:var(--text-secondary)" data-i18n="payments.total">المجموع</span>
+            <span class="mono" id="payments-total" style="font-size:1.2rem;font-weight:700;color:var(--success)">0.00 SAR</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end .page-content -->
+  </main>
+</div><!-- end #app -->
+
+<!-- ============================================
+     MEMBER MODAL
+     ============================================ -->
+<div class="modal-overlay" id="member-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title" id="member-modal-title">إضافة عضو</h3>
+      <button class="modal-close" data-close="member-modal">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="member-id" />
+      <div class="form-grid">
+        <div class="form-group">
+          <label>الاسم <span class="required-star">*</span></label>
+          <input type="text" id="member-name" placeholder="الاسم الكامل" />
+        </div>
+        <div class="form-group">
+          <label>رقم الهاتف <span class="required-star">*</span></label>
+          <input type="tel" id="member-phone" placeholder="+966501234567" />
+        </div>
+        <div class="form-group">
+          <label>البريد الإلكتروني</label>
+          <input type="email" id="member-email" placeholder="email@example.com" />
+        </div>
+        <div class="form-group">
+          <label>نوع الاشتراك <span class="required-star">*</span></label>
+          <select id="member-sub-type">
+            <option value="monthly">شهري</option>
+            <option value="quarterly">3 شهور</option>
+            <option value="yearly">سنوي</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>تاريخ البداية <span class="required-star">*</span></label>
+          <input type="date" id="member-start-date" />
+        </div>
+        <div class="form-group">
+          <label>تاريخ الانتهاء</label>
+          <input type="date" id="member-end-date" readonly style="opacity:0.6" />
+        </div>
+        <div class="form-group full-width">
+          <label>ملاحظات</label>
+          <textarea id="member-notes" placeholder="ملاحظات إضافية..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" data-close="member-modal">إلغاء</button>
+      <button class="btn btn-primary" id="save-member-btn">حفظ العضو</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================
+     PAYMENT MODAL
+     ============================================ -->
+<div class="modal-overlay" id="payment-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">تسجيل دفعة</h3>
+      <button class="modal-close" data-close="payment-modal">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group full-width">
+          <label>العضو <span class="required-star">*</span></label>
+          <select id="payment-member-id">
+            <option value="">-- اختر عضو --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>المبلغ (SAR) <span class="required-star">*</span></label>
+          <input type="number" id="payment-amount" placeholder="0.00" min="0" step="0.01" />
+        </div>
+        <div class="form-group">
+          <label>التاريخ <span class="required-star">*</span></label>
+          <input type="date" id="payment-date" />
+        </div>
+        <div class="form-group full-width">
+          <label>ملاحظات</label>
+          <input type="text" id="payment-notes" placeholder="سبب الدفعة..." />
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" data-close="payment-modal">إلغاء</button>
+      <button class="btn btn-primary" id="save-payment-btn">تسجيل الدفعة</button>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script type="module" src="/src/app.js"></script>
+</body>
+</html>
