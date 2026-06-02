@@ -1,124 +1,233 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GymPro - نظام إدارة الجيم</title>
-  <meta name="description" content="نظام إدارة الجيم - GymPro" />
-
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="/src/styles/main.css" />
-
-  <!-- Env config: injected by Vercel or set manually -->
-  <script>
-    window.ENV = {
-      SUPABASE_URL: 'https://dpabrokcapjvcalasemk.supabase.co',
-      SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwYWJyb2tjYXBqdmNhbGFzZW1rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MDMwMDksImV4cCI6MjA5NTk3OTAwOX0.SAAp6GIJttkCF0ZOcPElxZEUIiCZHBXgN5EgQb_w9mc'
-    };
-  </script>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>GymPro - نظام إدارة الجيم</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{--primary:#FF6B35;--primary-dark:#E55A25;--primary-glow:rgba(255,107,53,0.15);--bg-base:#0D0F12;--bg-card:#161A20;--bg-card-hover:#1C2028;--bg-input:#1E2430;--bg-sidebar:#111318;--text-primary:#F0F2F5;--text-secondary:#8A9BB0;--text-muted:#4A5568;--border:#252B38;--border-hover:#3A4455;--success:#22C55E;--success-light:rgba(34,197,94,0.15);--warning:#F59E0B;--warning-light:rgba(245,158,11,0.15);--danger:#EF4444;--danger-light:rgba(239,68,68,0.15);--info:#3B82F6;--info-light:rgba(59,130,246,0.15);--sidebar-width:260px;--header-height:64px;--radius:12px;--radius-sm:8px;--radius-lg:16px;--shadow-md:0 4px 16px rgba(0,0,0,0.4);--shadow-lg:0 8px 32px rgba(0,0,0,0.5);--font-body:'Outfit',sans-serif;--font-mono:'IBM Plex Mono',monospace}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px}
+body{font-family:var(--font-body);background:var(--bg-base);color:var(--text-primary);line-height:1.6;min-height:100vh;overflow-x:hidden}
+body.rtl{direction:rtl}body.ltr{direction:ltr}
+a{color:var(--primary);text-decoration:none}
+button{cursor:pointer;font-family:inherit}
+input,select,textarea{font-family:inherit}
+#app{display:flex;min-height:100vh}
+.sidebar{width:var(--sidebar-width);background:var(--bg-sidebar);border-inline-end:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;inset-inline-start:0;height:100vh;z-index:100;transition:transform 0.3s ease}
+.sidebar-logo{padding:1.5rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0.75rem}
+.logo-icon{width:40px;height:40px;background:var(--primary);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.logo-title{font-size:1.1rem;font-weight:800;color:var(--text-primary);letter-spacing:-0.02em;line-height:1}
+.logo-sub{font-size:0.7rem;color:var(--text-muted);margin-top:2px}
+.sidebar-nav{flex:1;padding:1rem 0.75rem;overflow-y:auto}
+.nav-label{font-size:0.65rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);padding:0.5rem 0.75rem;margin-top:0.5rem}
+.nav-item{display:flex;align-items:center;gap:0.75rem;padding:0.7rem 0.875rem;border-radius:var(--radius-sm);color:var(--text-secondary);font-size:0.9rem;font-weight:500;cursor:pointer;transition:all 0.2s;margin-bottom:2px;border:1px solid transparent}
+.nav-item:hover{background:var(--bg-card);color:var(--text-primary);border-color:var(--border)}
+.nav-item.active{background:var(--primary-glow);color:var(--primary);border-color:rgba(255,107,53,0.3)}
+.nav-icon{font-size:1.1rem;width:20px;text-align:center;flex-shrink:0}
+.sidebar-footer{padding:1rem 0.75rem;border-top:1px solid var(--border)}
+.main-content{margin-inline-start:var(--sidebar-width);flex:1;min-height:100vh;display:flex;flex-direction:column}
+.top-header{height:var(--header-height);background:var(--bg-card);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 1.75rem;position:sticky;top:0;z-index:50}
+.header-left{display:flex;align-items:center;gap:1rem}
+.page-title{font-size:1.15rem;font-weight:700;color:var(--text-primary)}
+.header-right{display:flex;align-items:center;gap:0.75rem}
+.lang-switcher{position:relative}
+.lang-btn{display:flex;align-items:center;gap:0.4rem;padding:0.45rem 0.75rem;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-secondary);font-size:0.82rem;font-weight:500;transition:all 0.2s}
+.lang-btn:hover{border-color:var(--border-hover);color:var(--text-primary)}
+.lang-dropdown{position:absolute;top:calc(100% + 8px);inset-inline-end:0;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);min-width:160px;box-shadow:var(--shadow-md);display:none;z-index:200;overflow:hidden}
+.lang-dropdown.open{display:block}
+.lang-option{display:flex;align-items:center;gap:0.6rem;padding:0.65rem 1rem;font-size:0.85rem;color:var(--text-secondary);cursor:pointer;transition:all 0.15s}
+.lang-option:hover{background:var(--bg-input);color:var(--text-primary)}
+.lang-option.current{color:var(--primary);background:var(--primary-glow)}
+.page-content{flex:1;padding:1.75rem;max-width:1400px;width:100%}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}
+.card-title{font-size:1rem;font-weight:700;color:var(--text-primary)}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:1.5rem}
+.stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem 1.5rem;display:flex;align-items:center;gap:1rem;transition:all 0.2s;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;inset-inline-start:0;width:3px;height:100%}
+.stat-card.c-primary::before{background:var(--primary)}
+.stat-card.c-success::before{background:var(--success)}
+.stat-card.c-danger::before{background:var(--danger)}
+.stat-card.c-info::before{background:var(--info)}
+.stat-card:hover{border-color:var(--border-hover);transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.stat-icon{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0}
+.stat-card.c-primary .stat-icon{background:var(--primary-glow)}
+.stat-card.c-success .stat-icon{background:var(--success-light)}
+.stat-card.c-danger .stat-icon{background:var(--danger-light)}
+.stat-card.c-info .stat-icon{background:var(--info-light)}
+.stat-info{flex:1}
+.stat-value{font-size:1.75rem;font-weight:800;color:var(--text-primary);line-height:1;font-family:var(--font-mono)}
+.stat-label{font-size:0.8rem;color:var(--text-secondary);margin-top:0.25rem}
+.btn{display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.1rem;border-radius:var(--radius-sm);font-size:0.875rem;font-weight:600;border:1px solid transparent;transition:all 0.2s;white-space:nowrap}
+.btn-primary{background:var(--primary);color:white;border-color:var(--primary)}
+.btn-primary:hover{background:var(--primary-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(255,107,53,0.3)}
+.btn-secondary{background:var(--bg-input);color:var(--text-primary);border-color:var(--border)}
+.btn-secondary:hover{border-color:var(--border-hover);background:var(--bg-card-hover)}
+.btn-danger{background:var(--danger-light);color:var(--danger);border-color:rgba(239,68,68,0.3)}
+.btn-danger:hover{background:var(--danger);color:white}
+.btn-sm{padding:0.35rem 0.7rem;font-size:0.8rem}
+.btn:disabled{opacity:0.5;cursor:not-allowed;transform:none!important}
+.badge{display:inline-flex;align-items:center;padding:0.2rem 0.6rem;border-radius:999px;font-size:0.72rem;font-weight:600}
+.badge-success{background:var(--success-light);color:var(--success)}
+.badge-danger{background:var(--danger-light);color:var(--danger)}
+.badge-warning{background:var(--warning-light);color:var(--warning)}
+.badge-info{background:var(--info-light);color:var(--info)}
+.table-wrapper{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:0.875rem}
+thead{background:var(--bg-input)}
+th{padding:0.875rem 1rem;text-align:start;font-size:0.75rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);white-space:nowrap;border-bottom:1px solid var(--border)}
+td{padding:0.875rem 1rem;color:var(--text-primary);border-bottom:1px solid var(--border);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--bg-card-hover)}
+body.rtl th,body.rtl td{text-align:right}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.form-group{display:flex;flex-direction:column;gap:0.4rem}
+.form-group.full{grid-column:1/-1}
+label{font-size:0.8rem;font-weight:600;color:var(--text-secondary)}
+.req{color:var(--danger);margin-inline-start:2px}
+input,select,textarea{width:100%;padding:0.65rem 0.875rem;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);font-size:0.9rem;transition:all 0.2s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow)}
+input::placeholder{color:var(--text-muted)}
+select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238A9BB0' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 0.75rem center;padding-inline-end:2rem}
+body.rtl select{background-position:left 0.75rem center}
+select option{background:var(--bg-card)}
+textarea{resize:vertical;min-height:80px}
+.search-bar{display:flex;align-items:center;gap:0.5rem;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0 0.875rem;transition:all 0.2s}
+.search-bar:focus-within{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow)}
+.search-bar input{border:none;background:none;box-shadow:none;padding:0.65rem 0;flex:1}
+.search-bar input:focus{box-shadow:none}
+.search-icon{color:var(--text-muted)}
+.toolbar{display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;margin-bottom:1.25rem}
+.toolbar-left{flex:1;display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap}
+.toolbar-right{display:flex;gap:0.5rem;align-items:center}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:1000;padding:1rem}
+.modal-overlay.active{display:flex}
+.modal{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);width:100%;max-width:560px;box-shadow:var(--shadow-lg);animation:modalIn 0.25s ease}
+@keyframes modalIn{from{opacity:0;transform:translateY(-20px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid var(--border)}
+.modal-title{font-size:1.05rem;font-weight:700;color:var(--text-primary)}
+.modal-close{background:none;border:none;color:var(--text-muted);font-size:1.3rem;padding:0.25rem;transition:color 0.2s}
+.modal-close:hover{color:var(--text-primary)}
+.modal-body{padding:1.5rem}
+.modal-footer{display:flex;gap:0.75rem;justify-content:flex-end;padding:1.25rem 1.5rem;border-top:1px solid var(--border)}
+.toast{position:fixed;bottom:1.5rem;inset-inline-end:1.5rem;display:flex;align-items:center;gap:0.75rem;padding:0.875rem 1.25rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-lg);font-size:0.9rem;font-weight:500;color:var(--text-primary);transform:translateX(120%);transition:transform 0.3s ease;z-index:9999;max-width:360px}
+.toast.show{transform:translateX(0)}
+.toast-success{border-color:rgba(34,197,94,0.3)}
+.toast-success .ti{color:var(--success)}
+.toast-error{border-color:rgba(239,68,68,0.3)}
+.toast-error .ti{color:var(--danger)}
+.toast-info{border-color:rgba(59,130,246,0.3)}
+.toast-info .ti{color:var(--info)}
+.empty-state{text-align:center;padding:4rem 2rem;color:var(--text-muted)}
+.empty-icon{font-size:3.5rem;margin-bottom:1rem}
+.empty-title{font-size:1.1rem;font-weight:600;color:var(--text-secondary);margin-bottom:0.5rem}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 0.7s linear infinite;margin:2rem auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-center{display:flex;justify-content:center;padding:3rem}
+.avatar{width:36px;height:36px;background:var(--primary-glow);border:1px solid rgba(255,107,53,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;color:var(--primary);flex-shrink:0}
+.member-cell{display:flex;align-items:center;gap:0.75rem}
+.member-name{font-weight:600}
+.member-id{font-size:0.72rem;color:var(--text-muted);font-family:var(--font-mono)}
+.expiry-item{display:flex;align-items:center;justify-content:space-between;padding:0.75rem;background:var(--warning-light);border:1px solid rgba(245,158,11,0.2);border-radius:var(--radius-sm);margin-bottom:0.5rem}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-top:1.25rem}
+#login-page{display:none;min-height:100vh;background:var(--bg-base);align-items:center;justify-content:center;padding:2rem}
+#login-page.active{display:flex}
+.login-container{width:100%;max-width:420px}
+.login-logo{text-align:center;margin-bottom:2.5rem}
+.login-logo-icon{width:72px;height:72px;background:var(--primary);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:2.2rem;margin:0 auto 1rem;box-shadow:0 8px 24px rgba(255,107,53,0.35)}
+.login-title{font-size:2rem;font-weight:800;color:var(--text-primary);letter-spacing:-0.03em}
+.login-subtitle{color:var(--text-secondary);font-size:0.9rem;margin-top:0.25rem}
+.login-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2rem}
+.login-card .form-group{margin-bottom:1rem}
+.checkin-result{margin-top:1rem;padding:1.25rem;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius);display:none}
+.checkin-result.visible{display:block}
+.ci-avatar{width:56px;height:56px;background:var(--primary-glow);border:2px solid rgba(255,107,53,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:700;color:var(--primary)}
+.menu-toggle{display:none;background:none;border:none;color:var(--text-primary);font-size:1.4rem;padding:0.25rem}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99}
+.page{display:none;animation:fadeIn 0.25s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.mono{font-family:var(--font-mono);direction:ltr;display:inline-block}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg-base)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--border-hover)}
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}
+  body.rtl .sidebar{transform:translateX(100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main-content{margin-inline-start:0}
+  .menu-toggle{display:flex}
+  .sidebar-overlay.visible{display:block}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .dash-grid{grid-template-columns:1fr}
+  .form-grid{grid-template-columns:1fr}
+  .toolbar{flex-direction:column;align-items:stretch}
+  .toolbar-left,.toolbar-right{width:100%}
+}
+@media(max-width:500px){
+  .stats-grid{grid-template-columns:1fr}
+  .page-content{padding:1rem}
+  .modal{max-width:100%}
+  .modal-footer{flex-direction:column}
+  .modal-footer .btn{width:100%;justify-content:center}
+}
+</style>
 </head>
 <body class="rtl">
 
-<!-- ============================================
-     LOGIN PAGE
-     ============================================ -->
+<!-- LOGIN -->
 <div id="login-page" class="active">
   <div class="login-container">
     <div class="login-logo">
       <div class="login-logo-icon">🏋️</div>
-      <h1 class="login-title" data-i18n="app_name">GymPro</h1>
-      <p class="login-subtitle" data-i18n="auth.login_subtitle">سجّل دخولك لإدارة جيمك</p>
+      <h1 class="login-title">GymPro</h1>
+      <p class="login-subtitle">سجّل دخولك لإدارة جيمك</p>
     </div>
-
     <div class="login-card">
-      <div id="login-error" style="display:none;background:var(--danger-light);border:1px solid rgba(239,68,68,0.3);border-radius:var(--radius-sm);padding:0.75rem 1rem;margin-bottom:1rem;color:var(--danger);font-size:0.875rem;"></div>
-
-      <div class="login-form">
-        <div class="form-group">
-          <label for="login-email" data-i18n="auth.email">البريد الإلكتروني</label>
-          <input type="email" id="login-email" placeholder="admin@gym.com" autocomplete="email" />
-        </div>
-        <div class="form-group" style="margin-bottom:1.25rem">
-          <label for="login-password" data-i18n="auth.password">كلمة المرور</label>
-          <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" />
-        </div>
-        <button id="login-btn" class="btn btn-primary login-submit" data-i18n="auth.login_btn">دخول</button>
-      </div>
+      <div id="login-error" style="display:none;background:var(--danger-light);border:1px solid rgba(239,68,68,0.3);border-radius:var(--radius-sm);padding:0.75rem 1rem;margin-bottom:1rem;color:var(--danger);font-size:0.875rem"></div>
+      <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="login-email" placeholder="admin@gym.com"/></div>
+      <div class="form-group" style="margin-bottom:1.25rem"><label>كلمة المرور</label><input type="password" id="login-password" placeholder="••••••••"/></div>
+      <button id="login-btn" class="btn btn-primary" style="width:100%;justify-content:center;padding:0.85rem;font-size:0.95rem">دخول</button>
     </div>
   </div>
 </div>
 
-<!-- ============================================
-     MAIN APP
-     ============================================ -->
+<!-- APP -->
 <div id="app" style="display:none">
-
-  <!-- Sidebar Overlay (mobile) -->
   <div class="sidebar-overlay" id="sidebar-overlay"></div>
-
-  <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
       <div class="logo-icon">🏋️</div>
-      <div class="logo-text">
-        <span class="logo-title" data-i18n="app_name">GymPro</span>
-        <span class="logo-sub" data-i18n="app_tagline">Gym Management</span>
+      <div>
+        <div class="logo-title">GymPro</div>
+        <div class="logo-sub">نظام إدارة الجيم</div>
       </div>
     </div>
-
     <nav class="sidebar-nav">
-      <div class="nav-section-label">القائمة الرئيسية</div>
-
-      <div class="nav-item active" data-page="dashboard">
-        <span class="nav-icon">📊</span>
-        <span data-i18n="nav.dashboard">لوحة التحكم</span>
-      </div>
-      <div class="nav-item" data-page="members">
-        <span class="nav-icon">👥</span>
-        <span data-i18n="nav.members">الأعضاء</span>
-      </div>
-      <div class="nav-item" data-page="checkin">
-        <span class="nav-icon">✅</span>
-        <span data-i18n="nav.checkin">تسجيل الحضور</span>
-      </div>
-      <div class="nav-item" data-page="payments">
-        <span class="nav-icon">💰</span>
-        <span data-i18n="nav.payments">المدفوعات</span>
-      </div>
+      <div class="nav-label">القائمة الرئيسية</div>
+      <div class="nav-item active" data-page="dashboard"><span class="nav-icon">📊</span><span>لوحة التحكم</span></div>
+      <div class="nav-item" data-page="members"><span class="nav-icon">👥</span><span>الأعضاء</span></div>
+      <div class="nav-item" data-page="checkin"><span class="nav-icon">✅</span><span>تسجيل الحضور</span></div>
+      <div class="nav-item" data-page="payments"><span class="nav-icon">💰</span><span>المدفوعات</span></div>
     </nav>
-
     <div class="sidebar-footer">
-      <div class="nav-item" id="logout-btn">
-        <span class="nav-icon">🚪</span>
-        <span data-i18n="nav.logout">تسجيل الخروج</span>
-      </div>
+      <div class="nav-item" id="logout-btn"><span class="nav-icon">🚪</span><span>تسجيل الخروج</span></div>
     </div>
   </aside>
 
-  <!-- Main Content -->
   <main class="main-content">
-    <!-- Top Header -->
     <header class="top-header">
       <div class="header-left">
         <button class="menu-toggle" id="menu-toggle">☰</button>
         <h2 class="page-title" id="header-title">لوحة التحكم</h2>
       </div>
       <div class="header-right">
-        <!-- Language Switcher -->
         <div class="lang-switcher">
-          <button class="lang-btn" id="lang-btn">
-            <span id="current-lang-flag">🇸🇦</span>
-            <span id="current-lang-name">العربية</span>
-            <span>▾</span>
-          </button>
+          <button class="lang-btn" id="lang-btn"><span id="lang-flag">🇸🇦</span><span id="lang-name">العربية</span><span>▾</span></button>
           <div class="lang-dropdown" id="lang-dropdown">
             <div class="lang-option current" data-lang="ar">🇸🇦 العربية</div>
             <div class="lang-option" data-lang="en">🇺🇸 English</div>
@@ -126,298 +235,497 @@
             <div class="lang-option" data-lang="hi">🇮🇳 हिंदी</div>
           </div>
         </div>
-
-        <!-- User Badge -->
         <div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0.75rem;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm)">
-          <span style="font-size:0.9rem">👤</span>
-          <span id="user-email" style="font-size:0.8rem;color:var(--text-secondary)">admin</span>
+          <span>👤</span><span id="user-email" style="font-size:0.8rem;color:var(--text-secondary)">admin</span>
         </div>
       </div>
     </header>
 
-    <!-- Pages -->
     <div class="page-content">
-
-      <!-- ==================== DASHBOARD ==================== -->
+      <!-- DASHBOARD -->
       <div id="page-dashboard" class="page active">
         <div class="stats-grid">
-          <div class="stat-card primary">
-            <div class="stat-icon">👥</div>
-            <div class="stat-info">
-              <div class="stat-value" id="stat-total">0</div>
-              <div class="stat-label" data-i18n="dashboard.total_members">إجمالي الأعضاء</div>
-            </div>
-          </div>
-          <div class="stat-card success">
-            <div class="stat-icon">✅</div>
-            <div class="stat-info">
-              <div class="stat-value" id="stat-active">0</div>
-              <div class="stat-label" data-i18n="dashboard.active_members">الأعضاء النشطون</div>
-            </div>
-          </div>
-          <div class="stat-card danger">
-            <div class="stat-icon">⚠️</div>
-            <div class="stat-info">
-              <div class="stat-value" id="stat-expired">0</div>
-              <div class="stat-label" data-i18n="dashboard.expired_subscriptions">الاشتراكات المنتهية</div>
-            </div>
-          </div>
-          <div class="stat-card info">
-            <div class="stat-icon">💰</div>
-            <div class="stat-info">
-              <div class="stat-value mono" id="stat-revenue">0</div>
-              <div class="stat-label" data-i18n="dashboard.total_revenue">إجمالي الإيرادات</div>
-            </div>
-          </div>
+          <div class="stat-card c-primary"><div class="stat-icon">👥</div><div class="stat-info"><div class="stat-value" id="s-total">0</div><div class="stat-label">إجمالي الأعضاء</div></div></div>
+          <div class="stat-card c-success"><div class="stat-icon">✅</div><div class="stat-info"><div class="stat-value" id="s-active">0</div><div class="stat-label">الأعضاء النشطون</div></div></div>
+          <div class="stat-card c-danger"><div class="stat-icon">⚠️</div><div class="stat-info"><div class="stat-value" id="s-expired">0</div><div class="stat-label">الاشتراكات المنتهية</div></div></div>
+          <div class="stat-card c-info"><div class="stat-icon">💰</div><div class="stat-info"><div class="stat-value mono" id="s-revenue">0</div><div class="stat-label">إجمالي الإيرادات</div></div></div>
         </div>
-
-        <div class="dashboard-grid">
-          <!-- Expiring Soon -->
-          <div class="card">
-            <div class="card-header">
-              <h3 class="card-title" data-i18n="dashboard.expiring_soon">⏰ تنتهي قريباً</h3>
-            </div>
-            <div id="expiring-soon-list">
-              <div class="loading-center"><div class="spinner"></div></div>
-            </div>
-          </div>
-
-          <!-- Today's Checkins -->
-          <div class="card">
-            <div class="card-header">
-              <h3 class="card-title" data-i18n="dashboard.recent_checkins">🏃 آخر تسجيلات الحضور</h3>
-              <span class="badge badge-info" id="checkin-count-badge">0</span>
-            </div>
-            <div id="recent-checkins-list">
-              <div class="loading-center"><div class="spinner"></div></div>
-            </div>
-          </div>
+        <div class="dash-grid">
+          <div class="card"><div class="card-header"><h3 class="card-title">⏰ تنتهي قريباً</h3></div><div id="expiring-list"><div class="loading-center"><div class="spinner"></div></div></div></div>
+          <div class="card"><div class="card-header"><h3 class="card-title">🏃 آخر تسجيلات الحضور</h3><span class="badge badge-info" id="ci-badge">0</span></div><div id="recent-ci"><div class="loading-center"><div class="spinner"></div></div></div></div>
         </div>
       </div>
 
-      <!-- ==================== MEMBERS ==================== -->
+      <!-- MEMBERS -->
       <div id="page-members" class="page">
         <div class="toolbar">
           <div class="toolbar-left">
-            <div class="search-bar" style="min-width:240px">
-              <span class="search-icon">🔍</span>
-              <input type="text" id="member-search" data-i18n-placeholder="members.search" placeholder="البحث بالاسم أو الهاتف..." />
-            </div>
-            <select id="member-filter" style="min-width:150px">
-              <option value="all" data-i18n="members.all">الكل</option>
-              <option value="active" data-i18n="members.active">نشط</option>
-              <option value="expired" data-i18n="members.expired">منتهي</option>
-            </select>
+            <div class="search-bar" style="min-width:240px"><span class="search-icon">🔍</span><input type="text" id="member-search" placeholder="البحث بالاسم أو الهاتف..."/></div>
+            <select id="member-filter" style="min-width:150px"><option value="all">الكل</option><option value="active">نشط</option><option value="expired">منتهي</option></select>
           </div>
-          <div class="toolbar-right">
-            <button class="btn btn-primary" id="add-member-btn">
-              <span>+</span> <span data-i18n="members.add_member">إضافة عضو</span>
-            </button>
-          </div>
+          <div class="toolbar-right"><button class="btn btn-primary" id="add-member-btn">+ إضافة عضو</button></div>
         </div>
-
         <div class="table-wrapper">
-          <table id="members-table">
-            <thead>
-              <tr>
-                <th data-i18n="members.name">الاسم</th>
-                <th data-i18n="members.phone">الهاتف</th>
-                <th data-i18n="members.sub_type">الاشتراك</th>
-                <th data-i18n="members.sub_end">انتهاء</th>
-                <th data-i18n="members.status">الحالة</th>
-                <th data-i18n="members.actions">الإجراءات</th>
-              </tr>
-            </thead>
-            <tbody id="members-tbody">
-              <tr><td colspan="6"><div class="loading-center"><div class="spinner"></div></div></td></tr>
-            </tbody>
-          </table>
+          <table><thead><tr><th>الاسم</th><th>الهاتف</th><th>الاشتراك</th><th>انتهاء</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+          <tbody id="members-tbody"><tr><td colspan="6"><div class="loading-center"><div class="spinner"></div></div></td></tr></tbody></table>
         </div>
       </div>
 
-      <!-- ==================== CHECK-IN ==================== -->
+      <!-- CHECKIN -->
       <div id="page-checkin" class="page">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
-          <!-- Check-in Form -->
           <div class="card">
-            <h3 class="card-title" style="margin-bottom:1.25rem" data-i18n="checkin.title">تسجيل الحضور</h3>
-
+            <h3 class="card-title" style="margin-bottom:1.25rem">تسجيل الحضور</h3>
             <div class="form-group" style="margin-bottom:1rem">
-              <label data-i18n="checkin.search_member">ابحث برقم الهاتف أو ID</label>
-              <div class="search-bar">
-                <span class="search-icon">🔍</span>
-                <input type="text" id="checkin-search" placeholder="+966501234567" />
-              </div>
+              <label>ابحث برقم الهاتف أو ID</label>
+              <div class="search-bar"><span class="search-icon">🔍</span><input type="text" id="ci-search" placeholder="+966501234567"/></div>
             </div>
-
-            <button class="btn btn-primary" id="checkin-btn" style="width:100%;justify-content:center;padding:0.75rem">
-              ✅ <span data-i18n="checkin.checkin_btn">تسجيل دخول</span>
-            </button>
-
-            <!-- Result -->
-            <div class="checkin-result" id="checkin-result">
-              <div class="checkin-member-info">
-                <div class="checkin-member-avatar" id="checkin-avatar">?</div>
-                <div>
-                  <div style="font-weight:700;font-size:1.05rem" id="checkin-name">-</div>
-                  <div style="color:var(--text-muted);font-size:0.8rem" id="checkin-phone">-</div>
-                </div>
+            <button class="btn btn-primary" id="ci-btn" style="width:100%;justify-content:center;padding:0.75rem">✅ تسجيل دخول</button>
+            <div class="checkin-result" id="ci-result">
+              <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem">
+                <div class="ci-avatar" id="ci-avatar">?</div>
+                <div><div style="font-weight:700;font-size:1.05rem" id="ci-name">-</div><div style="color:var(--text-muted);font-size:0.8rem" id="ci-phone">-</div></div>
               </div>
-              <div id="checkin-status-msg" style="font-size:0.875rem"></div>
+              <div id="ci-msg" style="font-size:0.875rem"></div>
             </div>
           </div>
-
-          <!-- Today's Checkins -->
           <div class="card">
-            <div class="card-header">
-              <h3 class="card-title" data-i18n="checkin.today_checkins">حضور اليوم</h3>
-              <span class="badge badge-info" id="today-count">0</span>
-            </div>
-            <div id="today-checkins-list">
-              <div class="loading-center"><div class="spinner"></div></div>
-            </div>
+            <div class="card-header"><h3 class="card-title">حضور اليوم</h3><span class="badge badge-info" id="today-count">0</span></div>
+            <div id="today-ci-list"><div class="loading-center"><div class="spinner"></div></div></div>
           </div>
         </div>
       </div>
 
-      <!-- ==================== PAYMENTS ==================== -->
+      <!-- PAYMENTS -->
       <div id="page-payments" class="page">
         <div class="toolbar">
-          <div class="toolbar-left">
-            <div class="search-bar" style="min-width:240px">
-              <span class="search-icon">🔍</span>
-              <input type="text" id="payment-search" placeholder="بحث..." />
-            </div>
-          </div>
-          <div class="toolbar-right">
-            <button class="btn btn-primary" id="add-payment-btn">
-              <span>+</span> <span data-i18n="payments.add_payment">تسجيل دفعة</span>
-            </button>
-          </div>
+          <div class="toolbar-left"><div class="search-bar" style="min-width:240px"><span class="search-icon">🔍</span><input type="text" id="pay-search" placeholder="بحث..."/></div></div>
+          <div class="toolbar-right"><button class="btn btn-primary" id="add-pay-btn">+ تسجيل دفعة</button></div>
         </div>
-
         <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th data-i18n="payments.member">العضو</th>
-                <th data-i18n="payments.amount">المبلغ</th>
-                <th data-i18n="payments.date">التاريخ</th>
-                <th data-i18n="payments.notes">ملاحظات</th>
-                <th>إجراءات</th>
-              </tr>
-            </thead>
-            <tbody id="payments-tbody">
-              <tr><td colspan="5"><div class="loading-center"><div class="spinner"></div></div></td></tr>
-            </tbody>
-          </table>
+          <table><thead><tr><th>العضو</th><th>المبلغ</th><th>التاريخ</th><th>ملاحظات</th><th>إجراءات</th></tr></thead>
+          <tbody id="pay-tbody"><tr><td colspan="5"><div class="loading-center"><div class="spinner"></div></div></td></tr></tbody></table>
         </div>
-
-        <!-- Total Row -->
         <div style="margin-top:1rem;display:flex;justify-content:flex-end">
           <div class="card" style="padding:0.875rem 1.5rem;display:inline-flex;align-items:center;gap:1rem">
-            <span style="color:var(--text-secondary)" data-i18n="payments.total">المجموع</span>
-            <span class="mono" id="payments-total" style="font-size:1.2rem;font-weight:700;color:var(--success)">0.00 SAR</span>
+            <span style="color:var(--text-secondary)">المجموع</span>
+            <span class="mono" id="pay-total" style="font-size:1.2rem;font-weight:700;color:var(--success)">0.00 SAR</span>
           </div>
         </div>
       </div>
-
-    </div><!-- end .page-content -->
+    </div>
   </main>
-</div><!-- end #app -->
+</div>
 
-<!-- ============================================
-     MEMBER MODAL
-     ============================================ -->
+<!-- MEMBER MODAL -->
 <div class="modal-overlay" id="member-modal">
   <div class="modal">
-    <div class="modal-header">
-      <h3 class="modal-title" id="member-modal-title">إضافة عضو</h3>
-      <button class="modal-close" data-close="member-modal">✕</button>
-    </div>
+    <div class="modal-header"><h3 class="modal-title" id="m-modal-title">إضافة عضو</h3><button class="modal-close" data-close="member-modal">✕</button></div>
     <div class="modal-body">
-      <input type="hidden" id="member-id" />
+      <input type="hidden" id="m-id"/>
       <div class="form-grid">
-        <div class="form-group">
-          <label>الاسم <span class="required-star">*</span></label>
-          <input type="text" id="member-name" placeholder="الاسم الكامل" />
-        </div>
-        <div class="form-group">
-          <label>رقم الهاتف <span class="required-star">*</span></label>
-          <input type="tel" id="member-phone" placeholder="+966501234567" />
-        </div>
-        <div class="form-group">
-          <label>البريد الإلكتروني</label>
-          <input type="email" id="member-email" placeholder="email@example.com" />
-        </div>
-        <div class="form-group">
-          <label>نوع الاشتراك <span class="required-star">*</span></label>
-          <select id="member-sub-type">
-            <option value="monthly">شهري</option>
-            <option value="quarterly">3 شهور</option>
-            <option value="yearly">سنوي</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>تاريخ البداية <span class="required-star">*</span></label>
-          <input type="date" id="member-start-date" />
-        </div>
-        <div class="form-group">
-          <label>تاريخ الانتهاء</label>
-          <input type="date" id="member-end-date" readonly style="opacity:0.6" />
-        </div>
-        <div class="form-group full-width">
-          <label>ملاحظات</label>
-          <textarea id="member-notes" placeholder="ملاحظات إضافية..."></textarea>
-        </div>
+        <div class="form-group"><label>الاسم <span class="req">*</span></label><input type="text" id="m-name" placeholder="الاسم الكامل"/></div>
+        <div class="form-group"><label>رقم الهاتف <span class="req">*</span></label><input type="tel" id="m-phone" placeholder="+966501234567"/></div>
+        <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="m-email" placeholder="email@example.com"/></div>
+        <div class="form-group"><label>نوع الاشتراك <span class="req">*</span></label><select id="m-type"><option value="monthly">شهري</option><option value="quarterly">3 شهور</option><option value="yearly">سنوي</option></select></div>
+        <div class="form-group"><label>تاريخ البداية <span class="req">*</span></label><input type="date" id="m-start"/></div>
+        <div class="form-group"><label>تاريخ الانتهاء</label><input type="date" id="m-end" readonly style="opacity:0.6"/></div>
+        <div class="form-group full"><label>ملاحظات</label><textarea id="m-notes" placeholder="ملاحظات إضافية..."></textarea></div>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" data-close="member-modal">إلغاء</button>
-      <button class="btn btn-primary" id="save-member-btn">حفظ العضو</button>
-    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" data-close="member-modal">إلغاء</button><button class="btn btn-primary" id="save-member-btn">حفظ العضو</button></div>
   </div>
 </div>
 
-<!-- ============================================
-     PAYMENT MODAL
-     ============================================ -->
-<div class="modal-overlay" id="payment-modal">
+<!-- PAYMENT MODAL -->
+<div class="modal-overlay" id="pay-modal">
   <div class="modal">
-    <div class="modal-header">
-      <h3 class="modal-title">تسجيل دفعة</h3>
-      <button class="modal-close" data-close="payment-modal">✕</button>
-    </div>
+    <div class="modal-header"><h3 class="modal-title">تسجيل دفعة</h3><button class="modal-close" data-close="pay-modal">✕</button></div>
     <div class="modal-body">
       <div class="form-grid">
-        <div class="form-group full-width">
-          <label>العضو <span class="required-star">*</span></label>
-          <select id="payment-member-id">
-            <option value="">-- اختر عضو --</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>المبلغ (SAR) <span class="required-star">*</span></label>
-          <input type="number" id="payment-amount" placeholder="0.00" min="0" step="0.01" />
-        </div>
-        <div class="form-group">
-          <label>التاريخ <span class="required-star">*</span></label>
-          <input type="date" id="payment-date" />
-        </div>
-        <div class="form-group full-width">
-          <label>ملاحظات</label>
-          <input type="text" id="payment-notes" placeholder="سبب الدفعة..." />
-        </div>
+        <div class="form-group full"><label>العضو <span class="req">*</span></label><select id="p-member"><option value="">-- اختر عضو --</option></select></div>
+        <div class="form-group"><label>المبلغ (SAR) <span class="req">*</span></label><input type="number" id="p-amount" placeholder="0.00" min="0" step="0.01"/></div>
+        <div class="form-group"><label>التاريخ <span class="req">*</span></label><input type="date" id="p-date"/></div>
+        <div class="form-group full"><label>ملاحظات</label><input type="text" id="p-notes" placeholder="سبب الدفعة..."/></div>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" data-close="payment-modal">إلغاء</button>
-      <button class="btn btn-primary" id="save-payment-btn">تسجيل الدفعة</button>
-    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" data-close="pay-modal">إلغاء</button><button class="btn btn-primary" id="save-pay-btn">تسجيل الدفعة</button></div>
   </div>
 </div>
 
-<!-- Scripts -->
-<script type="module" src="/src/app.js"></script>
+<script>
+// ============ CONFIG ============
+const SUPA_URL = 'https://dpabrokcapjvcalasemk.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwYWJyb2tjYXBqdmNhbGFzZW1rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MDMwMDksImV4cCI6MjA5NTk3OTAwOX0.SAAp6GIJttkCF0ZOcPElxZEUIiCZHBXgN5EgQb_w9mc';
+const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+// ============ i18n ============
+const LANGS = {
+  ar:{flag:'🇸🇦',name:'العربية',nav:{dashboard:'لوحة التحكم',members:'الأعضاء',checkin:'تسجيل الحضور',payments:'المدفوعات',logout:'تسجيل الخروج'},sub:{monthly:'شهري',quarterly:'3 شهور',yearly:'سنوي'},status:{active:'نشط',expired:'منتهي'},msg:{checkin_ok:'تم تسجيل الحضور ✅',already:'تم تسجيل الحضور مسبقاً اليوم',not_found:'العضو غير موجود',expired_warn:'تحذير: اشتراك منتهٍ ⚠️',saved:'تم الحفظ ✅',deleted:'تم الحذف',pay_saved:'تم تسجيل الدفعة ✅',confirm_del:'هل أنت متأكد من الحذف؟',fill_req:'يرجى ملء الحقول المطلوبة',error:'حدث خطأ',no_checkins:'لا يوجد حضور اليوم',no_expiring:'لا توجد اشتراكات تنتهي قريباً',no_members:'لا يوجد أعضاء',no_payments:'لا توجد مدفوعات'}},
+  en:{flag:'🇺🇸',name:'English',nav:{dashboard:'Dashboard',members:'Members',checkin:'Check-in',payments:'Payments',logout:'Logout'},sub:{monthly:'Monthly',quarterly:'3 Months',yearly:'Yearly'},status:{active:'Active',expired:'Expired'},msg:{checkin_ok:'Checked in ✅',already:'Already checked in today',not_found:'Member not found',expired_warn:'Warning: Expired subscription ⚠️',saved:'Saved ✅',deleted:'Deleted',pay_saved:'Payment recorded ✅',confirm_del:'Are you sure you want to delete?',fill_req:'Please fill required fields',error:'An error occurred',no_checkins:'No check-ins today',no_expiring:'No expiring subscriptions',no_members:'No members found',no_payments:'No payments found'}},
+  tl:{flag:'🇵🇭',name:'Tagalog',nav:{dashboard:'Dashboard',members:'Mga Miyembro',checkin:'Check-in',payments:'Mga Bayad',logout:'Mag-logout'},sub:{monthly:'Buwanan',quarterly:'3 Buwan',yearly:'Taunan'},status:{active:'Aktibo',expired:'Nag-expire'},msg:{checkin_ok:'Naka-check in ✅',already:'Naka-check in na ngayon',not_found:'Hindi nahanap ang miyembro',expired_warn:'Babala: Nag-expire na ⚠️',saved:'Na-save ✅',deleted:'Nabura',pay_saved:'Naitala ang bayad ✅',confirm_del:'Sigurado ka bang gusto mong burahin?',fill_req:'Punan ang mga kinakailangang field',error:'May naganap na error',no_checkins:'Walang check-in ngayon',no_expiring:'Walang malapit na mag-expire',no_members:'Walang miyembro',no_payments:'Walang bayad'}},
+  hi:{flag:'🇮🇳',name:'हिंदी',nav:{dashboard:'डैशबोर्ड',members:'सदस्य',checkin:'चेक-इन',payments:'भुगतान',logout:'लॉगआउट'},sub:{monthly:'मासिक',quarterly:'3 महीने',yearly:'वार्षिक'},status:{active:'सक्रिय',expired:'समाप्त'},msg:{checkin_ok:'चेक-इन सफल ✅',already:'आज पहले से चेक-इन किया गया है',not_found:'सदस्य नहीं मिला',expired_warn:'चेतावनी: समाप्त सदस्यता ⚠️',saved:'सहेजा गया ✅',deleted:'हटाया गया',pay_saved:'भुगतान दर्ज ✅',confirm_del:'क्या आप वाकई हटाना चाहते हैं?',fill_req:'आवश्यक फ़ील्ड भरें',error:'एक त्रुटि हुई',no_checkins:'आज कोई चेक-इन नहीं',no_expiring:'कोई समाप्त होने वाला नहीं',no_members:'कोई सदस्य नहीं मिला',no_payments:'कोई भुगतान नहीं'}}
+};
+let lang = localStorage.getItem('gym_lang')||'ar';
+const L = ()=>LANGS[lang];
+const RTL = ['ar'];
+
+function setLang(l){
+  lang=l;localStorage.setItem('gym_lang',l);
+  document.documentElement.lang=l;
+  document.documentElement.dir=RTL.includes(l)?'rtl':'ltr';
+  document.body.classList.toggle('rtl',RTL.includes(l));
+  document.body.classList.toggle('ltr',!RTL.includes(l));
+  document.getElementById('lang-flag').textContent=LANGS[l].flag;
+  document.getElementById('lang-name').textContent=LANGS[l].name;
+  document.querySelectorAll('.lang-option').forEach(o=>o.classList.toggle('current',o.dataset.lang===l));
+  // Update nav labels
+  document.querySelector('[data-page="dashboard"] span:last-child').textContent=L().nav.dashboard;
+  document.querySelector('[data-page="members"] span:last-child').textContent=L().nav.members;
+  document.querySelector('[data-page="checkin"] span:last-child').textContent=L().nav.checkin;
+  document.querySelector('[data-page="payments"] span:last-child').textContent=L().nav.payments;
+  document.getElementById('logout-btn').querySelector('span:last-child').textContent=L().nav.logout;
+}
+
+// ============ UTILS ============
+function fmtDate(d){if(!d)return'-';return new Date(d).toLocaleDateString('en-GB',{year:'numeric',month:'short',day:'numeric'})}
+function fmtTime(d){if(!d)return'-';return new Date(d).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}
+function fmtCur(a){return `${Number(a||0).toFixed(2)} SAR`}
+function today(){return new Date().toISOString().split('T')[0]}
+function calcEnd(start,type){const d=new Date(start);if(type==='monthly')d.setMonth(d.getMonth()+1);else if(type==='quarterly')d.setMonth(d.getMonth()+3);else d.setFullYear(d.getFullYear()+1);return d.toISOString().split('T')[0]}
+function daysLeft(end){return Math.ceil((new Date(end)-new Date())/(1000*60*60*24))}
+function initials(n){if(!n)return'?';const p=n.trim().split(/\s+/);return p.length>=2?(p[0][0]+p[1][0]).toUpperCase():n.substring(0,2).toUpperCase()}
+function shortId(id){return id?'#'+id.split('-')[0].toUpperCase():''}
+
+function toast(msg,type='success'){
+  const ex=document.querySelector('.toast');if(ex)ex.remove();
+  const t=document.createElement('div');
+  t.className=`toast toast-${type}`;
+  t.innerHTML=`<span class="ti">${type==='success'?'✓':type==='error'?'✕':'ℹ'}</span><span>${msg}</span>`;
+  document.body.appendChild(t);
+  setTimeout(()=>t.classList.add('show'),10);
+  setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),300)},3500);
+}
+
+function confirm_(msg){
+  return new Promise(res=>{
+    const o=document.createElement('div');o.className='modal-overlay active';
+    o.innerHTML=`<div class="modal"><div class="modal-body" style="text-align:center;padding:2rem"><div style="font-size:2.5rem;margin-bottom:1rem">⚠️</div><p style="font-size:1.1rem;margin-bottom:1.5rem">${msg}</p><div style="display:flex;gap:1rem;justify-content:center"><button class="btn btn-danger cy">حذف</button><button class="btn btn-secondary cn">إلغاء</button></div></div></div>`;
+    document.body.appendChild(o);
+    o.querySelector('.cy').onclick=()=>{o.remove();res(true)};
+    o.querySelector('.cn').onclick=()=>{o.remove();res(false)};
+    o.onclick=e=>{if(e.target===o){o.remove();res(false)}};
+  });
+}
+
+function openModal(id){document.getElementById(id).classList.add('active')}
+function closeModal(id){document.getElementById(id).classList.remove('active')}
+
+// ============ ROUTING ============
+let allMembers=[];
+const PAGE_TITLES={dashboard:'لوحة التحكم',members:'الأعضاء',checkin:'تسجيل الحضور',payments:'المدفوعات'};
+
+function navigate(page){
+  document.querySelectorAll('.nav-item[data-page]').forEach(e=>e.classList.toggle('active',e.dataset.page===page));
+  document.querySelectorAll('.page').forEach(e=>e.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  const titles={dashboard:L().nav.dashboard,members:L().nav.members,checkin:L().nav.checkin,payments:L().nav.payments};
+  document.getElementById('header-title').textContent=titles[page]||page;
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('visible');
+  if(page==='dashboard')loadDashboard();
+  else if(page==='members')loadMembers();
+  else if(page==='checkin')loadCheckin();
+  else if(page==='payments')loadPayments();
+}
+
+// ============ DASHBOARD ============
+async function loadDashboard(){
+  try{
+    const t=today();
+    const in7=new Date();in7.setDate(in7.getDate()+7);
+    const in7s=in7.toISOString().split('T')[0];
+    const [mr,pr,er,cr]=await Promise.all([
+      sb.from('members').select('id,status'),
+      sb.from('payments').select('amount'),
+      sb.from('members').select('id,name,phone,subscription_end').eq('status','active').gte('subscription_end',t).lte('subscription_end',in7s),
+      sb.from('checkins').select('*,members(name,phone)').eq('date',t).order('checkin_time',{ascending:false})
+    ]);
+    const members=mr.data||[];
+    const payments=pr.data||[];
+    const expiring=er.data||[];
+    const checkins=cr.data||[];
+    document.getElementById('s-total').textContent=members.length;
+    document.getElementById('s-active').textContent=members.filter(m=>m.status==='active').length;
+    document.getElementById('s-expired').textContent=members.filter(m=>m.status==='expired').length;
+    document.getElementById('s-revenue').textContent=fmtCur(payments.reduce((s,p)=>s+Number(p.amount||0),0));
+    document.getElementById('ci-badge').textContent=checkins.length;
+    // Expiring
+    const el=document.getElementById('expiring-list');
+    if(expiring.length===0){el.innerHTML=`<div class="empty-state"><div class="empty-icon">🎉</div><div class="empty-title">${L().msg.no_expiring}</div></div>`}
+    else{el.innerHTML=expiring.map(m=>`<div class="expiry-item"><div style="display:flex;align-items:center;gap:0.75rem"><div class="avatar" style="background:var(--warning-light);color:var(--warning);border-color:rgba(245,158,11,0.3)">${initials(m.name)}</div><div><div style="font-weight:600;font-size:0.9rem">${m.name}</div><div style="font-size:0.75rem;color:var(--text-muted)">${m.phone}</div></div></div><div class="badge badge-warning">${daysLeft(m.subscription_end)} يوم</div></div>`).join('')}
+    // Checkins
+    const cl=document.getElementById('recent-ci');
+    if(checkins.length===0){cl.innerHTML=`<div class="empty-state"><div class="empty-icon">🏃</div><div class="empty-title">${L().msg.no_checkins}</div></div>`}
+    else{cl.innerHTML=checkins.slice(0,8).map(c=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:0.65rem 0;border-bottom:1px solid var(--border)"><div style="display:flex;align-items:center;gap:0.75rem"><div class="avatar">${initials(c.members?.name)}</div><div><div style="font-weight:600;font-size:0.875rem">${c.members?.name||'?'}</div><div style="font-size:0.72rem;color:var(--text-muted)">${c.members?.phone||''}</div></div></div><div style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-muted)">${fmtTime(c.checkin_time)}</div></div>`).join('')}
+  }catch(e){console.error(e);toast(L().msg.error,'error')}
+}
+
+// ============ MEMBERS ============
+async function loadMembers(){
+  const search=document.getElementById('member-search').value;
+  const status=document.getElementById('member-filter').value;
+  const tbody=document.getElementById('members-tbody');
+  tbody.innerHTML='<tr><td colspan="6"><div class="loading-center"><div class="spinner"></div></div></td></tr>';
+  try{
+    let q=sb.from('members').select('*').order('created_at',{ascending:false});
+    if(status!=='all')q=q.eq('status',status);
+    if(search)q=q.or(`name.ilike.%${search}%,phone.ilike.%${search}%`);
+    const {data,error}=await q;if(error)throw error;
+    allMembers=data||[];
+    if(allMembers.length===0){tbody.innerHTML=`<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">👥</div><div class="empty-title">${L().msg.no_members}</div></div></td></tr>`;return}
+    tbody.innerHTML=allMembers.map(m=>{
+      const days=daysLeft(m.subscription_end);
+      const isExp=m.status==='expired';
+      const isSoon=!isExp&&days<=7;
+      return`<tr>
+        <td><div class="member-cell"><div class="avatar">${initials(m.name)}</div><div><div class="member-name">${m.name}</div><div class="member-id">${shortId(m.id)}</div></div></div></td>
+        <td><span class="mono">${m.phone}</span></td>
+        <td><span class="badge badge-info">${L().sub[m.subscription_type]||m.subscription_type}</span></td>
+        <td><div style="display:flex;align-items:center;gap:0.5rem">${fmtDate(m.subscription_end)}${isSoon?`<span class="badge badge-warning">${days}d</span>`:''}</div></td>
+        <td><span class="badge ${isExp?'badge-danger':'badge-success'}">${isExp?L().status.expired:L().status.active}</span></td>
+        <td><div style="display:flex;gap:0.5rem"><button class="btn btn-sm btn-secondary" onclick="editMember('${m.id}')">✏️</button><button class="btn btn-sm btn-danger" onclick="delMember('${m.id}')">🗑️</button></div></td>
+      </tr>`}).join('');
+  }catch(e){console.error(e);toast(L().msg.error,'error')}
+}
+
+function openAddMember(){
+  document.getElementById('m-id').value='';
+  document.getElementById('m-name').value='';
+  document.getElementById('m-phone').value='';
+  document.getElementById('m-email').value='';
+  document.getElementById('m-type').value='monthly';
+  document.getElementById('m-start').value=today();
+  document.getElementById('m-end').value=calcEnd(today(),'monthly');
+  document.getElementById('m-notes').value='';
+  document.getElementById('m-modal-title').textContent='إضافة عضو';
+  openModal('member-modal');
+}
+
+function editMember(id){
+  const m=allMembers.find(x=>x.id===id);if(!m)return;
+  document.getElementById('m-id').value=m.id;
+  document.getElementById('m-name').value=m.name;
+  document.getElementById('m-phone').value=m.phone;
+  document.getElementById('m-email').value=m.email||'';
+  document.getElementById('m-type').value=m.subscription_type;
+  document.getElementById('m-start').value=m.subscription_start;
+  document.getElementById('m-end').value=m.subscription_end;
+  document.getElementById('m-notes').value=m.notes||'';
+  document.getElementById('m-modal-title').textContent='تعديل العضو';
+  openModal('member-modal');
+}
+
+async function saveMember(){
+  const id=document.getElementById('m-id').value;
+  const name=document.getElementById('m-name').value.trim();
+  const phone=document.getElementById('m-phone').value.trim();
+  const email=document.getElementById('m-email').value.trim();
+  const type=document.getElementById('m-type').value;
+  const start=document.getElementById('m-start').value;
+  const end=document.getElementById('m-end').value;
+  const notes=document.getElementById('m-notes').value.trim();
+  if(!name||!phone||!start){toast(L().msg.fill_req,'error');return}
+  const btn=document.getElementById('save-member-btn');btn.disabled=true;
+  try{
+    const data={name,phone,email,subscription_type:type,subscription_start:start,subscription_end:end,notes};
+    if(id){const{error}=await sb.from('members').update(data).eq('id',id);if(error)throw error;}
+    else{const{error}=await sb.from('members').insert([data]);if(error)throw error;}
+    toast(L().msg.saved);closeModal('member-modal');loadMembers();
+  }catch(e){toast(L().msg.error+': '+(e.message||''),'error')}
+  finally{btn.disabled=false}
+}
+
+async function delMember(id){
+  const ok=await confirm_(L().msg.confirm_del);if(!ok)return;
+  try{const{error}=await sb.from('members').delete().eq('id',id);if(error)throw error;toast(L().msg.deleted);loadMembers();}
+  catch(e){toast(L().msg.error,'error')}
+}
+
+// ============ CHECKIN ============
+async function loadCheckin(){await refreshTodayCI()}
+
+async function refreshTodayCI(){
+  const t=today();
+  const{data}=await sb.from('checkins').select('*,members(name,phone)').eq('date',t).order('checkin_time',{ascending:false});
+  const list=data||[];
+  document.getElementById('today-count').textContent=list.length;
+  const el=document.getElementById('today-ci-list');
+  if(list.length===0){el.innerHTML=`<div class="empty-state"><div class="empty-icon">🏃</div><div class="empty-title">${L().msg.no_checkins}</div></div>`;return}
+  el.innerHTML=list.map((c,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:0.65rem 0;border-bottom:1px solid var(--border)"><div style="display:flex;align-items:center;gap:0.75rem"><div style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-muted);width:24px">${i+1}</div><div class="avatar">${initials(c.members?.name)}</div><div><div style="font-weight:600;font-size:0.875rem">${c.members?.name||'?'}</div><div style="font-size:0.72rem;color:var(--text-muted)">${c.members?.phone||''}</div></div></div><div style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary)">${fmtTime(c.checkin_time)}</div></div>`).join('');
+}
+
+async function doCheckin(){
+  const q=document.getElementById('ci-search').value.trim();
+  if(!q){toast(L().msg.fill_req,'error');return}
+  const btn=document.getElementById('ci-btn');btn.disabled=true;
+  const res=document.getElementById('ci-result');
+  try{
+    const{data:members}=await sb.from('members').select('*').or(`phone.eq.${q},id.eq.${q}`);
+    const member=members&&members[0];
+    if(!member){
+      res.classList.add('visible');
+      document.getElementById('ci-avatar').textContent='?';
+      document.getElementById('ci-name').textContent=L().msg.not_found;
+      document.getElementById('ci-phone').textContent='';
+      document.getElementById('ci-msg').innerHTML=`<span style="color:var(--danger)">❌ ${L().msg.not_found}</span>`;
+      return;
+    }
+    document.getElementById('ci-avatar').textContent=initials(member.name);
+    document.getElementById('ci-name').textContent=member.name;
+    document.getElementById('ci-phone').textContent=member.phone;
+    res.classList.add('visible');
+    if(member.status==='expired')document.getElementById('ci-msg').innerHTML=`<span style="color:var(--warning)">${L().msg.expired_warn}</span>`;
+    const t=today();
+    const{data:existing}=await sb.from('checkins').select('id').eq('member_id',member.id).eq('date',t);
+    if(existing&&existing.length>0){
+      document.getElementById('ci-msg').innerHTML=`<span style="color:var(--info)">ℹ️ ${L().msg.already}</span>`;
+      toast(L().msg.already,'info');
+    }else{
+      await sb.from('checkins').insert([{member_id:member.id}]);
+      document.getElementById('ci-msg').innerHTML=`<span style="color:var(--success)">✅ ${L().msg.checkin_ok} — ${fmtTime(new Date().toISOString())}</span>`;
+      toast(L().msg.checkin_ok);
+      await refreshTodayCI();
+    }
+    document.getElementById('ci-search').value='';
+  }catch(e){toast(L().msg.error,'error')}
+  finally{btn.disabled=false}
+}
+
+// ============ PAYMENTS ============
+async function loadPayments(){
+  const search=document.getElementById('pay-search').value.toLowerCase();
+  const tbody=document.getElementById('pay-tbody');
+  tbody.innerHTML='<tr><td colspan="5"><div class="loading-center"><div class="spinner"></div></div></td></tr>';
+  try{
+    const{data,error}=await sb.from('payments').select('*,members(name,phone)').order('payment_date',{ascending:false});
+    if(error)throw error;
+    let pays=data||[];
+    if(search)pays=pays.filter(p=>(p.members?.name||'').toLowerCase().includes(search)||(p.notes||'').toLowerCase().includes(search));
+    document.getElementById('pay-total').textContent=fmtCur(pays.reduce((s,p)=>s+Number(p.amount||0),0));
+    if(pays.length===0){tbody.innerHTML=`<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">💰</div><div class="empty-title">${L().msg.no_payments}</div></div></td></tr>`;return}
+    tbody.innerHTML=pays.map(p=>`<tr>
+      <td><div class="member-cell"><div class="avatar">${initials(p.members?.name)}</div><div><div class="member-name">${p.members?.name||'?'}</div><div style="font-size:0.75rem;color:var(--text-muted)">${p.members?.phone||''}</div></div></div></td>
+      <td><span class="mono" style="color:var(--success);font-weight:700">${fmtCur(p.amount)}</span></td>
+      <td>${fmtDate(p.payment_date)}</td>
+      <td style="color:var(--text-secondary)">${p.notes||'-'}</td>
+      <td><button class="btn btn-sm btn-danger" onclick="delPayment('${p.id}')">🗑️</button></td>
+    </tr>`).join('');
+  }catch(e){console.error(e);toast(L().msg.error,'error')}
+}
+
+async function openAddPayment(){
+  const{data}=await sb.from('members').select('id,name,phone').order('name');
+  const sel=document.getElementById('p-member');
+  sel.innerHTML='<option value="">-- اختر عضو --</option>'+(data||[]).map(m=>`<option value="${m.id}">${m.name} (${m.phone})</option>`).join('');
+  document.getElementById('p-amount').value='';
+  document.getElementById('p-date').value=today();
+  document.getElementById('p-notes').value='';
+  openModal('pay-modal');
+}
+
+async function savePayment(){
+  const mid=document.getElementById('p-member').value;
+  const amt=document.getElementById('p-amount').value;
+  const dt=document.getElementById('p-date').value;
+  const notes=document.getElementById('p-notes').value.trim();
+  if(!mid||!amt||!dt){toast(L().msg.fill_req,'error');return}
+  const btn=document.getElementById('save-pay-btn');btn.disabled=true;
+  try{
+    const{error}=await sb.from('payments').insert([{member_id:mid,amount:parseFloat(amt),payment_date:dt,notes}]);
+    if(error)throw error;
+    toast(L().msg.pay_saved);closeModal('pay-modal');loadPayments();
+  }catch(e){toast(L().msg.error,'error')}
+  finally{btn.disabled=false}
+}
+
+async function delPayment(id){
+  const ok=await confirm_(L().msg.confirm_del);if(!ok)return;
+  try{const{error}=await sb.from('payments').delete().eq('id',id);if(error)throw error;toast(L().msg.deleted);loadPayments();}
+  catch(e){toast(L().msg.error,'error')}
+}
+
+// ============ AUTH ============
+async function login(){
+  const email=document.getElementById('login-email').value.trim();
+  const password=document.getElementById('login-password').value;
+  const errEl=document.getElementById('login-error');
+  const btn=document.getElementById('login-btn');
+  errEl.style.display='none';
+  if(!email||!password){errEl.textContent='يرجى ملء جميع الحقول';errEl.style.display='block';return}
+  btn.disabled=true;btn.textContent='جاري الدخول...';
+  try{
+    const{data,error}=await sb.auth.signInWithPassword({email,password});
+    if(error)throw error;
+    showApp(data.user.email);
+  }catch(e){errEl.textContent='بيانات الدخول غير صحيحة';errEl.style.display='block';}
+  finally{btn.disabled=false;btn.textContent='دخول'}
+}
+
+function showApp(email){
+  document.getElementById('login-page').classList.remove('active');
+  document.getElementById('app').style.display='flex';
+  document.getElementById('user-email').textContent=email||'admin';
+  setLang(lang);
+  navigate('dashboard');
+}
+
+async function logout(){
+  await sb.auth.signOut();
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-page').classList.add('active');
+}
+
+// ============ INIT ============
+(async()=>{
+  setLang(lang);
+  // Auto-calc end date
+  document.getElementById('m-start').addEventListener('change',()=>{
+    const s=document.getElementById('m-start').value;
+    const t=document.getElementById('m-type').value;
+    if(s)document.getElementById('m-end').value=calcEnd(s,t);
+  });
+  document.getElementById('m-type').addEventListener('change',()=>{
+    const s=document.getElementById('m-start').value;
+    const t=document.getElementById('m-type').value;
+    if(s)document.getElementById('m-end').value=calcEnd(s,t);
+  });
+  // Check session
+  const{data:{session}}=await sb.auth.getSession();
+  if(session)showApp(session.user.email);
+  // Events
+  document.getElementById('login-btn').addEventListener('click',login);
+  document.getElementById('login-password').addEventListener('keydown',e=>{if(e.key==='Enter')login()});
+  document.getElementById('logout-btn').addEventListener('click',logout);
+  document.querySelectorAll('.nav-item[data-page]').forEach(el=>el.addEventListener('click',()=>navigate(el.dataset.page)));
+  document.getElementById('menu-toggle').addEventListener('click',()=>{document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebar-overlay').classList.toggle('visible')});
+  document.getElementById('sidebar-overlay').addEventListener('click',()=>{document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebar-overlay').classList.remove('visible')});
+  document.getElementById('lang-btn').addEventListener('click',e=>{e.stopPropagation();document.getElementById('lang-dropdown').classList.toggle('open')});
+  document.querySelectorAll('.lang-option').forEach(el=>el.addEventListener('click',()=>{document.getElementById('lang-dropdown').classList.remove('open');setLang(el.dataset.lang);const p=document.querySelector('.nav-item.active[data-page]')?.dataset?.page||'dashboard';navigate(p)}));
+  document.addEventListener('click',()=>document.getElementById('lang-dropdown').classList.remove('open'));
+  document.getElementById('add-member-btn').addEventListener('click',openAddMember);
+  document.getElementById('save-member-btn').addEventListener('click',saveMember);
+  document.getElementById('member-search').addEventListener('input',loadMembers);
+  document.getElementById('member-filter').addEventListener('change',loadMembers);
+  document.getElementById('ci-btn').addEventListener('click',doCheckin);
+  document.getElementById('ci-search').addEventListener('keydown',e=>{if(e.key==='Enter')doCheckin()});
+  document.getElementById('add-pay-btn').addEventListener('click',openAddPayment);
+  document.getElementById('save-pay-btn').addEventListener('click',savePayment);
+  document.getElementById('pay-search').addEventListener('input',loadPayments);
+  document.querySelectorAll('[data-close]').forEach(btn=>btn.addEventListener('click',()=>closeModal(btn.dataset.close)));
+  document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('active')}));
+})();
+</script>
 </body>
 </html>
+HTMLEOF
