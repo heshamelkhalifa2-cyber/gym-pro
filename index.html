@@ -266,7 +266,7 @@ textarea{resize:vertical;min-height:80px}
           <div class="toolbar-right"><button class="btn btn-primary" id="add-member-btn">+ إضافة عضو</button></div>
         </div>
         <div class="table-wrapper">
-          <table><thead><tr><th>الاسم</th><th>الهاتف</th><th>الاشتراك</th><th>انتهاء</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+          <table><thead><tr><th>الاسم</th><th>الهاتف</th><th>الاشتراك</th><th>انتهاء</th><th>الوزن</th><th>هدية/إيقاف</th><th>الحالة</th><th>إجراءات</th></tr></thead>
           <tbody id="members-tbody"><tr><td colspan="6"><div class="loading-center"><div class="spinner"></div></div></td></tr></tbody></table>
         </div>
       </div>
@@ -330,7 +330,7 @@ textarea{resize:vertical;min-height:80px}
         <div class="form-group"><label>نوع الاشتراك <span class="req">*</span></label><select id="m-type"><option value="monthly">شهري</option><option value="quarterly">3 شهور</option><option value="yearly">سنوي</option></select></div>
         <div class="form-group"><label>تاريخ البداية <span class="req">*</span></label><input type="date" id="m-start"/></div>
         <div class="form-group"><label>تاريخ الانتهاء</label><input type="date" id="m-end" readonly style="opacity:0.6"/></div>
-        <div class="form-group full"><label>ملاحظات</label><textarea id="m-notes" placeholder="ملاحظات إضافية..."></textarea></div>
+        <div class="form-group"><label>⚖️ الوزن الابتدائي (كجم)</label><input type="number" id="m-weight" placeholder="70.5" min="0" step="0.1"/></div><div class="form-group"><label>🎁 شهور الهدية المجانية</label><input type="number" id="m-free-months" placeholder="0" min="0" step="1" value="0"/></div><div class="form-group"><label>⏸️ شهور الإيقاف</label><input type="number" id="m-pause-months" placeholder="0" min="0" step="1" value="0"/></div><div class="form-group full"><label>ملاحظات</label><textarea id="m-notes" placeholder="ملاحظات إضافية..."></textarea></div>
       </div>
     </div>
     <div class="modal-footer"><button class="btn btn-secondary" data-close="member-modal">إلغاء</button><button class="btn btn-primary" id="save-member-btn">حفظ العضو</button></div>
@@ -493,6 +493,8 @@ async function loadMembers(){
         <td><span class="mono">${m.phone}</span></td>
         <td><span class="badge badge-info">${L().sub[m.subscription_type]||m.subscription_type}</span></td>
         <td><div style="display:flex;align-items:center;gap:0.5rem">${fmtDate(m.subscription_end)}${isSoon?`<span class="badge badge-warning">${days}d</span>`:''}</div></td>
+        <td>${m.weight?`<span class='mono'>${m.weight} كجم</span>`:'-'}</td>
+        <td style='font-size:0.78rem'>${m.free_months?`<span style='color:var(--success)'>🎁 ${m.free_months}شهر</span> `:''}${m.pause_months?`<span style='color:var(--warning)'>⏸️ ${m.pause_months}شهر</span>`:!m.free_months?'-':''}</td>
         <td><span class="badge ${isExp?'badge-danger':'badge-success'}">${isExp?L().status.expired:L().status.active}</span></td>
         <td><div style="display:flex;gap:0.5rem"><button class="btn btn-sm btn-secondary" onclick="editMember('${m.id}')">✏️</button><button class="btn btn-sm btn-danger" onclick="delMember('${m.id}')">🗑️</button></div></td>
       </tr>`}).join('');
@@ -507,7 +509,7 @@ function openAddMember(){
   document.getElementById('m-type').value='monthly';
   document.getElementById('m-start').value=today();
   document.getElementById('m-end').value=calcEnd(today(),'monthly');
-  document.getElementById('m-notes').value='';
+  document.getElementById('m-notes').value='';document.getElementById('m-weight').value='';document.getElementById('m-free-months').value='0';document.getElementById('m-pause-months').value='0';
   document.getElementById('m-modal-title').textContent='إضافة عضو';
   openModal('member-modal');
 }
@@ -521,7 +523,7 @@ function editMember(id){
   document.getElementById('m-type').value=m.subscription_type;
   document.getElementById('m-start').value=m.subscription_start;
   document.getElementById('m-end').value=m.subscription_end;
-  document.getElementById('m-notes').value=m.notes||'';
+  document.getElementById('m-notes').value=m.notes||'';document.getElementById('m-weight').value=m.weight||'';document.getElementById('m-free-months').value=m.free_months||0;document.getElementById('m-pause-months').value=m.pause_months||0;
   document.getElementById('m-modal-title').textContent='تعديل العضو';
   openModal('member-modal');
 }
@@ -538,7 +540,7 @@ async function saveMember(){
   if(!name||!phone||!start){toast(L().msg.fill_req,'error');return}
   const btn=document.getElementById('save-member-btn');btn.disabled=true;
   try{
-    const data={name,phone,email,subscription_type:type,subscription_start:start,subscription_end:end,notes};
+    const weight=document.getElementById('m-weight').value;const freeM=parseInt(document.getElementById('m-free-months').value||0);const pauseM=parseInt(document.getElementById('m-pause-months').value||0);let finalEnd=end;if(freeM>0){const d=new Date(end);d.setMonth(d.getMonth()+freeM);finalEnd=d.toISOString().split('T')[0];}const data={name,phone,email,subscription_type:type,subscription_start:start,subscription_end:finalEnd,notes,weight:weight?parseFloat(weight):null,free_months:freeM,pause_months:pauseM};
     if(id){const{error}=await sb.from('members').update(data).eq('id',id);if(error)throw error;}
     else{const{error}=await sb.from('members').insert([data]);if(error)throw error;}
     toast(L().msg.saved);closeModal('member-modal');loadMembers();
