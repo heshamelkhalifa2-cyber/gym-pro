@@ -1,0 +1,93 @@
+{
+  "app_name": "GymPro",
+  "app_tagline": "Gym Management System",
+  "nav": {
+    "dashboard": "Dashboard",
+    "members": "Members",
+    "subscriptions": "Subscriptions",
+    "checkin": "Check-in",
+    "payments": "Payments",
+    "logout": "Logout"
+  },
+  "auth": {
+    "login": "Login",
+    "email": "Email",
+    "password": "Password",
+    "login_btn": "Sign In",
+    "logging_in": "Signing in...",
+    "welcome_back": "Welcome Back",
+    "login_subtitle": "Sign in to manage your gym"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "total_members": "Total Members",
+    "active_members": "Active Members",
+    "expired_subscriptions": "Expired Subscriptions",
+    "total_revenue": "Total Revenue",
+    "expiring_soon": "Expiring Soon",
+    "recent_checkins": "Recent Check-ins",
+    "no_checkins": "No check-ins today"
+  },
+  "members": {
+    "title": "Member Management",
+    "add_member": "Add Member",
+    "edit_member": "Edit Member",
+    "delete_member": "Delete Member",
+    "search": "Search by name or phone...",
+    "filter_status": "Filter by status",
+    "all": "All",
+    "active": "Active",
+    "expired": "Expired",
+    "name": "Name",
+    "phone": "Phone",
+    "join_date": "Join Date",
+    "sub_type": "Subscription Type",
+    "sub_end": "End Date",
+    "status": "Status",
+    "actions": "Actions",
+    "monthly": "Monthly",
+    "quarterly": "3 Months",
+    "yearly": "Yearly",
+    "no_members": "No members found",
+    "confirm_delete": "Are you sure you want to delete this member?",
+    "member_id": "Member ID"
+  },
+  "checkin": {
+    "title": "Check-in",
+    "search_member": "Search by phone or ID...",
+    "checkin_btn": "Check In",
+    "today_checkins": "Today's Check-ins",
+    "checkin_success": "Check-in successful!",
+    "already_checked": "Already checked in today",
+    "member_not_found": "Member not found",
+    "expired_warning": "Warning: This member's subscription has expired"
+  },
+  "payments": {
+    "title": "Payments",
+    "add_payment": "Record Payment",
+    "member": "Member",
+    "amount": "Amount",
+    "date": "Date",
+    "notes": "Notes",
+    "total": "Total",
+    "no_payments": "No payments found",
+    "currency": "SAR"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Operation successful",
+    "confirm": "Confirm",
+    "close": "Close",
+    "yes": "Yes",
+    "no": "No",
+    "required": "Required",
+    "optional": "Optional"
+  }
+}

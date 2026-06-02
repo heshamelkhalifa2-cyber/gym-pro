@@ -1,0 +1,93 @@
+{
+  "app_name": "GymPro",
+  "app_tagline": "जिम प्रबंधन प्रणाली",
+  "nav": {
+    "dashboard": "डैशबोर्ड",
+    "members": "सदस्य",
+    "subscriptions": "सदस्यता",
+    "checkin": "चेक-इन",
+    "payments": "भुगतान",
+    "logout": "लॉगआउट"
+  },
+  "auth": {
+    "login": "लॉगिन",
+    "email": "ईमेल",
+    "password": "पासवर्ड",
+    "login_btn": "साइन इन करें",
+    "logging_in": "लॉगिन हो रहा है...",
+    "welcome_back": "वापसी पर स्वागत है",
+    "login_subtitle": "अपने जिम को प्रबंधित करने के लिए साइन इन करें"
+  },
+  "dashboard": {
+    "title": "डैशबोर्ड",
+    "total_members": "कुल सदस्य",
+    "active_members": "सक्रिय सदस्य",
+    "expired_subscriptions": "समाप्त सदस्यताएं",
+    "total_revenue": "कुल राजस्व",
+    "expiring_soon": "जल्द समाप्त होने वाले",
+    "recent_checkins": "हाल के चेक-इन",
+    "no_checkins": "आज कोई चेक-इन नहीं"
+  },
+  "members": {
+    "title": "सदस्य प्रबंधन",
+    "add_member": "सदस्य जोड़ें",
+    "edit_member": "सदस्य संपादित करें",
+    "delete_member": "सदस्य हटाएं",
+    "search": "नाम या फोन से खोजें...",
+    "filter_status": "स्थिति से फ़िल्टर करें",
+    "all": "सभी",
+    "active": "सक्रिय",
+    "expired": "समाप्त",
+    "name": "नाम",
+    "phone": "फोन",
+    "join_date": "शामिल होने की तारीख",
+    "sub_type": "सदस्यता प्रकार",
+    "sub_end": "समाप्ति तिथि",
+    "status": "स्थिति",
+    "actions": "कार्रवाई",
+    "monthly": "मासिक",
+    "quarterly": "3 महीने",
+    "yearly": "वार्षिक",
+    "no_members": "कोई सदस्य नहीं मिला",
+    "confirm_delete": "क्या आप इस सदस्य को हटाना चाहते हैं?",
+    "member_id": "सदस्य ID"
+  },
+  "checkin": {
+    "title": "चेक-इन",
+    "search_member": "फोन या ID से खोजें...",
+    "checkin_btn": "चेक इन करें",
+    "today_checkins": "आज के चेक-इन",
+    "checkin_success": "चेक-इन सफल!",
+    "already_checked": "आज पहले से चेक-इन किया गया है",
+    "member_not_found": "सदस्य नहीं मिला",
+    "expired_warning": "चेतावनी: इस सदस्य की सदस्यता समाप्त हो गई है"
+  },
+  "payments": {
+    "title": "भुगतान",
+    "add_payment": "भुगतान दर्ज करें",
+    "member": "सदस्य",
+    "amount": "राशि",
+    "date": "तारीख",
+    "notes": "नोट्स",
+    "total": "कुल",
+    "no_payments": "कोई भुगतान नहीं मिला",
+    "currency": "SAR"
+  },
+  "common": {
+    "save": "सहेजें",
+    "cancel": "रद्द करें",
+    "delete": "हटाएं",
+    "edit": "संपादित करें",
+    "add": "जोड़ें",
+    "search": "खोजें",
+    "loading": "लोड हो रहा है...",
+    "error": "एक त्रुटि हुई",
+    "success": "ऑपरेशन सफल",
+    "confirm": "पुष्टि करें",
+    "close": "बंद करें",
+    "yes": "हाँ",
+    "no": "नहीं",
+    "required": "आवश्यक",
+    "optional": "वैकल्पिक"
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "app_name": "جيم برو",
+  "app_tagline": "نظام إدارة الجيم",
+  "nav": {
+    "dashboard": "لوحة التحكم",
+    "members": "الأعضاء",
+    "subscriptions": "الاشتراكات",
+    "checkin": "تسجيل الحضور",
+    "payments": "المدفوعات",
+    "logout": "تسجيل الخروج"
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "login_btn": "دخول",
+    "logging_in": "جاري الدخول...",
+    "welcome_back": "مرحباً بعودتك",
+    "login_subtitle": "سجّل دخولك لإدارة جيمك"
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "total_members": "إجمالي الأعضاء",
+    "active_members": "الأعضاء النشطون",
+    "expired_subscriptions": "الاشتراكات المنتهية",
+    "total_revenue": "إجمالي الإيرادات",
+    "expiring_soon": "تنتهي قريباً",
+    "recent_checkins": "آخر تسجيلات الحضور",
+    "no_checkins": "لا توجد سجلات حضور اليوم"
+  },
+  "members": {
+    "title": "إدارة الأعضاء",
+    "add_member": "إضافة عضو",
+    "edit_member": "تعديل العضو",
+    "delete_member": "حذف العضو",
+    "search": "البحث بالاسم أو الهاتف...",
+    "filter_status": "فلتر الحالة",
+    "all": "الكل",
+    "active": "نشط",
+    "expired": "منتهي",
+    "name": "الاسم",
+    "phone": "رقم الهاتف",
+    "join_date": "تاريخ الانضمام",
+    "sub_type": "نوع الاشتراك",
+    "sub_end": "تاريخ الانتهاء",
+    "status": "الحالة",
+    "actions": "الإجراءات",
+    "monthly": "شهري",
+    "quarterly": "3 شهور",
+    "yearly": "سنوي",
+    "no_members": "لا يوجد أعضاء",
+    "confirm_delete": "هل أنت متأكد من حذف هذا العضو؟",
+    "member_id": "رقم العضو"
+  },
+  "checkin": {
+    "title": "تسجيل الحضور",
+    "search_member": "ابحث برقم الهاتف أو ID...",
+    "checkin_btn": "تسجيل دخول",
+    "today_checkins": "حضور اليوم",
+    "checkin_success": "تم تسجيل الحضور بنجاح!",
+    "already_checked": "تم تسجيل الحضور مسبقاً اليوم",
+    "member_not_found": "العضو غير موجود",
+    "expired_warning": "تحذير: اشتراك هذا العضو منتهٍ"
+  },
+  "payments": {
+    "title": "المدفوعات",
+    "add_payment": "تسجيل دفعة",
+    "member": "العضو",
+    "amount": "المبلغ",
+    "date": "التاريخ",
+    "notes": "ملاحظات",
+    "total": "المجموع",
+    "no_payments": "لا توجد مدفوعات",
+    "currency": "ر.س"
+  },
+  "common": {
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "add": "إضافة",
+    "search": "بحث",
+    "loading": "جاري التحميل...",
+    "error": "حدث خطأ",
+    "success": "تمت العملية بنجاح",
+    "confirm": "تأكيد",
+    "close": "إغلاق",
+    "yes": "نعم",
+    "no": "لا",
+    "required": "مطلوب",
+    "optional": "اختياري"
+  }
+}

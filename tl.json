@@ -1,0 +1,93 @@
+{
+  "app_name": "GymPro",
+  "app_tagline": "Sistema ng Pamamahala ng Gym",
+  "nav": {
+    "dashboard": "Dashboard",
+    "members": "Mga Miyembro",
+    "subscriptions": "Mga Subscription",
+    "checkin": "Check-in",
+    "payments": "Mga Bayad",
+    "logout": "Mag-logout"
+  },
+  "auth": {
+    "login": "Login",
+    "email": "Email",
+    "password": "Password",
+    "login_btn": "Mag-login",
+    "logging_in": "Naglo-login...",
+    "welcome_back": "Maligayang Pagbabalik",
+    "login_subtitle": "Mag-login para pamahalaan ang iyong gym"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "total_members": "Kabuuang Miyembro",
+    "active_members": "Mga Aktibong Miyembro",
+    "expired_subscriptions": "Nag-expire na Subscription",
+    "total_revenue": "Kabuuang Kita",
+    "expiring_soon": "Malapit nang Mag-expire",
+    "recent_checkins": "Kamakailang Check-ins",
+    "no_checkins": "Walang check-in ngayon"
+  },
+  "members": {
+    "title": "Pamamahala ng Miyembro",
+    "add_member": "Magdagdag ng Miyembro",
+    "edit_member": "I-edit ang Miyembro",
+    "delete_member": "Burahin ang Miyembro",
+    "search": "Maghanap sa pangalan o telepono...",
+    "filter_status": "I-filter ayon sa katayuan",
+    "all": "Lahat",
+    "active": "Aktibo",
+    "expired": "Nag-expire",
+    "name": "Pangalan",
+    "phone": "Telepono",
+    "join_date": "Petsa ng Pagsali",
+    "sub_type": "Uri ng Subscription",
+    "sub_end": "Petsa ng Pagtatapos",
+    "status": "Katayuan",
+    "actions": "Mga Aksyon",
+    "monthly": "Buwanan",
+    "quarterly": "3 Buwan",
+    "yearly": "Taunan",
+    "no_members": "Walang nahanap na miyembro",
+    "confirm_delete": "Sigurado ka bang gusto mong burahin ang miyembro na ito?",
+    "member_id": "ID ng Miyembro"
+  },
+  "checkin": {
+    "title": "Check-in",
+    "search_member": "Maghanap sa telepono o ID...",
+    "checkin_btn": "Mag-check in",
+    "today_checkins": "Mga Check-in Ngayon",
+    "checkin_success": "Matagumpay na naka-check in!",
+    "already_checked": "Naka-check in na ngayon",
+    "member_not_found": "Hindi nahanap ang miyembro",
+    "expired_warning": "Babala: Ang subscription ng miyembro na ito ay nag-expire na"
+  },
+  "payments": {
+    "title": "Mga Bayad",
+    "add_payment": "Itala ang Bayad",
+    "member": "Miyembro",
+    "amount": "Halaga",
+    "date": "Petsa",
+    "notes": "Mga Tala",
+    "total": "Kabuuan",
+    "no_payments": "Walang nahanap na bayad",
+    "currency": "SAR"
+  },
+  "common": {
+    "save": "I-save",
+    "cancel": "Kanselahin",
+    "delete": "Burahin",
+    "edit": "I-edit",
+    "add": "Idagdag",
+    "search": "Maghanap",
+    "loading": "Naglo-load...",
+    "error": "May naganap na error",
+    "success": "Matagumpay na operasyon",
+    "confirm": "Kumpirmahin",
+    "close": "Isara",
+    "yes": "Oo",
+    "no": "Hindi",
+    "required": "Kinakailangan",
+    "optional": "Opsyonal"
+  }
+}
