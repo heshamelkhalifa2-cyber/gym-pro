@@ -159,9 +159,18 @@ body.rtl .lf-input{padding:.7rem 2.5rem .7rem 1rem}
 /* ══════════════════════════════════════════════
    SIDEBAR — COLORFUL
 ══════════════════════════════════════════════ */
-.sb{width:var(--sw);background:var(--bs);border-inline-end:1px solid var(--br);display:flex;flex-direction:column;position:fixed;top:0;height:100vh;z-index:100;transition:transform .3s ease;overflow-y:auto;overflow-x:hidden;box-shadow:var(--sh1)}
-body.rtl .sb{right:0;left:auto;border-right:none;border-left:1px solid var(--br)}
-body.ltr .sb{left:0;right:auto;border-left:none;border-right:1px solid var(--br)}
+.sb{width:var(--sw);background:var(--bs);display:flex;flex-direction:column;position:fixed;top:0;height:100vh;z-index:100;transition:width .3s cubic-bezier(.4,0,.2,1),box-shadow .3s ease;overflow:hidden;box-shadow:var(--sh1)}
+body.rtl .sb{right:0;left:auto;border-left:1px solid var(--br)}
+body.ltr .sb{left:0;right:auto;border-right:1px solid var(--br)}
+.sb.collapsed{width:64px}
+.sb.collapsed .sb-title,.sb.collapsed .sb-sub,.sb.collapsed .sb-uname,.sb.collapsed .sb-urole,.sb.collapsed .ni span:last-child,.sb.collapsed .nav-section,.sb.collapsed .sb-user>div:last-child{display:none!important}
+.sb.collapsed .sb-logo{padding:.875rem;justify-content:center}
+.sb.collapsed .sb-nav{padding:.5rem .5rem}
+.sb.collapsed .ni{padding:.7rem;justify-content:center;border-radius:var(--rs)}
+.sb.collapsed .ni-ic{width:auto;font-size:1.1rem}
+.sb.collapsed .sb-ft{padding:.5rem}
+.sb.collapsed .sb-user{padding:.5rem;justify-content:center}
+.sb.collapsed .sb-uav{margin:0}
 
 .sb-logo{padding:1.25rem;border-bottom:1px solid var(--br);display:flex;align-items:center;gap:.75rem}
 .sb-icon{width:40px;height:40px;background:linear-gradient(135deg,#FF5722,#7C3AED);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;box-shadow:var(--shp)}
@@ -187,9 +196,13 @@ body.ltr .sb{left:0;right:auto;border-left:none;border-right:1px solid var(--br)
 /* ══════════════════════════════════════════════
    HEADER
 ══════════════════════════════════════════════ */
-.mc{flex:1;min-height:100vh;display:flex;flex-direction:column;min-width:0;width:calc(100% - var(--sw))}
+.mc{flex:1;min-height:100vh;display:flex;flex-direction:column;min-width:0;transition:margin .3s cubic-bezier(.4,0,.2,1)}
 body.rtl .mc{margin-right:var(--sw);margin-left:0}
 body.ltr .mc{margin-left:var(--sw);margin-right:0}
+body.rtl .sb.collapsed~.mc,.sb.collapsed~body.rtl .mc{margin-right:64px}
+body.ltr .sb.collapsed~.mc{margin-left:64px}
+.sb-collapsed-rtl .mc{margin-right:64px!important}
+.sb-collapsed-ltr .mc{margin-left:64px!important}
 .hdr{height:var(--hh);background:var(--bc);border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;padding:0 1.25rem;position:sticky;top:0;z-index:50;box-shadow:var(--sh1);width:100%}
 .hdr-l{display:flex;align-items:center;gap:.75rem;flex:1;min-width:0}
 .pg-title{font-size:1.05rem;font-weight:800;color:var(--t1);letter-spacing:-.01em}
@@ -445,6 +458,35 @@ body.ltr .sb{transform:translateX(-100%)}body.rtl .sb{transform:translateX(100%)
 
 
 
+
+/* Sidebar tooltip when collapsed */
+.sb.collapsed .ni{position:relative}
+.sb.collapsed .ni:hover::after{
+  content:attr(data-label);
+  position:absolute;
+  inset-inline-start:calc(100% + 8px);
+  top:50%;transform:translateY(-50%);
+  background:var(--t1);color:var(--bc);
+  padding:.35rem .75rem;border-radius:var(--rs);
+  font-size:.8rem;font-weight:700;
+  white-space:nowrap;z-index:999;
+  box-shadow:var(--sh2);
+  pointer-events:none;
+}
+.sb.collapsed .ni:hover::before{
+  content:'';
+  position:absolute;
+  inset-inline-start:calc(100% + 4px);
+  top:50%;transform:translateY(-50%);
+  border:4px solid transparent;
+  border-inline-end-color:var(--t1);
+  z-index:999;
+}
+/* Collapsed toggle arrow flip */
+.sb.collapsed #sb-toggle{transform:scaleX(-1)}
+body.rtl .sb #sb-toggle{transform:scaleX(-1)}
+body.rtl .sb.collapsed #sb-toggle{transform:scaleX(1)}
+
 </style>
 </head>
 <body class="rtl">
@@ -565,7 +607,7 @@ body.ltr .sb{transform:translateX(-100%)}body.rtl .sb{transform:translateX(100%)
           <div><div style="font-size:1rem;font-weight:900;color:var(--t1)">GymPro</div><div style="font-size:.65rem;color:var(--tm);text-transform:uppercase;letter-spacing:.08em">Management</div></div>
         </div>
         <div class="lang-sw">
-          <button class="lang-btn" id="l-btn2"><span id="lf">🇸🇦</span><span id="ln">AR</span><span>▾</span></button>
+          <button class="lang-btn" id="l-btn2" style="padding:.35rem .6rem;gap:.3rem"><span id="lf">🇸🇦</span><span id="ln" style="font-size:.75rem;font-weight:700">AR</span><span style="font-size:.65rem">▾</span></button>
           <div class="lang-dd" id="l-dd">
             <div class="lo cur" data-lang="ar">🇸🇦 العربية</div>
             <div class="lo" data-lang="en">🇺🇸 English</div>
@@ -620,23 +662,26 @@ body.ltr .sb{transform:translateX(-100%)}body.rtl .sb{transform:translateX(100%)
 
   <!-- SIDEBAR -->
   <aside class="sb" id="sbar">
-    <div class="sb-logo">
-      <div class="sb-icon">🏋️</div>
-      <div><div class="sb-title">GymPro</div><div class="sb-sub" id="n-tag">MANAGEMENT</div></div>
+    <div class="sb-logo" style="justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:.75rem;min-width:0">
+        <div class="sb-icon" style="flex-shrink:0">🏋️</div>
+        <div style="overflow:hidden"><div class="sb-title">GymPro</div><div class="sb-sub" id="n-tag">MANAGEMENT</div></div>
+      </div>
+      <button id="sb-toggle" onclick="toggleSidebar()" title="طي القائمة" style="width:28px;height:28px;border-radius:8px;background:var(--pg);border:1px solid rgba(255,87,34,0.2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;color:var(--p);transition:all .2s">◀</button>
     </div>
     <nav class="sb-nav">
       <div class="nav-section" id="n-lbl">الرئيسية</div>
       <div class="ni active" data-page="dashboard"><span class="ni-ic">📊</span><span id="n-dash">لوحة التحكم</span></div>
-      <div class="ni" data-page="members"><span class="ni-ic">👥</span><span id="n-mem">الأعضاء</span></div>
-      <div class="ni" data-page="checkin"><span class="ni-ic">✅</span><span id="n-ci">تسجيل الحضور</span></div>
-      <div class="ni" data-page="payments"><span class="ni-ic">💰</span><span id="n-pay">المدفوعات</span></div>
+      <div class="ni" data-page="members" data-label="الأعضاء"><span class="ni-ic">👥</span><span id="n-mem">الأعضاء</span></div>
+      <div class="ni" data-page="checkin" data-label="تسجيل الحضور"><span class="ni-ic">✅</span><span id="n-ci">تسجيل الحضور</span></div>
+      <div class="ni" data-page="payments" data-label="المدفوعات"><span class="ni-ic">💰</span><span id="n-pay">المدفوعات</span></div>
       <div class="nav-section" style="margin-top:1.25rem">خدمات</div>
-      <div class="ni" data-page="schedule"><span class="ni-ic">📅</span><span id="n-sched">جدول الحصص</span></div>
-      <div class="ni" data-page="exercises"><span class="ni-ic">💪</span><span id="n-ex">التمارين</span></div>
-      <div class="ni" data-page="whatsapp"><span class="ni-ic">💬</span><span id="n-wa">واتساب</span></div>
+      <div class="ni" data-page="schedule" data-label="جدول الحصص"><span class="ni-ic">📅</span><span id="n-sched">جدول الحصص</span></div>
+      <div class="ni" data-page="exercises" data-label="التمارين"><span class="ni-ic">💪</span><span id="n-ex">التمارين</span></div>
+      <div class="ni" data-page="whatsapp" data-label="واتساب"><span class="ni-ic">💬</span><span id="n-wa">واتساب</span></div>
       <div class="nav-section" style="margin-top:1.25rem">التقارير</div>
-      <div class="ni" data-page="report"><span class="ni-ic">📈</span><span id="n-rep">التقرير الشهري</span></div>
-      <div class="ni" data-page="measurements"><span class="ni-ic">📏</span><span id="n-meas">القياسات</span></div>
+      <div class="ni" data-page="report" data-label="التقرير الشهري"><span class="ni-ic">📈</span><span id="n-rep">التقرير الشهري</span></div>
+      <div class="ni" data-page="measurements" data-label="القياسات"><span class="ni-ic">📏</span><span id="n-meas">القياسات</span></div>
     </nav>
     <div class="sb-ft">
       <div style="padding:.5rem .875rem;margin-bottom:.5rem;font-size:.65rem;color:var(--tm);text-align:center;line-height:1.6;border-bottom:1px solid var(--br);margin-bottom:.75rem">
@@ -1217,6 +1262,15 @@ function applyLang(l){
   const tpt=document.getElementById('tp-tot');if(tpt)tpt.textContent=x.ptot;
   Array.from(document.getElementById('m-ty').options).forEach((o,i)=>{if(x.sub[i])o.textContent=x.sub[i]});
   Array.from(document.getElementById('renew-type').options).forEach((o,i)=>{if(x.sub[i])o.textContent=x.sub[i]});
+  // Fix sidebar margin after lang change (RTL/LTR switch)
+  const sb=document.getElementById('sbar');
+  const mc=document.querySelector('.mc');
+  if(sb&&mc){
+    const isCollapsed=sb.classList.contains('collapsed');
+    const margin=isCollapsed?'64px':'var(--sw)';
+    if(x.d==='rtl'){mc.style.marginRight=margin;mc.style.marginLeft='0';}
+    else{mc.style.marginLeft=margin;mc.style.marginRight='0';}
+  }
 }
 
 // Utils
@@ -1660,6 +1714,15 @@ function showApp(email){
   document.getElementById('u-em').textContent=email||'admin';
   document.getElementById('sb-uav').textContent=short[0].toUpperCase();
   applyLang(lang);initCharts();nav('dashboard');loadAC();
+  // Apply sidebar state
+  const mc=document.querySelector('.mc');
+  const isCollapsed=localStorage.getItem('sb_collapsed')==='1';
+  const isRTL=document.body.classList.contains('rtl');
+  const margin=isCollapsed?'64px':'var(--sw)';
+  if(mc){
+    if(isRTL){mc.style.marginRight=margin;mc.style.marginLeft='0';}
+    else{mc.style.marginLeft=margin;mc.style.marginRight='0';}
+  }
 }
 async function logout(){await sb.auth.signOut();document.getElementById('app').style.display='none';document.getElementById('lp').classList.add('active');}
 
@@ -1675,7 +1738,13 @@ async function logout(){await sb.auth.signOut();document.getElementById('app').s
   document.getElementById('l-p').addEventListener('keydown',e=>{if(e.key==='Enter')login()});
   document.getElementById('logout-btn').addEventListener('click',logout);
   document.querySelectorAll('.ni[data-page]').forEach(el=>el.addEventListener('click',()=>nav(el.dataset.page)));
-  document.getElementById('mtg').addEventListener('click',()=>{document.getElementById('sbar').classList.toggle('open');document.getElementById('sov').classList.toggle('vis')});
+  document.getElementById('mtg').addEventListener('click',()=>{
+    const sb=document.getElementById('sbar');
+    // On mobile: show/hide; On desktop: done by toggleSidebar
+    if(window.innerWidth<=900){
+      sb.classList.toggle('open');document.getElementById('sov').classList.toggle('vis');
+    }
+  });
   document.getElementById('sov').addEventListener('click',()=>{document.getElementById('sbar').classList.remove('open');document.getElementById('sov').classList.remove('vis')});
   // Lang switchers
   ['l-btn2','l-btn2b'].forEach(id=>{const btn=document.getElementById(id);if(!btn)return;const ddId=id==='l-btn2'?'l-dd':'l-ddb';btn.addEventListener('click',e=>{e.stopPropagation();document.getElementById(ddId).classList.toggle('open')});});
@@ -2287,6 +2356,40 @@ document.getElementById('wa-member-wrap')&&(document.getElementById('wa-member-w
 
 
 <script>
+// ── SIDEBAR TOGGLE ──
+function toggleSidebar(){
+  const sb = document.getElementById('sbar');
+  const mc = document.querySelector('.mc');
+  const isRTL = document.body.classList.contains('rtl');
+  const isCollapsed = sb.classList.toggle('collapsed');
+  localStorage.setItem('sb_collapsed', isCollapsed ? '1' : '0');
+  const margin = isCollapsed ? '64px' : 'var(--sw)';
+  if(isRTL){
+    mc.style.marginRight = margin;
+    mc.style.marginLeft = '0';
+  } else {
+    mc.style.marginLeft = margin;
+    mc.style.marginRight = '0';
+  }
+}
+
+// Apply saved sidebar state
+(function(){
+  const saved = localStorage.getItem('sb_collapsed');
+  if(saved === '1'){
+    const sb = document.getElementById('sbar');
+    const mc = document.querySelector('.mc');
+    if(sb){
+      sb.classList.add('collapsed');
+      const isRTL = document.body.classList.contains('rtl');
+      if(mc){
+        if(isRTL){mc.style.marginRight='64px';mc.style.marginLeft='0';}
+        else{mc.style.marginLeft='64px';mc.style.marginRight='0';}
+      }
+    }
+  }
+})();
+
 // ── THEME TOGGLE ──
 function toggleTheme(){
   const isDark = document.body.classList.toggle('dark');
