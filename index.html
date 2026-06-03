@@ -603,6 +603,10 @@ textarea{resize:vertical;min-height:75px}
       <div class="ni" data-page="members"><span class="ni-ic">👥</span><span id="n-mem">الأعضاء</span></div>
       <div class="ni" data-page="checkin"><span class="ni-ic">✅</span><span id="n-ci">تسجيل الحضور</span></div>
       <div class="ni" data-page="payments"><span class="ni-ic">💰</span><span id="n-pay">المدفوعات</span></div>
+      <div class="nav-section" style="margin-top:1.25rem">خدمات</div>
+      <div class="ni" data-page="schedule"><span class="ni-ic">📅</span><span id="n-sched">جدول الحصص</span></div>
+      <div class="ni" data-page="exercises"><span class="ni-ic">💪</span><span id="n-ex">التمارين</span></div>
+      <div class="ni" data-page="whatsapp"><span class="ni-ic">💬</span><span id="n-wa">واتساب</span></div>
       <div class="nav-section" style="margin-top:1.25rem">التقارير</div>
       <div class="ni" data-page="report"><span class="ni-ic">📈</span><span id="n-rep">التقرير الشهري</span></div>
       <div class="ni" data-page="measurements"><span class="ni-ic">📏</span><span id="n-meas">القياسات</span></div>
@@ -759,6 +763,114 @@ textarea{resize:vertical;min-height:75px}
         <div id="ms-content"><div class="es"><div class="ei">📏</div><div class="et">ابحث عن عضو لعرض قياساته</div></div></div>
       </div>
 
+
+      <!-- SCHEDULE -->
+      <div id="pg-schedule" class="pg2">
+        <div class="pg-hdr"><div class="pg-hdr-left"><h2 id="sched-t">جدول الحصص</h2><p>إدارة الكلاسات والحصص اليومية</p></div>
+          <button class="btn bp" id="add-class-btn">＋ إضافة حصة</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:.5rem;margin-bottom:1rem">
+          <div class="sched-day-hdr" style="text-align:center;padding:.5rem;background:linear-gradient(135deg,#FF5722,#7C3AED);color:white;border-radius:8px;font-weight:700;font-size:.8rem">الأحد</div>
+          <div class="sched-day-hdr" style="text-align:center;padding:.5rem;background:linear-gradient(135deg,#FF5722,#7C3AED);color:white;border-radius:8px;font-weight:700;font-size:.8rem">الإثنين</div>
+          <div class="sched-day-hdr" style="text-align:center;padding:.5rem;background:linear-gradient(135deg,#FF5722,#7C3AED);color:white;border-radius:8px;font-weight:700;font-size:.8rem">الثلاثاء</div>
+          <div class="sched-day-hdr" style="text-align:center;padding:.5rem;background:linear-gradient(135deg,#FF5722,#7C3AED);color:white;border-radius:8px;font-weight:700;font-size:.8rem">الأربعاء</div>
+          <div class="sched-day-hdr" style="text-align:center;padding:.5rem;background:linear-gradient(135deg,#FF5722,#7C3AED);color:white;border-radius:8px;font-weight:700;font-size:.8rem">الخميس</div>
+          <div class="sched-day-hdr" style="text-align:center;padding:.5rem;background:linear-gradient(135deg,#FF5722,#7C3AED);color:white;border-radius:8px;font-weight:700;font-size:.8rem">الجمعة</div>
+          <div class="sched-day-hdr" style="text-align:center;padding:.5rem;background:linear-gradient(135deg,#FF5722,#7C3AED);color:white;border-radius:8px;font-weight:700;font-size:.8rem">السبت</div>
+        </div>
+        <div id="schedule-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:.5rem;min-height:400px">
+          <div class="lc" style="grid-column:1/-1"><div class="spn"></div></div>
+        </div>
+      </div>
+
+      <!-- EXERCISES -->
+      <div id="pg-exercises" class="pg2">
+        <div class="pg-hdr"><div class="pg-hdr-left"><h2 id="ex-t">التمارين</h2><p>مكتبة التمارين وخطط التدريب</p></div>
+          <div style="display:flex;gap:.75rem"><button class="btn bp" id="add-ex-btn">＋ تمرين جديد</button><button class="btn bs2" id="add-plan-btn">📋 خطة تدريب</button></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem">
+          <div class="card">
+            <div class="ch"><h3 class="ct">💪 مكتبة التمارين</h3>
+              <div class="srch" style="min-width:180px"><span class="si3">🔍</span><input type="text" id="ex-srch" placeholder="بحث..."/></div>
+            </div>
+            <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem" id="ex-cats"></div>
+            <div id="ex-list"><div class="lc"><div class="spn"></div></div></div>
+          </div>
+          <div class="card">
+            <div class="ch"><h3 class="ct">📋 خطط التدريب</h3></div>
+            <div class="f2" style="margin-bottom:1rem">
+              <label>ابحث عن عضو</label>
+              <div class="srch" style="position:relative"><span class="si3">🔍</span><input type="text" id="plan-member-srch" placeholder="اسم العضو..."/><div class="ac-list" id="plan-ac" style="display:none"></div></div>
+            </div>
+            <div id="plans-list"><div class="es"><div class="ei">📋</div><div class="et">ابحث عن عضو لعرض خططه</div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WHATSAPP -->
+      <div id="pg-whatsapp" class="pg2">
+        <div class="pg-hdr"><div class="pg-hdr-left"><h2 id="wa-t">واتساب</h2><p>إرسال رسائل للأعضاء</p></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem">
+
+          <!-- Send Message -->
+          <div style="display:flex;flex-direction:column;gap:1.25rem">
+            <div class="card">
+              <h3 class="ct" style="margin-bottom:1.25rem">📤 إرسال رسالة</h3>
+              <div class="f2" style="margin-bottom:1rem">
+                <label>نوع الإرسال</label>
+                <select id="wa-type">
+                  <option value="single">عضو واحد</option>
+                  <option value="expiring">الاشتراكات المنتهية قريباً (خلال 7 أيام)</option>
+                  <option value="expired">الاشتراكات المنتهية</option>
+                  <option value="all_active">كل الأعضاء النشطين</option>
+                  <option value="all">كل الأعضاء</option>
+                </select>
+              </div>
+              <div class="f2" id="wa-member-wrap" style="margin-bottom:1rem">
+                <label>اختر عضو</label>
+                <select id="wa-member"><option value="">-- اختر عضو --</option></select>
+              </div>
+              <div class="f2" style="margin-bottom:1rem">
+                <label>القالب</label>
+                <select id="wa-template" onchange="applyTemplate()">
+                  <option value="custom">رسالة مخصصة</option>
+                  <option value="renewal">تذكير بتجديد الاشتراك</option>
+                  <option value="expired">إشعار انتهاء الاشتراك</option>
+                  <option value="welcome">ترحيب بعضو جديد</option>
+                  <option value="promo">عرض خاص</option>
+                </select>
+              </div>
+              <div class="f2" style="margin-bottom:1rem">
+                <label>نص الرسالة</label>
+                <textarea id="wa-msg" rows="5" placeholder="اكتب رسالتك هنا...
+متغيرات: {name} {phone} {days} {end_date}"></textarea>
+              </div>
+              <div style="background:var(--bg);border:1px solid var(--br);border-radius:var(--rs);padding:1rem;margin-bottom:1rem;font-size:.82rem">
+                <div style="font-weight:700;color:var(--t2);margin-bottom:.4rem;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em">معاينة الرسالة</div>
+                <div id="wa-preview" style="color:var(--t1);white-space:pre-wrap;line-height:1.6">—</div>
+              </div>
+              <button class="btn bp" id="wa-send-btn" style="width:100%;justify-content:center;padding:.8rem">
+                📲 فتح واتساب وإرسال
+              </button>
+              <div style="font-size:.75rem;color:var(--tm);margin-top:.5rem;text-align:center">
+                سيفتح واتساب ويملأ الرسالة تلقائياً لكل عضو
+              </div>
+            </div>
+
+            <!-- Auto reminders -->
+            <div class="card">
+              <h3 class="ct" style="margin-bottom:1.25rem">⚡ تذكيرات تلقائية</h3>
+              <div id="wa-auto-list"><div class="lc"><div class="spn"></div></div></div>
+            </div>
+          </div>
+
+          <!-- Log -->
+          <div class="card">
+            <div class="ch"><h3 class="ct">📋 سجل الرسائل</h3><button class="btn bs2 btn-sm" onclick="loadWaLog()">🔄 تحديث</button></div>
+            <div id="wa-log"><div class="lc"><div class="spn"></div></div></div>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 </div>
@@ -1548,5 +1660,524 @@ async function logout(){await sb.auth.signOut();document.getElementById('app').s
   document.querySelectorAll('.mo').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('active')}));
 })();
 </script>
+
+<!-- CLASS MODAL -->
+<div class="mo" id="class-mo">
+  <div class="md md-sm">
+    <div class="mh"><h3 class="mt">📅 إضافة حصة</h3><button class="xbtn" data-close="class-mo">✕</button></div>
+    <div class="mc2">
+      <input type="hidden" id="cl-id"/>
+      <div class="fg">
+        <div class="f2 full"><label>اسم الحصة <span class="req">*</span></label><input type="text" id="cl-name" placeholder="مثال: يوجا للمبتدئين"/></div>
+        <div class="f2"><label>المدرب</label><input type="text" id="cl-inst" placeholder="اسم المدرب"/></div>
+        <div class="f2"><label>اليوم <span class="req">*</span></label>
+          <select id="cl-day">
+            <option value="0">الأحد</option><option value="1">الإثنين</option><option value="2">الثلاثاء</option>
+            <option value="3">الأربعاء</option><option value="4">الخميس</option><option value="5">الجمعة</option><option value="6">السبت</option>
+          </select>
+        </div>
+        <div class="f2"><label>السعة القصوى</label><input type="number" id="cl-cap" value="20" min="1"/></div>
+        <div class="f2"><label>وقت البداية <span class="req">*</span></label><input type="time" id="cl-start"/></div>
+        <div class="f2"><label>وقت النهاية <span class="req">*</span></label><input type="time" id="cl-end"/></div>
+        <div class="f2 full"><label>لون الحصة</label>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap" id="cl-colors">
+            <div class="cl-col" data-c="#FF5722" style="width:28px;height:28px;border-radius:50%;background:#FF5722;cursor:pointer;border:3px solid transparent" onclick="selectColor(this)"></div>
+            <div class="cl-col" data-c="#7C3AED" style="width:28px;height:28px;border-radius:50%;background:#7C3AED;cursor:pointer;border:3px solid transparent" onclick="selectColor(this)"></div>
+            <div class="cl-col" data-c="#00BCD4" style="width:28px;height:28px;border-radius:50%;background:#00BCD4;cursor:pointer;border:3px solid transparent" onclick="selectColor(this)"></div>
+            <div class="cl-col" data-c="#00C853" style="width:28px;height:28px;border-radius:50%;background:#00C853;cursor:pointer;border:3px solid transparent" onclick="selectColor(this)"></div>
+            <div class="cl-col" data-c="#E91E63" style="width:28px;height:28px;border-radius:50%;background:#E91E63;cursor:pointer;border:3px solid transparent" onclick="selectColor(this)"></div>
+            <div class="cl-col" data-c="#FF9800" style="width:28px;height:28px;border-radius:50%;background:#FF9800;cursor:pointer;border:3px solid transparent" onclick="selectColor(this)"></div>
+            <div class="cl-col" data-c="#2196F3" style="width:28px;height:28px;border-radius:50%;background:#2196F3;cursor:pointer;border:3px solid transparent" onclick="selectColor(this)"></div>
+          </div>
+          <input type="hidden" id="cl-color" value="#FF5722"/>
+        </div>
+      </div>
+    </div>
+    <div class="mft"><button class="btn bs2" data-close="class-mo">إلغاء</button><button class="btn bp" id="cl-save">💾 حفظ الحصة</button></div>
+  </div>
+</div>
+
+<!-- EXERCISE MODAL -->
+<div class="mo" id="ex-mo">
+  <div class="md md-sm">
+    <div class="mh"><h3 class="mt">💪 إضافة تمرين</h3><button class="xbtn" data-close="ex-mo">✕</button></div>
+    <div class="mc2">
+      <div class="fg">
+        <div class="f2 full"><label>اسم التمرين <span class="req">*</span></label><input type="text" id="ex-name" placeholder="مثال: بنش برس"/></div>
+        <div class="f2"><label>الفئة</label>
+          <select id="ex-cat"><option value="قوة">قوة</option><option value="كارديو">كارديو</option><option value="كور">كور</option><option value="مرونة">مرونة</option><option value="أخرى">أخرى</option></select>
+        </div>
+        <div class="f2"><label>مجموعة العضلات</label><input type="text" id="ex-muscle" placeholder="مثال: صدر، ظهر..."/></div>
+        <div class="f2"><label>عدد الجولات</label><input type="number" id="ex-sets" placeholder="3" min="1"/></div>
+        <div class="f2"><label>عدد التكرارات</label><input type="text" id="ex-reps" placeholder="مثال: 8-12"/></div>
+        <div class="f2"><label>راحة (ثانية)</label><input type="number" id="ex-rest" placeholder="90" min="0"/></div>
+        <div class="f2 full"><label>وصف</label><textarea id="ex-desc" placeholder="وصف التمرين..."></textarea></div>
+      </div>
+    </div>
+    <div class="mft"><button class="btn bs2" data-close="ex-mo">إلغاء</button><button class="btn bp" id="ex-save">💾 حفظ التمرين</button></div>
+  </div>
+</div>
+
+<!-- WORKOUT PLAN MODAL -->
+<div class="mo" id="plan-mo">
+  <div class="md">
+    <div class="mh"><h3 class="mt">📋 خطة تدريب</h3><button class="xbtn" data-close="plan-mo">✕</button></div>
+    <div class="mc2">
+      <input type="hidden" id="plan-id"/>
+      <div class="fg" style="margin-bottom:1rem">
+        <div class="f2 full"><label>اسم الخطة <span class="req">*</span></label><input type="text" id="plan-name" placeholder="مثال: خطة بناء العضل"/></div>
+        <div class="f2 full"><label>العضو <span class="req">*</span></label><select id="plan-mem"><option value="">-- اختر عضو --</option></select></div>
+        <div class="f2 full"><label>ملاحظات</label><textarea id="plan-notes" placeholder="ملاحظات للمدرب..."></textarea></div>
+      </div>
+      <div style="border-top:1px solid var(--br);padding-top:1rem">
+        <div class="ch" style="margin-bottom:.75rem"><h3 class="ct">💪 التمارين</h3><button class="btn bp btn-sm" onclick="addExToPlan()">+ إضافة تمرين</button></div>
+        <div id="plan-exs-list"><div class="es" style="padding:1.5rem"><div class="et">اضغط "+ إضافة تمرين" لإضافة تمارين للخطة</div></div></div>
+      </div>
+    </div>
+    <div class="mft"><button class="btn bs2" data-close="plan-mo">إلغاء</button><button class="btn bp" id="plan-save">💾 حفظ الخطة</button></div>
+  </div>
+</div>
+
+<!-- CLASS BOOKINGS MODAL -->
+<div class="mo" id="book-mo">
+  <div class="md md-sm">
+    <div class="mh"><h3 class="mt" id="book-title">حجوزات الحصة</h3><button class="xbtn" data-close="book-mo">✕</button></div>
+    <div class="mc2">
+      <input type="hidden" id="book-class-id"/>
+      <div class="f2" style="margin-bottom:1rem">
+        <label>اختر عضو للحجز</label>
+        <select id="book-member"><option value="">-- اختر عضو --</option></select>
+      </div>
+      <button class="btn bp" id="book-save" style="width:100%;justify-content:center;margin-bottom:1rem">+ حجز مقعد</button>
+      <div id="book-list"><div class="lc"><div class="spn"></div></div></div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ══════════════════════════════════════════════
+// SCHEDULE — جدول الحصص
+// ══════════════════════════════════════════════
+const DAYS_AR = ['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+let selectedColor = '#FF5722';
+let planExercises = [];
+let allExercises = [];
+
+function selectColor(el){
+  document.querySelectorAll('.cl-col').forEach(c=>c.style.border='3px solid transparent');
+  el.style.border='3px solid var(--t1)';
+  selectedColor=el.dataset.c;
+  document.getElementById('cl-color').value=selectedColor;
+}
+
+async function loadSchedule(){
+  const grid = document.getElementById('schedule-grid');
+  grid.innerHTML = Array(7).fill('').map((_,i) => `<div id="day-col-${i}" style="display:flex;flex-direction:column;gap:.4rem;min-height:300px"></div>`).join('');
+  try{
+    const{data,error} = await sb.from('classes').select('*').order('start_time');
+    if(error)throw error;
+    (data||[]).forEach(cls => {
+      const col = document.getElementById('day-col-'+cls.day_of_week);
+      if(!col)return;
+      const card = document.createElement('div');
+      card.style.cssText = `background:${cls.color||'#FF5722'};border-radius:10px;padding:.75rem;color:white;cursor:pointer;transition:all .2s;position:relative`;
+      card.innerHTML = `
+        <div style="font-weight:800;font-size:.85rem">${cls.name}</div>
+        ${cls.instructor?`<div style="font-size:.72rem;opacity:.85;margin-top:.2rem">👤 ${cls.instructor}</div>`:''}
+        <div style="font-size:.72rem;opacity:.85;margin-top:.2rem">🕐 ${cls.start_time?.slice(0,5)} - ${cls.end_time?.slice(0,5)}</div>
+        <div style="font-size:.72rem;opacity:.85">👥 ${cls.max_capacity} مقعد</div>
+        <div style="display:flex;gap:.3rem;margin-top:.5rem">
+          <button onclick="event.stopPropagation();openBookings('${cls.id}','${cls.name}')" style="background:rgba(255,255,255,0.2);border:none;border-radius:6px;color:white;padding:.2rem .5rem;font-size:.7rem;cursor:pointer;font-family:var(--font);font-weight:700">📋 حجوزات</button>
+          <button onclick="event.stopPropagation();deleteClass('${cls.id}')" style="background:rgba(255,0,0,0.2);border:none;border-radius:6px;color:white;padding:.2rem .5rem;font-size:.7rem;cursor:pointer;font-family:var(--font);font-weight:700">🗑️</button>
+        </div>`;
+      col.appendChild(card);
+    });
+    // Add "+" button to each day
+    for(let i=0;i<7;i++){
+      const col = document.getElementById('day-col-'+i);
+      if(col){
+        const addBtn = document.createElement('button');
+        addBtn.style.cssText = 'background:var(--bg);border:1.5px dashed var(--br);border-radius:10px;padding:.5rem;color:var(--tm);cursor:pointer;font-size:.8rem;font-family:var(--font);transition:all .2s;width:100%';
+        addBtn.textContent = '+ إضافة حصة';
+        addBtn.onmouseenter=()=>addBtn.style.borderColor='var(--p)';
+        addBtn.onmouseleave=()=>addBtn.style.borderColor='var(--br)';
+        addBtn.onclick=()=>{document.getElementById('cl-day').value=i;openModal('class-mo')};
+        col.appendChild(addBtn);
+      }
+    }
+  }catch(e){toast('خطأ في تحميل الجدول','error')}
+}
+
+async function saveClass(){
+  const name=document.getElementById('cl-name').value.trim();
+  const day=document.getElementById('cl-day').value;
+  const start=document.getElementById('cl-start').value;
+  const end=document.getElementById('cl-end').value;
+  if(!name||!start||!end){toast(T().req,'error');return}
+  const btn=document.getElementById('cl-save');btn.disabled=true;
+  try{
+    await sb.from('classes').insert([{name,instructor:document.getElementById('cl-inst').value.trim(),day_of_week:parseInt(day),start_time:start,end_time:end,max_capacity:parseInt(document.getElementById('cl-cap').value||20),color:selectedColor}]);
+    toast('تم إضافة الحصة ✅');closeMo('class-mo');loadSchedule();
+  }catch(e){toast(T().err,'error')}finally{btn.disabled=false}
+}
+
+async function deleteClass(id){
+  const ok=await confirm_('هل تريد حذف هذه الحصة؟');if(!ok)return;
+  await sb.from('classes').delete().eq('id',id);toast('تم الحذف');loadSchedule();
+}
+
+async function openBookings(classId, className){
+  document.getElementById('book-class-id').value=classId;
+  document.getElementById('book-title').textContent='حجوزات: '+className;
+  // Load members
+  const{data:mems}=await sb.from('members').select('id,name,phone').eq('status','active').order('name');
+  document.getElementById('book-member').innerHTML='<option value="">-- اختر عضو --</option>'+(mems||[]).map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
+  await refreshBookings(classId);
+  openMo('book-mo');
+}
+
+async function refreshBookings(classId){
+  const today=td2();
+  const{data}=await sb.from('class_bookings').select('*,members(name,phone)').eq('class_id',classId).eq('booked_date',today);
+  const list=document.getElementById('book-list');
+  list.innerHTML=(data&&data.length)?data.map(b=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:.65rem;background:var(--bg);border-radius:var(--rs);margin-bottom:.4rem">
+    <span style="font-weight:600">${b.members?.name||'?'}</span>
+    <button onclick="cancelBooking('${b.id}','${classId}')" class="btn btn-sm bd">إلغاء</button>
+  </div>`).join(''):`<div class="es" style="padding:1.5rem"><div class="et">لا توجد حجوزات لليوم</div></div>`;
+}
+
+async function saveBooking(){
+  const classId=document.getElementById('book-class-id').value;
+  const memberId=document.getElementById('book-member').value;
+  if(!memberId){toast('اختر عضواً','error');return}
+  try{
+    await sb.from('class_bookings').insert([{class_id:classId,member_id:memberId}]);
+    toast('تم الحجز ✅');await refreshBookings(classId);
+  }catch(e){toast(e.message?.includes('duplicate')?'هذا العضو محجوز بالفعل':T().err,'error')}
+}
+
+async function cancelBooking(id,classId){
+  await sb.from('class_bookings').delete().eq('id',id);toast('تم إلغاء الحجز');await refreshBookings(classId);
+}
+
+function openModal(id){openMo(id)}
+
+// ══════════════════════════════════════════════
+// EXERCISES — التمارين
+// ══════════════════════════════════════════════
+let selectedCat = 'الكل';
+let planAcMembers = [];
+
+async function loadExercises(){
+  try{
+    const{data,error}=await sb.from('exercises').select('*').order('category').order('name');
+    if(error)throw error;
+    allExercises=data||[];
+    renderExercises();
+    // Build categories
+    const cats=['الكل',...new Set(allExercises.map(e=>e.category).filter(Boolean))];
+    document.getElementById('ex-cats').innerHTML=cats.map(c=>`<button onclick="filterExCat('${c}')" style="padding:.25rem .75rem;border-radius:999px;font-size:.75rem;font-weight:700;cursor:pointer;border:1.5px solid ${c===selectedCat?'var(--p)':'var(--br)'};background:${c===selectedCat?'var(--p)':'var(--bg)'};color:${c===selectedCat?'white':'var(--t2)'};font-family:var(--font);transition:all .2s">${c}</button>`).join('');
+  }catch(e){console.error(e)}
+}
+
+function filterExCat(cat){selectedCat=cat;renderExercises();loadExercises();}
+
+function renderExercises(){
+  const srch=document.getElementById('ex-srch').value.toLowerCase();
+  const list=document.getElementById('ex-list');
+  let exs=allExercises;
+  if(selectedCat!=='الكل')exs=exs.filter(e=>e.category===selectedCat);
+  if(srch)exs=exs.filter(e=>e.name.toLowerCase().includes(srch)||e.muscle_group?.toLowerCase().includes(srch));
+  if(!exs.length){list.innerHTML=`<div class="es" style="padding:1.5rem"><div class="et">لا توجد تمارين</div></div>`;return}
+  const catColors={'قوة':'#FF5722','كارديو':'#E91E63','كور':'#7C3AED','مرونة':'#00BCD4','أخرى':'#9E9E9E'};
+  list.innerHTML=exs.map(e=>`<div style="display:flex;align-items:center;gap:.75rem;padding:.75rem;background:var(--bg);border:1px solid var(--br);border-radius:var(--rs);margin-bottom:.4rem;transition:all .2s" onmouseenter="this.style.borderColor='var(--p)'" onmouseleave="this.style.borderColor='var(--br)'">
+    <div style="width:36px;height:36px;border-radius:9px;background:${catColors[e.category]||'#9E9E9E'}22;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0">💪</div>
+    <div style="flex:1">
+      <div style="font-weight:700;font-size:.875rem">${e.name}</div>
+      <div style="font-size:.72rem;color:var(--tm)">${e.muscle_group||''} ${e.sets?'• '+e.sets+' جولات':''} ${e.reps?'× '+e.reps:''}</div>
+    </div>
+    <span style="padding:.15rem .5rem;border-radius:999px;font-size:.65rem;font-weight:700;background:${catColors[e.category]||'#9E9E9E'}22;color:${catColors[e.category]||'#666'}">${e.category||''}</span>
+    <button onclick="delExercise('${e.id}')" class="btn btn-sm bd" style="flex-shrink:0">🗑️</button>
+  </div>`).join('');
+}
+
+async function saveExercise(){
+  const name=document.getElementById('ex-name').value.trim();
+  if(!name){toast(T().req,'error');return}
+  const btn=document.getElementById('ex-save');btn.disabled=true;
+  try{
+    await sb.from('exercises').insert([{name,category:document.getElementById('ex-cat').value,muscle_group:document.getElementById('ex-muscle').value.trim(),description:document.getElementById('ex-desc').value.trim(),sets:document.getElementById('ex-sets').value?parseInt(document.getElementById('ex-sets').value):null,reps:document.getElementById('ex-reps').value.trim(),rest_seconds:document.getElementById('ex-rest').value?parseInt(document.getElementById('ex-rest').value):null}]);
+    toast('تم إضافة التمرين ✅');closeMo('ex-mo');loadExercises();
+  }catch(e){toast(T().err,'error')}finally{btn.disabled=false}
+}
+
+async function delExercise(id){
+  const ok=await confirm_('هل تريد حذف هذا التمرين؟');if(!ok)return;
+  await sb.from('exercises').delete().eq('id',id);toast('تم الحذف');loadExercises();
+}
+
+// Workout Plans
+async function openAddPlan(){
+  document.getElementById('plan-id').value='';
+  document.getElementById('plan-name').value='';
+  document.getElementById('plan-notes').value='';
+  planExercises=[];renderPlanExercises();
+  // Load members
+  const{data}=await sb.from('members').select('id,name').eq('status','active').order('name');
+  document.getElementById('plan-mem').innerHTML='<option value="">-- اختر عضو --</option>'+(data||[]).map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
+  openMo('plan-mo');
+}
+
+function addExToPlan(){
+  if(!allExercises.length){toast('لا توجد تمارين في المكتبة','error');return}
+  const sel=document.createElement('div');
+  sel.style.cssText='background:var(--bg);border:1px solid var(--br);border-radius:var(--rs);padding:.75rem;margin-bottom:.5rem';
+  sel.innerHTML=`<select style="width:100%;margin-bottom:.5rem" onchange="updatePlanEx(this)">${allExercises.map(e=>`<option value="${e.id}">${e.name} (${e.category||''})</option>`).join('')}</select>
+  <div style="display:flex;gap:.5rem">
+    <input type="number" placeholder="جولات" style="width:80px" class="pe-sets"/>
+    <input type="text" placeholder="تكرارات" style="flex:1" class="pe-reps"/>
+    <input type="number" placeholder="راحة(ث)" style="width:90px" class="pe-rest"/>
+    <button onclick="this.parentElement.parentElement.remove()" class="btn btn-sm bd">🗑️</button>
+  </div>`;
+  document.getElementById('plan-exs-list').appendChild(sel);
+}
+
+async function savePlan(){
+  const name=document.getElementById('plan-name').value.trim();
+  const memId=document.getElementById('plan-mem').value;
+  if(!name||!memId){toast(T().req,'error');return}
+  const btn=document.getElementById('plan-save');btn.disabled=true;
+  try{
+    const{data:plan}=await sb.from('workout_plans').insert([{member_id:memId,name,notes:document.getElementById('plan-notes').value.trim()}]).select().single();
+    // Save exercises
+    const rows=document.getElementById('plan-exs-list').querySelectorAll('div > select');
+    let idx=0;
+    for(const sel of rows){
+      const parent=sel.parentElement;
+      await sb.from('plan_exercises').insert([{plan_id:plan.id,exercise_id:sel.value,sets:parent.querySelector('.pe-sets')?.value?parseInt(parent.querySelector('.pe-sets').value):null,reps:parent.querySelector('.pe-reps')?.value||null,rest_seconds:parent.querySelector('.pe-rest')?.value?parseInt(parent.querySelector('.pe-rest').value):null,order_index:idx++}]);
+    }
+    toast('تم حفظ الخطة ✅');closeMo('plan-mo');
+  }catch(e){toast(T().err,'error')}finally{btn.disabled=false}
+}
+
+function renderPlanExercises(){
+  const list=document.getElementById('plan-exs-list');
+  list.innerHTML=`<div class="es" style="padding:1.5rem"><div class="et">اضغط "+ إضافة تمرين" لإضافة تمارين للخطة</div></div>`;
+}
+
+async function loadPlansForMember(id){
+  const{data}=await sb.from('workout_plans').select('*').eq('member_id',id).order('created_at',{ascending:false});
+  const list=document.getElementById('plans-list');
+  if(!data||!data.length){list.innerHTML=`<div class="es" style="padding:1.5rem"><div class="et">لا توجد خطط لهذا العضو</div><button class="btn bp btn-sm" style="margin-top:1rem" onclick="openAddPlan()">+ إنشاء خطة</button></div>`;return}
+  list.innerHTML=data.map(p=>`<div style="background:var(--bg);border:1px solid var(--br);border-radius:var(--rs);padding:1rem;margin-bottom:.5rem">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><div style="font-weight:700">${p.name}</div><div style="font-size:.75rem;color:var(--tm)">${new Date(p.created_at).toLocaleDateString('ar')}</div></div>
+      <div style="display:flex;gap:.35rem">
+        <button onclick="viewPlan('${p.id}')" class="btn btn-sm bpu">👁️ عرض</button>
+        <button onclick="deletePlan('${p.id}')" class="btn btn-sm bd">🗑️</button>
+      </div>
+    </div>
+    ${p.notes?`<div style="font-size:.8rem;color:var(--t2);margin-top:.4rem">${p.notes}</div>`:''}
+  </div>`).join('');
+}
+
+async function viewPlan(id){
+  const{data:exs}=await sb.from('plan_exercises').select('*,exercises(name,category,muscle_group)').eq('plan_id',id).order('order_index');
+  if(!exs||!exs.length){toast('لا توجد تمارين في هذه الخطة','info');return}
+  const catColors={'قوة':'#FF5722','كارديو':'#E91E63','كور':'#7C3AED','مرونة':'#00BCD4'};
+  const html=exs.map((e,i)=>`<div style="display:flex;align-items:center;gap:.75rem;padding:.75rem;background:var(--bg);border-radius:var(--rs);margin-bottom:.4rem">
+    <div style="width:28px;height:28px;border-radius:50%;background:${catColors[e.exercises?.category]||'#9E9E9E'};display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:.8rem;flex-shrink:0">${i+1}</div>
+    <div style="flex:1"><div style="font-weight:700">${e.exercises?.name||'?'}</div><div style="font-size:.75rem;color:var(--tm)">${e.sets?e.sets+' جولات':''}${e.reps?' × '+e.reps:''}${e.rest_seconds?' • راحة '+e.rest_seconds+'ث':''}</div></div>
+  </div>`).join('');
+  const o=document.createElement('div');o.className='mo active';
+  o.innerHTML=`<div class="md md-sm"><div class="mh"><h3 class="mt">📋 تمارين الخطة</h3><button class="xbtn" onclick="this.closest('.mo').remove()">✕</button></div><div class="mc2">${html}</div></div>`;
+  document.body.appendChild(o);o.onclick=e=>{if(e.target===o)o.remove()};
+}
+
+async function deletePlan(id){
+  const ok=await confirm_('هل تريد حذف هذه الخطة؟');if(!ok)return;
+  await sb.from('workout_plans').delete().eq('id',id);toast('تم الحذف');
+}
+
+// Plan member autocomplete
+function setupPlanAc(){
+  const inp=document.getElementById('plan-member-srch'),list=document.getElementById('plan-ac');
+  inp.addEventListener('input',async()=>{
+    const q=inp.value.toLowerCase();if(!q||q.length<2){list.style.display='none';return}
+    const{data}=await sb.from('members').select('id,name,phone').or(`name.ilike.%${q}%,phone.ilike.%${q}%`).eq('status','active');
+    const matches=data||[];
+    if(!matches.length){list.style.display='none';return}
+    list.style.display='block';
+    list.innerHTML=matches.map(m=>`<div class="ac-item" data-id="${m.id}"><div class="ac-n">${m.name}</div></div>`).join('');
+    list.querySelectorAll('.ac-item').forEach(el=>el.addEventListener('click',()=>{inp.value=el.querySelector('.ac-n').textContent;list.style.display='none';loadPlansForMember(el.dataset.id);}));
+  });
+}
+
+// ══════════════════════════════════════════════
+// WHATSAPP — واتساب
+// ══════════════════════════════════════════════
+const WA_TEMPLATES = {
+  renewal: `مرحباً {name} 👋
+نذكرك بأن اشتراكك في الجيم سينتهي خلال {days} أيام 📅
+(تاريخ الانتهاء: {end_date})
+
+لتجديد اشتراكك والاستمرار في رحلتك الرياضية، تواصل معنا 💪
+نحن هنا لدعمك! 🏋️`,
+
+  expired: `مرحباً {name} 👋
+للأسف انتهى اشتراكك في الجيم في تاريخ {end_date} 📅
+
+لا تتوقف عن رحلتك الرياضية! تواصل معنا الآن لتجديد اشتراكك بأفضل الأسعار 💪
+نتمنى أن نراك قريباً 🏋️`,
+
+  welcome: `أهلاً وسهلاً {name}! 🎉
+يسعدنا انضمامك لعائلة الجيم 🏋️
+
+اشتراكك مفعّل حتى {end_date}
+نتمنى لك رحلة رياضية ممتعة وناجحة 💪
+لأي استفسار نحن دائماً هنا! 😊`,
+
+  promo: `مرحباً {name} 👋
+لدينا عرض خاص لك! 🎯
+
+احتفالاً بولائك معنا، نقدم لك خصم خاص على تجديد اشتراكك 🎁
+لا تفوّت هذه الفرصة! تواصل معنا الآن 📲
+
+نحن في انتظارك 🏋️💪`
+};
+
+function applyTemplate(){
+  const type=document.getElementById('wa-template').value;
+  if(type==='custom'){document.getElementById('wa-msg').value='';updateWaPreview();return}
+  document.getElementById('wa-msg').value=WA_TEMPLATES[type]||'';
+  updateWaPreview();
+}
+
+function updateWaPreview(){
+  const msg=document.getElementById('wa-msg').value;
+  const preview=msg.replace(/{name}/g,'اسم العضو').replace(/{phone}/g,'xxxxxxx').replace(/{days}/g,'5').replace(/{end_date}/g,'01/07/2025');
+  document.getElementById('wa-preview').textContent=preview||'—';
+}
+
+async function loadWaAutoList(){
+  // Find members expiring in 7 days
+  const today=td2();const in7=new Date();in7.setDate(in7.getDate()+7);
+  const{data}=await sb.from('members').select('id,name,phone,subscription_end').eq('status','active').gte('subscription_end',today).lte('subscription_end',in7.toISOString().split('T')[0]);
+  const list=document.getElementById('wa-auto-list');
+  if(!data||!data.length){list.innerHTML=`<div class="es" style="padding:1.5rem"><div class="ei">🎉</div><div class="et">لا توجد اشتراكات تنتهي قريباً</div></div>`;return}
+  list.innerHTML=`<div style="font-size:.8rem;color:var(--t2);margin-bottom:.75rem;font-weight:600">⚠️ ${data.length} عضو اشتراكه ينتهي خلال 7 أيام</div>`;
+  list.innerHTML+=data.map(m=>{
+    const days=Math.ceil((new Date(m.subscription_end)-new Date())/(864e5));
+    const msg=WA_TEMPLATES.renewal.replace(/{name}/g,m.name).replace(/{days}/g,days).replace(/{end_date}/g,fd(m.subscription_end)).replace(/{phone}/g,m.phone);
+    const phone=m.phone.replace(/\D/g,'');
+    return`<div style="display:flex;justify-content:space-between;align-items:center;padding:.65rem;background:var(--bg);border:1px solid rgba(255,193,7,0.2);border-radius:var(--rs);margin-bottom:.4rem">
+      <div><div style="font-weight:700;font-size:.875rem">${m.name}</div><div style="font-size:.72rem;color:var(--wa)">⏰ ${days} يوم متبقي</div></div>
+      <button onclick="sendWa('${phone}',\`${msg.replace(/`/g,"'")}\`,'${m.id}','renewal')" class="btn btn-sm bp" style="background:linear-gradient(135deg,#25D366,#128C7E)">📲 إرسال</button>
+    </div>`;
+  }).join('');
+}
+
+async function sendWa(phone,msg,memberId,type){
+  const encoded=encodeURIComponent(msg);
+  window.open(`https://wa.me/${phone}?text=${encoded}`,'_blank');
+  // Log it
+  if(memberId){
+    try{await sb.from('whatsapp_log').insert([{member_id:memberId,phone,message:msg,type:type||'custom',status:'sent'}]);}catch(e){}
+    loadWaLog();
+  }
+}
+
+async function sendWaToGroup(){
+  const type=document.getElementById('wa-type').value;
+  const msgTemplate=document.getElementById('wa-msg').value;
+  if(!msgTemplate.trim()){toast('اكتب رسالة أولاً','error');return}
+  let members=[];
+  if(type==='single'){
+    const mid=document.getElementById('wa-member').value;
+    if(!mid){toast('اختر عضواً','error');return}
+    const{data}=await sb.from('members').select('*').eq('id',mid).single();
+    if(data)members=[data];
+  }else{
+    let q=sb.from('members').select('*');
+    if(type==='expiring'){const in7=new Date();in7.setDate(in7.getDate()+7);q=q.eq('status','active').gte('subscription_end',td2()).lte('subscription_end',in7.toISOString().split('T')[0]);}
+    else if(type==='expired')q=q.eq('status','expired');
+    else if(type==='all_active')q=q.eq('status','active');
+    const{data}=await q.order('name');
+    members=data||[];
+  }
+  if(!members.length){toast('لا يوجد أعضاء مطابقون','info');return}
+  if(members.length>1){const ok=await confirm_(`سيتم فتح واتساب لـ ${members.length} عضو. هل تريد المتابعة؟`);if(!ok)return}
+  let sent=0;
+  for(const m of members){
+    const days=dl(m.subscription_end);
+    const msg=msgTemplate.replace(/{name}/g,m.name).replace(/{phone}/g,m.phone).replace(/{days}/g,days).replace(/{end_date}/g,fd(m.subscription_end));
+    const phone=(m.phone||'').replace(/\D/g,'');
+    if(phone){
+      setTimeout(()=>window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`,'_blank'),sent*1500);
+      try{await sb.from('whatsapp_log').insert([{member_id:m.id,phone,message:msg,type:'bulk',status:'sent'}]);}catch(e){}
+      sent++;
+    }
+  }
+  toast(`تم فتح واتساب لـ ${sent} عضو ✅`);
+  setTimeout(loadWaLog,2000);
+}
+
+async function loadWaLog(){
+  const{data}=await sb.from('whatsapp_log').select('*,members(name)').order('sent_at',{ascending:false}).limit(30);
+  const list=document.getElementById('wa-log');
+  if(!data||!data.length){list.innerHTML=`<div class="es"><div class="ei">💬</div><div class="et">لا توجد رسائل بعد</div></div>`;return}
+  const typeColors={renewal:'#FF9800',expired:'#F44336',welcome:'#00C853',promo:'#7C3AED',bulk:'#2196F3',custom:'#9E9E9E'};
+  list.innerHTML=data.map(l=>`<div style="padding:.75rem;border-bottom:1px solid var(--br)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.25rem">
+      <div style="font-weight:700;font-size:.875rem">${l.members?.name||l.phone||'?'}</div>
+      <span style="padding:.15rem .5rem;border-radius:999px;font-size:.65rem;font-weight:700;background:${typeColors[l.type]||'#9E9E9E'}22;color:${typeColors[l.type]||'#666'}">${l.type||'رسالة'}</span>
+    </div>
+    <div style="font-size:.75rem;color:var(--tm);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${(l.message||'').substring(0,60)}...</div>
+    <div style="font-size:.68rem;color:var(--tm);margin-top:.25rem">${ft(l.sent_at)}</div>
+  </div>`).join('');
+}
+
+// ══════════════════════════════════════════════
+// EXTEND NAV + INIT
+// ══════════════════════════════════════════════
+// Patch nav() to handle new pages
+const _origNav=nav;
+nav=function(page){
+  _origNav(page);
+  if(page==='schedule')loadSchedule();
+  else if(page==='exercises'){loadExercises();setupPlanAc();}
+  else if(page==='whatsapp'){loadWaAutoList();loadWaLog();loadWaMembers();}
+};
+
+async function loadWaMembers(){
+  const{data}=await sb.from('members').select('id,name,phone').order('name');
+  document.getElementById('wa-member').innerHTML='<option value="">-- اختر عضو --</option>'+(data||[]).map(m=>`<option value="${m.id}">${m.name} (${m.phone})</option>`).join('');
+}
+
+// wa-type change
+document.getElementById('wa-type')?.addEventListener('change',function(){
+  document.getElementById('wa-member-wrap').style.display=this.value==='single'?'flex':'none';
+});
+
+// wa-msg preview
+document.getElementById('wa-msg')?.addEventListener('input',updateWaPreview);
+document.getElementById('wa-send-btn')?.addEventListener('click',sendWaToGroup);
+
+// class save
+document.getElementById('cl-save')?.addEventListener('click',saveClass);
+document.getElementById('book-save')?.addEventListener('click',saveBooking);
+document.getElementById('ex-save')?.addEventListener('click',saveExercise);
+document.getElementById('plan-save')?.addEventListener('click',savePlan);
+document.getElementById('add-ex-btn')?.addEventListener('click',()=>{['ex-name','ex-muscle','ex-desc'].forEach(id=>document.getElementById(id).value='');['ex-sets','ex-rest'].forEach(id=>document.getElementById(id).value='');document.getElementById('ex-reps').value='';openMo('ex-mo')});
+document.getElementById('add-plan-btn')?.addEventListener('click',openAddPlan);
+document.getElementById('add-class-btn')?.addEventListener('click',()=>{['cl-name','cl-inst'].forEach(id=>document.getElementById(id).value='');document.getElementById('cl-cap').value='20';selectColor(document.querySelector('.cl-col'));openMo('class-mo')});
+document.getElementById('ex-srch')?.addEventListener('input',renderExercises);
+// Init color
+document.querySelector('.cl-col')&&selectColor(document.querySelector('.cl-col'));
+// wa type init
+document.getElementById('wa-member-wrap')&&(document.getElementById('wa-member-wrap').style.display='none');
+</script>
+
 </body>
 </html>
