@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>GymPro — نظام إدارة الجيم</title>
+<title>GymPro — نظام إدارة الجيم | Hesham El-Khalifa</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
@@ -612,6 +612,12 @@ textarea{resize:vertical;min-height:75px}
       <div class="ni" data-page="measurements"><span class="ni-ic">📏</span><span id="n-meas">القياسات</span></div>
     </nav>
     <div class="sb-ft">
+      <div style="padding:.5rem .875rem;margin-bottom:.5rem;font-size:.65rem;color:var(--tm);text-align:center;line-height:1.6;border-bottom:1px solid var(--br);margin-bottom:.75rem">
+        <div style="font-weight:700;color:var(--t2);margin-bottom:.2rem">🏋️ GymPro v2.0</div>
+        <div>تطوير وتصميم</div>
+        <div style="color:var(--p);font-weight:700">هشام الخليفة</div>
+        <div style="margin-top:.3rem;font-size:.6rem">© 2026 جميع الحقوق محفوظة</div>
+      </div>
       <div class="sb-user">
         <div class="sb-uav" id="sb-uav">A</div>
         <div style="overflow:hidden;flex:1">
@@ -619,6 +625,7 @@ textarea{resize:vertical;min-height:75px}
           <div class="sb-urole">Admin</div>
         </div>
       </div>
+      <div class="ni" onclick="openMo('about-mo')"><span class="ni-ic">ℹ️</span><span>حول التطبيق</span></div>
       <div class="ni" id="logout-btn"><span class="ni-ic">🚪</span><span id="n-out">تسجيل الخروج</span></div>
     </div>
   </aside>
@@ -2178,6 +2185,77 @@ document.querySelector('.cl-col')&&selectColor(document.querySelector('.cl-col')
 // wa type init
 document.getElementById('wa-member-wrap')&&(document.getElementById('wa-member-wrap').style.display='none');
 </script>
+
+
+<!-- ABOUT MODAL -->
+<div class="mo" id="about-mo">
+  <div class="md md-sm">
+    <div class="mh"><h3 class="mt">ℹ️ حول التطبيق</h3><button class="xbtn" data-close="about-mo">✕</button></div>
+    <div class="mc2" style="text-align:center;padding:2rem">
+      <!-- Logo -->
+      <div style="width:80px;height:80px;background:linear-gradient(135deg,#FF5722,#7C3AED);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:2.2rem;margin:0 auto 1.25rem;box-shadow:0 8px 24px rgba(255,87,34,0.35)">🏋️</div>
+      <div style="font-size:1.6rem;font-weight:900;background:linear-gradient(135deg,#FF5722,#7C3AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-.03em">GymPro</div>
+      <div style="font-size:.78rem;color:var(--tm);text-transform:uppercase;letter-spacing:.1em;margin-bottom:1.5rem">نظام إدارة الجيم المتكامل</div>
+
+      <!-- Version badge -->
+      <div style="display:inline-flex;align-items:center;gap:.5rem;background:linear-gradient(135deg,rgba(255,87,34,0.1),rgba(124,58,237,0.1));border:1.5px solid rgba(255,87,34,0.2);border-radius:999px;padding:.35rem 1rem;margin-bottom:1.5rem">
+        <span style="width:8px;height:8px;border-radius:50%;background:var(--su);display:inline-block"></span>
+        <span style="font-size:.78rem;font-weight:700;color:var(--t1)">الإصدار 2.0.0</span>
+      </div>
+
+      <!-- Divider -->
+      <div style="height:1px;background:var(--br);margin:1.25rem 0"></div>
+
+      <!-- Developer info -->
+      <div style="margin-bottom:1.25rem">
+        <div style="font-size:.72rem;color:var(--tm);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem;font-weight:700">المطوّر</div>
+        <div style="display:flex;align-items:center;gap:.875rem;background:var(--bg);border:1px solid var(--br);border-radius:var(--r);padding:1rem;text-align:start">
+          <div style="width:48px;height:48px;background:linear-gradient(135deg,#FF5722,#7C3AED);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:900;color:white;flex-shrink:0">HK</div>
+          <div>
+            <div style="font-size:1rem;font-weight:800;color:var(--t1)">هشام الخليفة</div>
+            <div style="font-size:.78rem;color:var(--t2);margin-top:.15rem">Hesham El-Khalifa</div>
+            <div style="font-size:.72rem;color:var(--p);font-weight:700;margin-top:.15rem">Full-Stack Developer</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Features list -->
+      <div style="background:var(--bg);border:1px solid var(--br);border-radius:var(--r);padding:1rem;text-align:start;margin-bottom:1.25rem">
+        <div style="font-size:.72rem;color:var(--tm);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem;font-weight:700">المميزات</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem;font-size:.78rem;color:var(--t2)">
+          <div>✅ إدارة الأعضاء</div>
+          <div>✅ تسجيل الحضور</div>
+          <div>✅ المدفوعات</div>
+          <div>✅ التقارير الشهرية</div>
+          <div>✅ جدول الحصص</div>
+          <div>✅ خطط التمارين</div>
+          <div>✅ واتساب تلقائي</div>
+          <div>✅ QR Code</div>
+          <div>✅ 4 لغات</div>
+          <div>✅ داكن/فاتح</div>
+        </div>
+      </div>
+
+      <!-- Tech stack -->
+      <div style="display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.25rem">
+        <span style="padding:.25rem .7rem;border-radius:999px;font-size:.72rem;font-weight:700;background:rgba(255,87,34,0.1);color:#FF5722;border:1px solid rgba(255,87,34,0.2)">HTML5</span>
+        <span style="padding:.25rem .7rem;border-radius:999px;font-size:.72rem;font-weight:700;background:rgba(124,58,237,0.1);color:#7C3AED;border:1px solid rgba(124,58,237,0.2)">CSS3</span>
+        <span style="padding:.25rem .7rem;border-radius:999px;font-size:.72rem;font-weight:700;background:rgba(33,150,243,0.1);color:#2196F3;border:1px solid rgba(33,150,243,0.2)">JavaScript</span>
+        <span style="padding:.25rem .7rem;border-radius:999px;font-size:.72rem;font-weight:700;background:rgba(0,200,83,0.1);color:#00895A;border:1px solid rgba(0,200,83,0.2)">Supabase</span>
+        <span style="padding:.25rem .7rem;border-radius:999px;font-size:.72rem;font-weight:700;background:rgba(0,0,0,0.08);color:var(--t2);border:1px solid var(--br)">Vercel</span>
+      </div>
+
+      <!-- Copyright -->
+      <div style="height:1px;background:var(--br);margin:1.25rem 0"></div>
+      <div style="font-size:.75rem;color:var(--tm);line-height:1.7">
+        <div style="font-weight:700;color:var(--t2);margin-bottom:.25rem">⚖️ حقوق النشر والملكية الفكرية</div>
+        © 2026 هشام الخليفة — جميع الحقوق محفوظة<br/>
+        <span style="font-size:.7rem">يُحظر نسخ أو توزيع أو إعادة بيع هذا التطبيق<br/>بدون إذن صريح من المطوّر</span>
+      </div>
+    </div>
+    <div class="mft" style="justify-content:center"><button class="btn bp" data-close="about-mo">حسناً</button></div>
+  </div>
+</div>
 
 </body>
 </html>
