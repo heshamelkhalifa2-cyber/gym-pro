@@ -202,10 +202,6 @@ body.ltr .sb{left:0;right:auto;border-right:1px solid var(--br)}
 .mc{flex:1;min-height:100vh;display:flex;flex-direction:column;min-width:0;transition:margin .3s cubic-bezier(.4,0,.2,1)}
 body.rtl .mc{margin-right:var(--sw);margin-left:0}
 body.ltr .mc{margin-left:var(--sw);margin-right:0}
-body.rtl .sb.collapsed~.mc,.sb.collapsed~body.rtl .mc{margin-right:64px}
-body.ltr .sb.collapsed~.mc{margin-left:64px}
-.sb-collapsed-rtl .mc{margin-right:64px!important}
-.sb-collapsed-ltr .mc{margin-left:64px!important}
 .hdr{height:var(--hh);background:var(--bc);border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;padding:0 1.25rem;position:sticky;top:0;z-index:200;box-shadow:var(--sh1);width:100%}
 .hdr-l{display:flex;align-items:center;gap:.75rem;flex:1;min-width:0}
 .pg-title{font-size:1.05rem;font-weight:800;color:var(--t1);letter-spacing:-.01em}
@@ -490,6 +486,59 @@ body.ltr .sb{transform:translateX(-100%)}body.rtl .sb{transform:translateX(100%)
 body.rtl .sb #sb-toggle{transform:scaleX(-1)}
 body.rtl .sb.collapsed #sb-toggle{transform:scaleX(1)}
 
+
+/* ── GYM ANIMATED BACKGROUND ── */
+.pc{position:relative;}
+.pc::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  overflow:hidden;
+}
+.gym-bg-layer{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  overflow:hidden;
+}
+.gym-bg-layer svg{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+}
+.pc>*{position:relative;z-index:1;}
+
+/* Floating shapes animation */
+@keyframes floatShape{
+  0%,100%{transform:translateY(0) rotate(0deg);opacity:.04}
+  33%{transform:translateY(-18px) rotate(5deg);opacity:.07}
+  66%{transform:translateY(-8px) rotate(-3deg);opacity:.05}
+}
+@keyframes floatShape2{
+  0%,100%{transform:translateY(0) rotate(0deg);opacity:.03}
+  50%{transform:translateY(-25px) rotate(-8deg);opacity:.06}
+}
+@keyframes spinRing{
+  from{transform:rotate(0deg)}
+  to{transform:rotate(360deg)}
+}
+@keyframes pulseShape{
+  0%,100%{transform:scale(1);opacity:.04}
+  50%{transform:scale(1.15);opacity:.08}
+}
+.bg-barbell{animation:floatShape 7s ease-in-out infinite;fill:var(--p)}
+.bg-barbell2{animation:floatShape2 9s ease-in-out infinite;fill:var(--s);animation-delay:-3s}
+.bg-dumbbell{animation:floatShape 5s ease-in-out infinite;fill:var(--su);animation-delay:-2s}
+.bg-ring{animation:spinRing 20s linear infinite;transform-origin:center;fill:none;stroke:var(--p);opacity:.05}
+.bg-ring2{animation:spinRing 30s linear infinite reverse;transform-origin:center;fill:none;stroke:var(--s);opacity:.04}
+.bg-blob{animation:pulseShape 4s ease-in-out infinite}
+body.dark .bg-barbell{opacity:.06}
+body.dark .bg-ring{opacity:.08}
+
 </style>
 </head>
 <body class="rtl">
@@ -755,6 +804,73 @@ body.rtl .sb.collapsed #sb-toggle{transform:scaleX(1)}
       </div>
     </header>
 
+    <!-- Gym Animated Background -->
+    <div class="gym-bg-layer" aria-hidden="true">
+      <svg viewBox="0 0 1400 900" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+        <!-- Rotating rings -->
+        <circle class="bg-ring" cx="200" cy="200" r="120" stroke-width="2" stroke-dasharray="12 8"/>
+        <circle class="bg-ring2" cx="1200" cy="700" r="160" stroke-width="2" stroke-dasharray="16 10"/>
+        <circle class="bg-ring" cx="900" cy="150" r="80" stroke-width="1.5" stroke-dasharray="8 6" style="animation-duration:25s"/>
+        <circle class="bg-ring2" cx="400" cy="750" r="100" stroke-width="1.5" stroke-dasharray="10 8" style="animation-duration:18s;stroke:var(--su)"/>
+
+        <!-- Barbell 1 - top right -->
+        <g class="bg-barbell" transform="translate(900,80)">
+          <rect x="40" y="18" width="200" height="10" rx="5"/>
+          <rect x="0" y="0" width="44" height="46" rx="10"/>
+          <rect x="18" y="6" width="28" height="34" rx="7" opacity=".6"/>
+          <rect x="236" y="0" width="44" height="46" rx="10"/>
+          <rect x="234" y="6" width="28" height="34" rx="7" opacity=".6"/>
+        </g>
+
+        <!-- Barbell 2 - bottom left -->
+        <g class="bg-barbell2" transform="translate(60,680)">
+          <rect x="30" y="14" width="160" height="8" rx="4"/>
+          <rect x="0" y="0" width="34" height="36" rx="8"/>
+          <rect x="14" y="5" width="22" height="26" rx="6" opacity=".6"/>
+          <rect x="188" y="0" width="34" height="36" rx="8"/>
+          <rect x="184" y="5" width="22" height="26" rx="6" opacity=".6"/>
+        </g>
+
+        <!-- Dumbbell 1 -->
+        <g class="bg-dumbbell" transform="translate(1100,300)">
+          <rect x="0" y="10" width="100" height="8" rx="4"/>
+          <rect x="0" y="4" width="22" height="20" rx="5"/>
+          <rect x="78" y="4" width="22" height="20" rx="5"/>
+        </g>
+
+        <!-- Dumbbell 2 -->
+        <g class="bg-barbell" transform="translate(200,450)" style="animation-delay:-4s">
+          <rect x="0" y="10" width="80" height="7" rx="3"/>
+          <rect x="0" y="4" width="18" height="18" rx="4"/>
+          <rect x="62" y="4" width="18" height="18" rx="4"/>
+        </g>
+
+        <!-- Weight plates scattered -->
+        <circle class="bg-blob" cx="650" cy="800" r="45" fill="var(--p)" style="animation-delay:-1s"/>
+        <circle class="bg-blob" cx="1300" cy="200" r="35" fill="var(--s)" style="animation-delay:-2.5s"/>
+        <circle class="bg-blob" cx="100" cy="350" r="28" fill="var(--su)" style="animation-delay:-1.5s"/>
+        <circle class="bg-blob" cx="750" cy="100" r="20" fill="var(--wa)" style="animation-delay:-3s"/>
+
+        <!-- Heart rate / pulse line -->
+        <polyline points="50,500 120,500 145,460 175,545 200,470 225,500 300,500 325,460 355,545 380,470 405,500 480,500"
+          fill="none" stroke="var(--da)" stroke-width="2" opacity=".05"
+          style="animation:floatShape 6s ease-in-out infinite"/>
+
+        <!-- Kettlebell shape -->
+        <g class="bg-barbell2" transform="translate(1050,550)" style="animation-delay:-5s">
+          <ellipse cx="30" cy="45" rx="28" ry="26"/>
+          <rect x="18" y="10" width="24" height="20" rx="12"/>
+          <rect x="22" y="5" width="16" height="12" rx="4" opacity=".6"/>
+        </g>
+
+        <!-- Pull-up bar suggestion -->
+        <g class="bg-dumbbell" transform="translate(300,150)" style="animation-delay:-3.5s;animation-duration:8s">
+          <rect x="0" y="0" width="180" height="10" rx="5"/>
+          <rect x="0" y="10" width="10" height="40" rx="3"/>
+          <rect x="170" y="10" width="10" height="40" rx="3"/>
+        </g>
+      </svg>
+    </div>
     <div class="pc">
 
       <!-- DASHBOARD -->
@@ -2403,19 +2519,8 @@ function toggleSidebar(){
 
 // Apply saved sidebar state
 (function(){
-  const saved = localStorage.getItem('sb_collapsed');
-  if(saved === '1'){
-    const sb = document.getElementById('sbar');
-    const mc = document.querySelector('.mc');
-    if(sb){
-      sb.classList.add('collapsed');
-      const isRTL = document.body.classList.contains('rtl');
-      if(mc){
-        if(isRTL){mc.style.marginRight='64px';mc.style.marginLeft='0';}
-        else{mc.style.marginLeft='64px';mc.style.marginRight='0';}
-      }
-    }
-  }
+  // Reset on each load to prevent layout issues
+  localStorage.removeItem('sb_collapsed');
 })();
 
 // ── THEME TOGGLE ──
