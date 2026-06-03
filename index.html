@@ -418,6 +418,25 @@ textarea{resize:vertical;min-height:75px}
 .ci-grid{grid-template-columns:1fr}.report-grid{grid-template-columns:1fr 1fr}
 }
 @media(max-width:500px){.sg{grid-template-columns:1fr}.pc{padding:1rem}.report-grid{grid-template-columns:1fr}}
+
+/* ── THEME OVERRIDE ── */
+body.dark{
+  --bg:#0F1020;--bg2:#131428;--bc:#1A1B2E;--bc2:#1F2040;
+  --bs:#141525;--bi:#1A1B2E;--br:rgba(255,255,255,0.08);--brh:rgba(255,255,255,0.15);
+  --t1:#F0F4FF;--t2:#8892B0;--tm:#4A5570;
+  --sh1:0 4px 20px rgba(0,0,0,0.3);--sh2:0 8px 32px rgba(0,0,0,0.4);--sh3:0 16px 48px rgba(0,0,0,0.5);
+}
+body.dark .bgs{background:rgba(0,200,83,0.15);color:#69F0AE;border-color:rgba(0,200,83,0.3)}
+body.dark .bgd{background:rgba(244,67,54,0.15);color:#FF8A80;border-color:rgba(244,67,54,0.3)}
+body.dark .bgw{background:rgba(255,193,7,0.15);color:#FFD740;border-color:rgba(255,193,7,0.3)}
+body.dark .bgi{background:rgba(33,150,243,0.15);color:#82B1FF;border-color:rgba(33,150,243,0.3)}
+body.dark .bgp{background:rgba(124,58,237,0.15);color:#B39DDB;border-color:rgba(124,58,237,0.3)}
+body.dark .lp-form-panel{background:#1A1B2E}
+body.dark .receipt{background:#1A1B2E;color:#F0F4FF}
+body.dark .receipt-logo h2{color:#FF8A65}
+body.dark .receipt-row{border-bottom-color:rgba(255,255,255,0.08);color:#F0F4FF}
+body.dark .receipt-footer{color:#8892B0}
+
 </style>
 </head>
 <body class="rtl">
@@ -642,6 +661,7 @@ textarea{resize:vertical;min-height:75px}
       </div>
       <div class="hdr-r">
         <div class="hdr-clock"><span class="clk-dot"></span><span id="live-clock">--:--:--</span></div>
+        <button id="theme-toggle" onclick="toggleTheme()" title="تبديل الوضع" style="width:38px;height:38px;border-radius:var(--rs);background:var(--bg);border:1px solid var(--br);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;transition:all .2s;flex-shrink:0">🌙</button>
         <div class="lang-sw">
           <button class="lang-btn" id="l-btn2b"><span id="lfb">🇸🇦</span><span id="lnb">AR</span><span>▾</span></button>
           <div class="lang-dd" id="l-ddb">
@@ -2256,6 +2276,34 @@ document.getElementById('wa-member-wrap')&&(document.getElementById('wa-member-w
     <div class="mft" style="justify-content:center"><button class="btn bp" data-close="about-mo">حسناً</button></div>
   </div>
 </div>
+
+
+<script>
+// ── THEME TOGGLE ──
+function toggleTheme(){
+  const isDark = document.body.classList.toggle('dark');
+  localStorage.setItem('gym_theme', isDark ? 'dark' : 'light');
+  document.getElementById('theme-toggle').textContent = isDark ? '☀️' : '🌙';
+  document.getElementById('theme-toggle').title = isDark ? 'الوضع الفاتح' : 'الوضع الغامق';
+  // Update charts if visible
+  if(typeof dc2!=='undefined'&&dc2){
+    const act=parseInt(document.getElementById('s-act').textContent)||0;
+    const exp=parseInt(document.getElementById('s-exp').textContent)||0;
+    const subs={};
+    try{updateCharts(act,exp,subs);}catch(e){}
+  }
+}
+// Apply saved theme on load
+(function(){
+  const saved = localStorage.getItem('gym_theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  if(saved==='dark' || (!saved && prefersDark)){
+    document.body.classList.add('dark');
+    const btn=document.getElementById('theme-toggle');
+    if(btn){btn.textContent='☀️';btn.title='الوضع الفاتح';}
+  }
+})();
+</script>
 
 </body>
 </html>
