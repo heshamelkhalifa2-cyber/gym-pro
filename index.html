@@ -1918,6 +1918,8 @@ function showApp(email){
   document.getElementById('u-em').textContent=email||'admin';
   document.getElementById('sb-uav').textContent=short[0].toUpperCase();
   applyLang(lang);initCharts();nav('dashboard');loadAC();
+  // Check for QR checkin URL param
+  setTimeout(checkQRFromURL, 1000);
   // Apply sidebar state
   const mc=document.querySelector('.mc');
   const isCollapsed=localStorage.getItem('sb_collapsed')==='1';
@@ -2644,7 +2646,7 @@ function toggleTheme(){
 </div>
 
 <!-- QR SELF CHECKIN PAGE -->
-<div id="qr-checkin-page" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;padding:2rem">
+<div id="qr-checkin-page" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9999;flex-direction:column;align-items:center;justify-content:center;padding:2rem">
   <div style="text-align:center;max-width:400px;width:100%">
     <div style="width:60px;height:60px;background:linear-gradient(135deg,#FF5722,#7C3AED);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto 1rem">🏋️</div>
     <h2 style="font-size:1.4rem;font-weight:900;margin-bottom:.5rem">GymPro</h2>
@@ -2880,15 +2882,20 @@ async function processQRInput(){
 }
 
 // Auto check-in from URL (when member scans QR)
-(function(){
+// Only runs AFTER app is loaded and user is authenticated
+function checkQRFromURL(){
   const params = new URLSearchParams(window.location.search);
   const token = params.get('checkin');
   if(token){
-    document.getElementById('qr-manual-input').value = token;
-    document.getElementById('qr-checkin-page').style.display = 'flex';
-    setTimeout(processQRInput, 500);
+    const inp = document.getElementById('qr-manual-input');
+    const page = document.getElementById('qr-checkin-page');
+    if(inp) inp.value = token;
+    if(page) page.style.display = 'flex';
+    setTimeout(processQRInput, 800);
+    // Clean URL
+    window.history.replaceState({},'',window.location.pathname);
   }
-})();
+}
 
 // ══════════════════════════════════════════════
 // RETENTION / CAMPAIGNS - in WhatsApp page
