@@ -1585,33 +1585,7 @@ async function loadDash(){
 }
 
 // Members
-async function loadMems(){
-  const srch=document.getElementById('m-srch').value,flt=document.getElementById('m-flt').value;
-  const tbody=document.getElementById('m-tbody');
-  tbody.innerHTML='<tr><td colspan="7"><div class="lc"><div class="spn"></div></div></td></tr>';
-  try{
-    let q=sb.from('members').select('*').order('created_at',{ascending:false});
-    if(flt!=='all')q=q.eq('status',flt);if(srch)q=q.or(`name.ilike.%${srch}%,phone.ilike.%${srch}%`);
-    const{data,error}=await q;if(error)throw error;allM=data||[];
-    if(!allM.length){tbody.innerHTML=`<tr><td colspan="7"><div class="es"><div class="ei">👥</div><div class="et">${T().nomen}</div></div></td></tr>`;return}
-    tbody.innerHTML=allM.map(m=>{
-      const days=dl(m.subscription_end),isE=m.status==='expired',isS=!isE&&days<=10;
-      return`<tr style="cursor:pointer" onclick="openProfile('${m.id}')">
-        <td><div class="mc4">${mkAv(m.name,m.photo_url)}<div><div class="mn">${m.name}</div><div class="mi">${sid(m.id)}</div></div></div></td>
-        <td><span class="mono" style="font-size:.82rem">${m.phone}</span></td>
-        <td><span class="badge bgi">${subLbl(m.subscription_type)}</span></td>
-        <td><div style="display:flex;align-items:center;gap:.4rem;font-size:.85rem">${fd(m.subscription_end)}${isS?`<span class="badge bgw" style="font-size:.65rem">${days}d</span>`:''}</div></td>
-        <td>${m.weight?`<span class="mono" style="color:#00897B;font-weight:700">${m.weight}kg</span>`:'-'}</td>
-        <td><span class="badge ${isE?'bgd':'bgs'}">${isE?T().mexp:T().mact}</span></td>
-        <td onclick="event.stopPropagation()"><div style="display:flex;gap:.35rem">
-          <button class="btn btn-sm bg" onclick="openRenew('${m.id}')" title="${T().renew}">🔄</button>
-          <button class="btn btn-sm bpu" onclick="openQR('${m.id}')" title="QR">📱</button>
-          <button class="btn btn-sm bs2" onclick="editM('${m.id}')">✏️</button>
-          <button class="btn btn-sm bd" onclick="delM('${m.id}')">🗑️</button>
-        </div></td>
-      </tr>`}).join('');
-  }catch(e){toast(T().err,'error')}
-}
+
 
 let photoBase64='';
 document.getElementById('m-photo').addEventListener('change',function(){
@@ -2686,7 +2660,7 @@ function setCat(el){
 }
 
 // Enhanced loadMems - patch the original
-loadMems = async function(){
+async function loadMems(){
   const srch = document.getElementById('m-srch')?.value || '';
   const daysFlt = document.getElementById('m-days-flt')?.value || '';
   const subFlt = document.getElementById('m-sub-flt')?.value || '';
