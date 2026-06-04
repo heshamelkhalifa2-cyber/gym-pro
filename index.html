@@ -1466,6 +1466,8 @@ function applyLang(l){
   const tpt=document.getElementById('tp-tot');if(tpt)tpt.textContent=x.ptot;
   Array.from(document.getElementById('m-ty').options).forEach((o,i)=>{if(x.sub[i])o.textContent=x.sub[i]});
   Array.from(document.getElementById('renew-type').options).forEach((o,i)=>{if(x.sub[i])o.textContent=x.sub[i]});
+  // Update category tabs
+  updateCatTabs(l);
   // Fix sidebar margin after lang change (RTL/LTR switch)
   const sb=document.getElementById('sbar');
   const mc=document.querySelector('.mc');
@@ -1535,13 +1537,27 @@ let allM=[];
 function nav(page){
   document.querySelectorAll('.ni[data-page]').forEach(e=>e.classList.toggle('active',e.dataset.page===page));
   document.querySelectorAll('.pg2').forEach(e=>e.classList.remove('active'));
-  document.getElementById('pg-'+page).classList.add('active');
-  const titles={dashboard:T().nav[0],members:T().nav[1],checkin:T().nav[2],payments:T().nav[3],report:T().nav[5],measurements:T().nav[6]};
+  const pageEl = document.getElementById('pg-'+page);
+  if(pageEl) pageEl.classList.add('active');
+  const titles={
+    dashboard:T().nav[0],members:T().nav[1],checkin:T().nav[2],
+    payments:T().nav[3],report:T().nav[5],measurements:T().nav[6],
+    schedule:'جدول الحصص',exercises:'التمارين',whatsapp:'واتساب'
+  };
   const t=titles[page]||page;
-  document.getElementById('pg-t').textContent=t;document.getElementById('pg-t2').textContent=t;
-  document.getElementById('sbar').classList.remove('open');document.getElementById('sov').classList.remove('vis');
-  if(page==='dashboard')loadDash();else if(page==='members')loadMems();else if(page==='checkin')loadCI();
-  else if(page==='payments')loadPays();else if(page==='report')initReport();else if(page==='measurements')initMeas();
+  const ptEl=document.getElementById('pg-t');if(ptEl)ptEl.textContent=t;
+  const pt2El=document.getElementById('pg-t2');if(pt2El)pt2El.textContent=t;
+  document.getElementById('sbar').classList.remove('open');
+  document.getElementById('sov').classList.remove('vis');
+  if(page==='dashboard')loadDash();
+  else if(page==='members')loadMems();
+  else if(page==='checkin')loadCI();
+  else if(page==='payments')loadPays();
+  else if(page==='report')initReport();
+  else if(page==='measurements')initMeas();
+  else if(page==='schedule')loadSchedule();
+  else if(page==='exercises'){loadExercises();setupPlanAc();}
+  else if(page==='whatsapp'){loadRetentionCampaigns();loadWaLog();loadWaMembers();}
 }
 
 // Dashboard
@@ -2452,14 +2468,7 @@ async function loadWaLog(){
 // ══════════════════════════════════════════════
 // EXTEND NAV + INIT
 // ══════════════════════════════════════════════
-// Patch nav() to handle new pages
-const _origNav=nav;
-nav=function(page){
-  _origNav(page);
-  if(page==='schedule')loadSchedule();
-  else if(page==='exercises'){loadExercises();setupPlanAc();}
-  else if(page==='whatsapp'){loadWaAutoList();loadWaLog();loadWaMembers();}
-};
+// nav() handles all pages directly
 
 async function loadWaMembers(){
   const{data}=await sb.from('members').select('id,name,phone').order('name');
@@ -2677,13 +2686,12 @@ function setCat(el){
 }
 
 // Enhanced loadMems - patch the original
-const _origLoadMems = loadMems;
 loadMems = async function(){
   const srch = document.getElementById('m-srch')?.value || '';
   const daysFlt = document.getElementById('m-days-flt')?.value || '';
   const subFlt = document.getElementById('m-sub-flt')?.value || '';
   const tbody = document.getElementById('m-tbody');
-  if(!tbody){return _origLoadMems();}
+  if(!tbody){return;}
   tbody.innerHTML = '<tr><td colspan="8"><div class="lc"><div class="spn"></div></div></td></tr>';
 
   try{
@@ -2963,16 +2971,14 @@ document.getElementById('frz-save')?.addEventListener('click', saveFreeze);
 // QR kiosk keyboard
 document.getElementById('qr-manual-input')?.addEventListener('keydown', e=>{if(e.key==='Enter')processQRInput()});
 
-// Override applyLang to update category tabs
-const _origApplyLang = applyLang;
-applyLang = function(l){
-  _origApplyLang(l);
+// Update category tabs when lang changes
+function updateCatTabs(l){
   const cats = TX[l]?.cats_mem;
   if(cats){
     const tabs = document.querySelectorAll('.cat-tab');
     tabs.forEach((tab,i)=>{if(cats[i])tab.textContent=cats[i]});
   }
-};
+}
 </script>
 
 </body>
