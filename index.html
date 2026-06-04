@@ -1434,6 +1434,14 @@ const TX={
 let lang=localStorage.getItem('g_lang')||'ar';
 const T=()=>TX[lang];
 
+function updateCatTabs(l){
+  const cats = TX[l]?.cats_mem;
+  if(cats){
+    const tabs = document.querySelectorAll('.cat-tab');
+    tabs.forEach((tab,i)=>{if(cats[i])tab.textContent=cats[i]});
+  }
+}
+
 function applyLang(l){
   lang=l;localStorage.setItem('g_lang',l);const x=TX[l];
   document.documentElement.lang=l;document.documentElement.dir=x.d;
@@ -2374,7 +2382,7 @@ async function loadWaAutoList(){
     const phone=m.phone.replace(/\D/g,'');
     return`<div style="display:flex;justify-content:space-between;align-items:center;padding:.65rem;background:var(--bg);border:1px solid rgba(255,193,7,0.2);border-radius:var(--rs);margin-bottom:.4rem">
       <div><div style="font-weight:700;font-size:.875rem">${m.name}</div><div style="font-size:.72rem;color:var(--wa)">⏰ ${days} يوم متبقي</div></div>
-      <button onclick="sendWa('${phone}',\`${msg.replace(/`/g,"'")}\`,'${m.id}','renewal')" class="btn btn-sm bp" style="background:linear-gradient(135deg,#25D366,#128C7E)">📲 إرسال</button>
+      <button onclick="sendWa('${phone}',\`${msg.replace(/\x60/g,'\x27')}\`,'${m.id}','renewal')" class="btn btn-sm bp" style="background:linear-gradient(135deg,#25D366,#128C7E)">📲 إرسال</button>
     </div>`;
   }).join('');
 }
@@ -2738,8 +2746,7 @@ function exportMembers(){
   if(!allM.length){toast('لا يوجد أعضاء للتصدير','info');return}
   const headers = ['الاسم','الهاتف','البريد','نوع الاشتراك','تاريخ البدء','تاريخ الانتهاء','الوزن','الحالة','الفئة'];
   const rows = allM.map(m=>[m.name,m.phone,m.email||'',subLbl(m.subscription_type),m.subscription_start,m.subscription_end,m.weight||'',m.status,m.category||''].join(','));
-  const csv = [headers.join(','),...rows].join('
-');
+  const csv = [headers.join(','),...rows].join('\n');
   const blob = new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');a.href=url;a.download=`members-${td2()}.csv`;a.click();
@@ -2799,7 +2806,7 @@ async function generateMemberQRToken(memberId){
     await sb.from('qr_tokens').upsert([{member_id:memberId, token}],{onConflict:'member_id'});
     return token;
   }catch(e){
-    // If table doesn't exist yet, just use member ID
+    // If table does not exist yet, just use member ID
     return 'GP-' + memberId.split('-')[0].toUpperCase();
   }
 }
@@ -2946,13 +2953,7 @@ document.getElementById('frz-save')?.addEventListener('click', saveFreeze);
 document.getElementById('qr-manual-input')?.addEventListener('keydown', e=>{if(e.key==='Enter')processQRInput()});
 
 // Update category tabs when lang changes
-function updateCatTabs(l){
-  const cats = TX[l]?.cats_mem;
-  if(cats){
-    const tabs = document.querySelectorAll('.cat-tab');
-    tabs.forEach((tab,i)=>{if(cats[i])tab.textContent=cats[i]});
-  }
-}
+
 </script>
 
 </body>
