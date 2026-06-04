@@ -216,7 +216,7 @@ body.ltr .mc{margin-left:var(--sw);margin-right:0}
 .lang-sw{position:relative}
 .lang-btn{display:flex;align-items:center;gap:.4rem;padding:.38rem .7rem;background:var(--bg);border:1.5px solid var(--br);border-radius:var(--rs);color:var(--t1);font-size:.8rem;font-weight:700;transition:all .2s;cursor:pointer}
 .lang-btn:hover{border-color:var(--p);color:var(--p)}
-.lang-dd{position:fixed;top:var(--hh);background:var(--bc);border:1.5px solid var(--br);border-radius:var(--rs);min-width:160px;box-shadow:var(--sh3);display:none;z-index:9998;overflow:hidden}
+.lang-dd{position:fixed;background:var(--bc);border:1.5px solid var(--br);border-radius:var(--rs);min-width:160px;max-width:90vw;box-shadow:var(--sh3);display:none;z-index:9998;overflow:hidden}
 .lang-dd.open{display:block}
 .lo{display:flex;align-items:center;gap:.6rem;padding:.65rem 1rem;font-size:.85rem;color:var(--t2);cursor:pointer;transition:all .15s;font-weight:500}
 .lo:hover{background:var(--bg);color:var(--t1)}.lo.cur{color:var(--p);background:var(--pg);font-weight:700}
@@ -539,6 +539,23 @@ body.rtl .sb.collapsed #sb-toggle{transform:scaleX(1)}
 body.dark .bg-barbell{opacity:.06}
 body.dark .bg-ring{opacity:.08}
 
+
+/* ── MEMBER CATEGORIES ── */
+.cat-tabs{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:1rem}
+.cat-tab{padding:.3rem .7rem;border-radius:999px;font-size:.72rem;font-weight:700;cursor:pointer;border:1.5px solid var(--br);background:var(--bc);color:var(--t2);transition:all .2s;white-space:nowrap}
+.cat-tab:hover{border-color:var(--p);color:var(--p)}
+.cat-tab.active{color:white;border-color:transparent}
+.cat-tab[data-cat="all"].active{background:linear-gradient(135deg,#FF5722,#7C3AED)}
+.cat-tab[data-cat="current"].active{background:#00897B}
+.cat-tab[data-cat="expiring_soon"].active{background:#F57F17}
+.cat-tab[data-cat="expired"].active{background:#C62828}
+.cat-tab[data-cat="lapsed"].active{background:#6D4C41}
+.cat-tab[data-cat="new"].active{background:#1565C0}
+.cat-tab[data-cat="veteran"].active{background:#4527A0}
+.cat-tab[data-cat="frozen"].active{background:#0277BD}
+/* Freeze badge */
+.freeze-badge{display:inline-flex;align-items:center;gap:.3rem;padding:.2rem .55rem;border-radius:999px;font-size:.68rem;font-weight:700;background:rgba(2,119,189,0.15);color:#0277BD;border:1px solid rgba(2,119,189,0.25)}
+
 </style>
 </head>
 <body class="rtl">
@@ -774,6 +791,7 @@ body.dark .bg-ring{opacity:.08}
           <div class="sb-urole">Admin</div>
         </div>
       </div>
+      <div class="ni" onclick="document.getElementById('qr-checkin-page').style.display='flex'"><span class="ni-ic">📲</span><span>كشك الحضور QR</span></div>
       <div class="ni" onclick="openMo('about-mo')"><span class="ni-ic">ℹ️</span><span>حول التطبيق</span></div>
       <div class="ni" id="logout-btn"><span class="ni-ic">🚪</span><span id="n-out">تسجيل الخروج</span></div>
     </div>
@@ -791,7 +809,8 @@ body.dark .bg-ring{opacity:.08}
       </div>
       <div class="hdr-r">
         <div class="hdr-clock"><span class="clk-dot"></span><span id="live-clock">--:--:--</span></div>
-        <button id="theme-toggle" onclick="toggleTheme()" title="Toggle theme" style="width:36px;height:36px;border-radius:var(--rs);background:var(--bg);border:1.5px solid var(--br);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all .2s;flex-shrink:0" onmouseenter="this.style.borderColor='var(--p)'" onmouseleave="this.style.borderColor='var(--br)'">🌙</button>
+        <button onclick="document.getElementById('qr-checkin-page').style.display='flex'" title="QR Check-in" style="width:36px;height:36px;border-radius:var(--rs);background:var(--pg);border:1.5px solid rgba(255,87,34,0.2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all .2s;flex-shrink:0">📲</button>
+        <button id="theme-toggle" onclick="toggleTheme()" title="Toggle theme" style="width:36px;height:36px;border-radius:var(--rs);background:var(--bg);border:1.5px solid var(--br);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all .2s;flex-shrink:0">🌙</button>
         <div class="lang-sw">
           <button class="lang-btn" id="l-btn2b"><span id="lfb">🇸🇦</span><span id="lnb">AR</span><span>▾</span></button>
           <div class="lang-dd" id="l-ddb">
@@ -901,20 +920,51 @@ body.dark .bg-ring{opacity:.08}
 
       <!-- MEMBERS -->
       <div id="pg-members" class="pg2">
-        <div class="pg-hdr"><div class="pg-hdr-left"><h2 id="mem-t">الأعضاء</h2><p>إدارة بيانات الأعضاء</p></div></div>
-        <div class="tb">
+        <div class="pg-hdr"><div class="pg-hdr-left"><h2 id="mem-t">الأعضاء</h2><p id="mem-sub-t">إدارة بيانات الأعضاء</p></div>
+          <button class="btn bp" id="add-m-btn">＋ <span id="add-m-t">إضافة عضو</span></button>
+        </div>
+        <!-- Category Tabs -->
+        <div class="cat-tabs" id="mem-cats">
+          <div class="cat-tab active" data-cat="all" onclick="setCat(this)">👥 الكل</div>
+          <div class="cat-tab" data-cat="current" onclick="setCat(this)">✅ حاليون</div>
+          <div class="cat-tab" data-cat="expiring_soon" onclick="setCat(this)">⏰ قرب الانتهاء</div>
+          <div class="cat-tab" data-cat="expired" onclick="setCat(this)">❌ منتهي</div>
+          <div class="cat-tab" data-cat="lapsed" onclick="setCat(this)">💤 قديم +شهر</div>
+          <div class="cat-tab" data-cat="new" onclick="setCat(this)">🆕 جديد -3شهور</div>
+          <div class="cat-tab" data-cat="veteran" onclick="setCat(this)">🏆 قديم +سنة</div>
+          <div class="cat-tab" data-cat="frozen" onclick="setCat(this)">🧊 مجمّد</div>
+        </div>
+        <!-- Filters -->
+        <div class="tb" style="margin-bottom:.75rem">
           <div class="tbl">
-            <div class="srch" style="min-width:240px"><span class="si3">🔍</span><input type="text" id="m-srch" placeholder="البحث..."/></div>
-            <select id="m-flt" style="min-width:130px"><option value="all" id="f-all">الكل</option><option value="active" id="f-act">نشط</option><option value="expired" id="f-exp">منتهي</option></select>
+            <div class="srch" style="min-width:220px"><span class="si3">🔍</span><input type="text" id="m-srch" placeholder="البحث بالاسم أو الهاتف..."/></div>
+            <select id="m-days-flt" style="min-width:160px" onchange="loadMems()">
+              <option value="">كل الفترات</option>
+              <option value="7">ينتهي خلال 7 أيام</option>
+              <option value="15">ينتهي خلال 15 يوم</option>
+              <option value="30">ينتهي خلال 30 يوم</option>
+              <option value="new30">انضم خلال 30 يوم</option>
+              <option value="new90">انضم خلال 90 يوم</option>
+            </select>
+            <select id="m-sub-flt" style="min-width:140px" onchange="loadMems()">
+              <option value="">كل الاشتراكات</option>
+              <option value="1">شهر</option>
+              <option value="3">3 شهور</option>
+              <option value="6">6 شهور</option>
+              <option value="12">سنة</option>
+            </select>
           </div>
-          <div class="tbr"><button class="btn bp" id="add-m-btn">＋ <span id="add-m-t">إضافة عضو</span></button></div>
+          <div class="tbr">
+            <button class="btn bs2 btn-sm" onclick="exportMembers()">📥 تصدير</button>
+          </div>
         </div>
         <div class="tw">
           <table>
-            <thead><tr><th id="th-n">الاسم</th><th id="th-ph">الهاتف</th><th id="th-sb">الاشتراك</th><th id="th-en">انتهاء</th><th id="th-wt">الوزن</th><th id="th-st">الحالة</th><th id="th-ac">إجراءات</th></tr></thead>
-            <tbody id="m-tbody"><tr><td colspan="7"><div class="lc"><div class="spn"></div></div></td></tr></tbody>
+            <thead><tr><th id="th-n">الاسم</th><th id="th-ph">الهاتف</th><th id="th-sb">الاشتراك</th><th id="th-en">انتهاء</th><th id="th-wt">الوزن</th><th>الفئة</th><th id="th-st">الحالة</th><th id="th-ac">إجراءات</th></tr></thead>
+            <tbody id="m-tbody"><tr><td colspan="8"><div class="lc"><div class="spn"></div></div></td></tr></tbody>
           </table>
         </div>
+        <div id="m-count" style="text-align:center;padding:.75rem;font-size:.8rem;color:var(--tm)"></div>
       </div>
 
       <!-- CHECKIN -->
@@ -1127,8 +1177,10 @@ body.dark .bg-ring{opacity:.08}
             <option value="10">10 شهور</option><option value="11">11 شهر</option><option value="12">سنة كاملة (12 شهر)</option>
           </select>
         </div>
-        <div class="f2"><label>تاريخ البداية <span class="req">*</span></label><input type="date" id="m-st"/></div>
-        <div class="f2"><label>تاريخ الانتهاء</label><input type="date" id="m-en" readonly style="opacity:.5"/></div>
+        <div class="f2"><label>تاريخ التسجيل</label><input type="date" id="m-reg"/></div>
+        <div class="f2"><label>تاريخ البدء الفعلي <span class="req">*</span></label><input type="date" id="m-st"/></div>
+        <div class="f2" style="grid-column:1/-1"><label style="color:var(--in)">💡 يمكنك تسجيل الاشتراك اليوم وتحديد تاريخ البدء في المستقبل (مسبقاً)</label></div>
+        <div class="f2"><label>تاريخ الانتهاء (تلقائي)</label><input type="date" id="m-en" readonly style="opacity:.5"/></div>
         <div class="f2"><label>⚖️ الوزن (كجم)</label><input type="number" id="m-wt" placeholder="70.5" min="0" step="0.1"/></div>
         <div class="f2"><label>🎁 شهور الهدية</label><input type="number" id="m-fm" value="0" min="0"/></div>
         <div class="f2"><label>⏸️ شهور الإيقاف</label><input type="number" id="m-pm" value="0" min="0"/></div>
@@ -1315,6 +1367,8 @@ const TX={
     mth:['الاسم','الهاتف','الاشتراك','انتهاء','الوزن','الحالة','إجراءات'],
     nomen:'لا يوجد أعضاء',cdel:'هل أنت متأكد من الحذف؟',addtit:'إضافة عضو',edtit:'تعديل العضو',msave:'حفظ العضو',mcan:'إلغاء',
     sub:['شهر','شهران','3 شهور','4 شهور','5 شهور','6 شهور','7 شهور','8 شهور','9 شهور','10 شهور','11 شهر','سنة'],
+    cats_mem:['👥 الكل','✅ حاليون','⏰ قرب الانتهاء','❌ منتهي','💤 قديم +شهر','🆕 جديد -3شهور','🏆 قديم +سنة','🧊 مجمّد'],
+    cat_labels:{all:'الكل',current:'حالي',expiring_soon:'قرب الانتهاء',expired:'منتهي',lapsed:'قديم',new:'جديد',veteran:'قديم جداً',frozen:'مجمّد'},
     cttl:'البحث عن عضو',cph:'اكتب الاسم أو أول 4 أرقام...',cbtn:'تسجيل دخول',ctd:'حضور اليوم',
     cok:'تم تسجيل الحضور ✅',calr:'تم تسجيل الحضور مسبقاً ℹ️',cnf:'العضو غير موجود ❌',
     cexp:'🚫 اشتراك منتهٍ!',csoon:'⚠️ الاشتراك سينتهي خلال {d} أيام!',
@@ -1331,6 +1385,8 @@ const TX={
     mth:['Name','Phone','Subscription','Expires','Weight','Status','Actions'],
     nomen:'No members found',cdel:'Are you sure?',addtit:'Add Member',edtit:'Edit Member',msave:'Save Member',mcan:'Cancel',
     sub:['1M','2M','3M','4M','5M','6M','7M','8M','9M','10M','11M','1Y'],
+    cats_mem:['👥 All','✅ Current','⏰ Expiring Soon','❌ Expired','💤 Lapsed +1M','🆕 New -3M','🏆 Veteran +1Y','🧊 Frozen'],
+    cat_labels:{all:'All',current:'Current',expiring_soon:'Expiring Soon',expired:'Expired',lapsed:'Lapsed',new:'New',veteran:'Veteran',frozen:'Frozen'},
     cttl:'Search Member',cph:'Type name or first 4 digits...',cbtn:'Check In',ctd:"Today's Check-ins",
     cok:'Checked in ✅',calr:'Already checked in ℹ️',cnf:'Member not found ❌',
     cexp:'🚫 Subscription expired!',csoon:'⚠️ Expires in {d} days!',
@@ -1347,6 +1403,8 @@ const TX={
     mth:['Pangalan','Telepono','Subscription','Magtatapos','Timbang','Katayuan','Aksyon'],
     nomen:'Walang miyembro',cdel:'Sigurado ka?',addtit:'Magdagdag',edtit:'I-edit',msave:'I-save',mcan:'Kanselahin',
     sub:['1B','2B','3B','4B','5B','6B','7B','8B','9B','10B','11B','1T'],
+    cats_mem:['👥 Lahat','✅ Kasalukuyan','⏰ Malapit','❌ Nag-expire','💤 Luma','🆕 Bago','🏆 Beterano','🧊 Naka-freeze'],
+    cat_labels:{all:'Lahat',current:'Kasalukuyan',expiring_soon:'Malapit na',expired:'Nag-expire',lapsed:'Luma',new:'Bago',veteran:'Beterano',frozen:'Naka-freeze'},
     cttl:'Maghanap ng Miyembro',cph:'I-type ang pangalan...',cbtn:'Mag-check in',ctd:'Check-in Ngayon',
     cok:'Naka-check in ✅',calr:'Naka-check in na ℹ️',cnf:'Hindi nahanap ❌',
     cexp:'🚫 Nag-expire na!',csoon:'⚠️ Mag-e-expire sa {d} araw!',
@@ -1362,7 +1420,9 @@ const TX={
     madd:'सदस्य जोड़ें',mact:'सक्रिय',mexp:'समाप्त',mall:'सभी',
     mth:['नाम','फोन','सदस्यता','समाप्ति','वजन','स्थिति','कार्रवाई'],
     nomen:'कोई सदस्य नहीं',cdel:'क्या आप वाकई हटाना चाहते हैं?',addtit:'सदस्य जोड़ें',edtit:'संपादित करें',msave:'सहेजें',mcan:'रद्द करें',
-    sub:['1M','2M','3M','4M','5M','6M','7M','8M','9M','10M','11M','1Y'],
+        sub:['1M','2M','3M','4M','5M','6M','7M','8M','9M','10M','11M','1Y'],
+    cats_mem:['👥 सभी','✅ वर्तमान','⏰ समाप्त होने वाला','❌ समाप्त','💤 पुराना','🆕 नया','🏆 अनुभवी','🧊 फ्रोज़न'],
+    cat_labels:{all:'सभी',current:'वर्तमान',expiring_soon:'समाप्त होने वाला',expired:'समाप्त',lapsed:'पुराना',new:'नया',veteran:'अनुभवी',frozen:'फ्रोज़न'},
     cttl:'सदस्य खोजें',cph:'नाम या पहले 4 अंक...',cbtn:'चेक इन',ctd:'आज के चेक-इन',
     cok:'चेक-इन सफल ✅',calr:'पहले से चेक-इन ℹ️',cnf:'सदस्य नहीं मिला ❌',
     cexp:'🚫 सदस्यता समाप्त!',csoon:'⚠️ {d} दिनों में समाप्त!',
@@ -2138,6 +2198,7 @@ function renderExercises(){
   if(selectedCat!=='الكل')exs=exs.filter(e=>e.category===selectedCat);
   if(srch)exs=exs.filter(e=>e.name.toLowerCase().includes(srch)||e.muscle_group?.toLowerCase().includes(srch));
   if(!exs.length){list.innerHTML=`<div class="es" style="padding:1.5rem"><div class="et">لا توجد تمارين</div></div>`;return}
+  // Always Arabic category colors regardless of UI language
   const catColors={'قوة':'#FF5722','كارديو':'#E91E63','كور':'#7C3AED','مرونة':'#00BCD4','أخرى':'#9E9E9E'};
   list.innerHTML=exs.map(e=>`<div style="display:flex;align-items:center;gap:.75rem;padding:.75rem;background:var(--bg);border:1px solid var(--br);border-radius:var(--rs);margin-bottom:.4rem;transition:all .2s" onmouseenter="this.style.borderColor='var(--p)'" onmouseleave="this.style.borderColor='var(--br)'">
     <div style="width:36px;height:36px;border-radius:9px;background:${catColors[e.category]||'#9E9E9E'}22;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0">💪</div>
@@ -2547,6 +2608,364 @@ function toggleTheme(){
     if(btn){btn.textContent='☀️';btn.title='الوضع الفاتح';}
   }
 })();
+</script>
+
+
+<!-- FREEZE MODAL -->
+<div class="mo" id="freeze-mo">
+  <div class="md md-sm">
+    <div class="mh"><h3 class="mt">🧊 تجميد الاشتراك</h3><button class="xbtn" data-close="freeze-mo">✕</button></div>
+    <div class="mc2">
+      <input type="hidden" id="frz-id"/>
+      <div style="background:rgba(2,119,189,0.08);border:1.5px solid rgba(2,119,189,0.2);border-radius:var(--rs);padding:1rem;margin-bottom:1rem">
+        <div style="font-weight:800;font-size:1rem" id="frz-name">-</div>
+        <div style="font-size:.8rem;color:var(--t2);margin-top:.25rem">الاشتراك الحالي ينتهي: <span id="frz-end" style="font-weight:700;color:#0277BD">-</span></div>
+      </div>
+      <div class="fg" style="grid-template-columns:1fr">
+        <div class="f2"><label>تاريخ بداية التجميد <span class="req">*</span></label><input type="date" id="frz-start"/></div>
+        <div class="f2"><label>مدة التجميد <span class="req">*</span></label>
+          <select id="frz-dur">
+            <option value="1">شهر واحد</option>
+            <option value="2">شهران</option>
+            <option value="3">3 شهور</option>
+            <option value="6">6 شهور</option>
+          </select>
+        </div>
+      </div>
+      <div style="background:rgba(2,119,189,0.08);border:1.5px solid rgba(2,119,189,0.2);border-radius:var(--rs);padding:.875rem;margin-top:.75rem;font-size:.875rem;font-weight:600;color:#0277BD">
+        🧊 سيمتد الاشتراك تلقائياً بعد انتهاء التجميد بمدة التجميد
+      </div>
+      <div style="background:var(--wal);border:1px solid rgba(255,193,7,0.2);border-radius:var(--rs);padding:.75rem;margin-top:.5rem;font-size:.8rem;color:#E65100">
+        ⚠️ مدة التجميد لن تُحتسب من مدة الاشتراك
+      </div>
+    </div>
+    <div class="mft"><button class="btn bs2" data-close="freeze-mo">إلغاء</button><button class="btn" style="background:#0277BD;color:white" id="frz-save">🧊 تجميد الاشتراك</button></div>
+  </div>
+</div>
+
+<!-- QR SELF CHECKIN PAGE -->
+<div id="qr-checkin-page" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;padding:2rem">
+  <div style="text-align:center;max-width:400px;width:100%">
+    <div style="width:60px;height:60px;background:linear-gradient(135deg,#FF5722,#7C3AED);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto 1rem">🏋️</div>
+    <h2 style="font-size:1.4rem;font-weight:900;margin-bottom:.5rem">GymPro</h2>
+    <p style="color:var(--t2);font-size:.875rem;margin-bottom:2rem">امسح الـ QR للدخول</p>
+    <div id="qr-scan-result" style="display:none;background:var(--bc);border:2px solid var(--su);border-radius:var(--r);padding:1.5rem;margin-bottom:1rem">
+      <div class="av av-lg" id="qr-res-av" style="margin:0 auto 1rem">?</div>
+      <div style="font-size:1.2rem;font-weight:900" id="qr-res-name">-</div>
+      <div style="color:var(--t2);font-size:.85rem;margin-top:.25rem" id="qr-res-msg">-</div>
+    </div>
+    <input type="text" id="qr-manual-input" placeholder="أو أدخل الـ Token يدوياً..." style="text-align:center;margin-bottom:.75rem" autocomplete="off"/>
+    <button onclick="processQRInput()" class="btn bp" style="width:100%;justify-content:center;padding:.8rem">✅ تسجيل دخول</button>
+    <button onclick="document.getElementById('qr-checkin-page').style.display='none'" class="btn bs2" style="width:100%;justify-content:center;margin-top:.5rem">رجوع</button>
+  </div>
+</div>
+
+
+<script>
+// ══════════════════════════════════════════════
+// MEMBER CATEGORIES & ENHANCED FILTERS
+// ══════════════════════════════════════════════
+let currentCat = 'all';
+
+function setCat(el){
+  document.querySelectorAll('.cat-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  currentCat = el.dataset.cat;
+  loadMems();
+}
+
+// Enhanced loadMems - patch the original
+const _origLoadMems = loadMems;
+loadMems = async function(){
+  const srch = document.getElementById('m-srch')?.value || '';
+  const daysFlt = document.getElementById('m-days-flt')?.value || '';
+  const subFlt = document.getElementById('m-sub-flt')?.value || '';
+  const tbody = document.getElementById('m-tbody');
+  if(!tbody){return _origLoadMems();}
+  tbody.innerHTML = '<tr><td colspan="8"><div class="lc"><div class="spn"></div></div></td></tr>';
+
+  try{
+    let q = sb.from('members').select('*').order('created_at',{ascending:false});
+
+    // Category filter
+    if(currentCat !== 'all') q = q.eq('category', currentCat);
+
+    // Days filter
+    const t = td2();
+    if(daysFlt === '7'){const d=new Date();d.setDate(d.getDate()+7);q=q.gte('subscription_end',t).lte('subscription_end',d.toISOString().split('T')[0]);}
+    else if(daysFlt === '15'){const d=new Date();d.setDate(d.getDate()+15);q=q.gte('subscription_end',t).lte('subscription_end',d.toISOString().split('T')[0]);}
+    else if(daysFlt === '30'){const d=new Date();d.setDate(d.getDate()+30);q=q.gte('subscription_end',t).lte('subscription_end',d.toISOString().split('T')[0]);}
+    else if(daysFlt === 'new30'){const d=new Date();d.setDate(d.getDate()-30);q=q.gte('subscription_start',d.toISOString().split('T')[0]);}
+    else if(daysFlt === 'new90'){const d=new Date();d.setDate(d.getDate()-90);q=q.gte('subscription_start',d.toISOString().split('T')[0]);}
+
+    // Subscription type filter
+    if(subFlt) q = q.eq('subscription_type', subFlt);
+
+    // Search
+    if(srch) q = q.or(`name.ilike.%${srch}%,phone.ilike.%${srch}%`);
+
+    const{data,error} = await q;
+    if(error)throw error;
+    allM = data || [];
+
+    const countEl = document.getElementById('m-count');
+    if(countEl) countEl.textContent = `${allM.length} عضو`;
+
+    if(!allM.length){
+      tbody.innerHTML = `<tr><td colspan="8"><div class="es"><div class="ei">👥</div><div class="et">${T().nomen}</div></div></td></tr>`;
+      return;
+    }
+
+    const catColors = {current:'#00897B',expiring_soon:'#F57F17',expired:'#C62828',lapsed:'#6D4C41',new:'#1565C0',veteran:'#4527A0',frozen:'#0277BD'};
+    const catIcons = {current:'✅',expiring_soon:'⏰',expired:'❌',lapsed:'💤',new:'🆕',veteran:'🏆',frozen:'🧊'};
+
+    tbody.innerHTML = allM.map(m => {
+      const days = dl(m.subscription_end);
+      const isE = m.status === 'expired' || days < 0;
+      const isS = !isE && days <= 15;
+      const isFrz = m.is_frozen;
+      const cat = m.category || 'current';
+      const catColor = catColors[cat] || '#666';
+      const catIcon = catIcons[cat] || '👤';
+
+      return `<tr style="cursor:pointer" onclick="openProfile('${m.id}')">
+        <td><div class="mc4">${mkAv(m.name,m.photo_url)}<div><div class="mn">${m.name}</div><div class="mi">${sid(m.id)}</div></div></div></td>
+        <td><span class="mono" style="font-size:.82rem">${m.phone}</span></td>
+        <td><span class="badge bgi">${subLbl(m.subscription_type)}</span></td>
+        <td><div style="display:flex;align-items:center;gap:.35rem;font-size:.85rem">${fd(m.subscription_end)}${isS&&!isE?`<span class="badge bgw" style="font-size:.62rem">${days}d</span>`:''}</div></td>
+        <td>${m.weight?`<span class="mono" style="color:#00897B;font-weight:700">${m.weight}kg</span>`:'-'}</td>
+        <td><span style="display:inline-flex;align-items:center;gap:.25rem;padding:.2rem .5rem;border-radius:999px;font-size:.68rem;font-weight:700;background:${catColor}18;color:${catColor};border:1px solid ${catColor}30">${catIcon} ${T().cat_labels?.[cat]||cat}</span>${isFrz?'<span class="freeze-badge" style="margin-inline-start:.25rem">🧊</span>':''}</td>
+        <td><span class="badge ${isE?'bgd':isFrz?'':'bgs'}" style="${isFrz?'background:rgba(2,119,189,0.15);color:#0277BD;border-color:rgba(2,119,189,0.25)':''}">${isFrz?'🧊 مجمّد':isE?T().mexp:T().mact}</span></td>
+        <td onclick="event.stopPropagation()"><div style="display:flex;gap:.3rem;flex-wrap:wrap">
+          <button class="btn btn-sm bg" onclick="openRenew('${m.id}')" title="تجديد">🔄</button>
+          <button class="btn btn-sm" style="background:rgba(2,119,189,0.1);color:#0277BD;border:1px solid rgba(2,119,189,0.2)" onclick="openFreeze('${m.id}')" title="تجميد">🧊</button>
+          ${m.is_frozen?`<button class="btn btn-sm" style="background:var(--sul);color:var(--su);border:1px solid rgba(0,200,83,0.2)" onclick="unfreeze('${m.id}')" title="إلغاء التجميد">▶️</button>`:''}
+          <button class="btn btn-sm bpu" onclick="openQR('${m.id}')" title="QR">📱</button>
+          <button class="btn btn-sm bs2" onclick="editM('${m.id}')">✏️</button>
+          <button class="btn btn-sm bd" onclick="delM('${m.id}')">🗑️</button>
+        </div></td>
+      </tr>`;
+    }).join('');
+  }catch(e){console.error(e);toast(T().err,'error')}
+};
+
+// Export members to CSV
+function exportMembers(){
+  if(!allM.length){toast('لا يوجد أعضاء للتصدير','info');return}
+  const headers = ['الاسم','الهاتف','البريد','نوع الاشتراك','تاريخ البدء','تاريخ الانتهاء','الوزن','الحالة','الفئة'];
+  const rows = allM.map(m=>[m.name,m.phone,m.email||'',subLbl(m.subscription_type),m.subscription_start,m.subscription_end,m.weight||'',m.status,m.category||''].join(','));
+  const csv = [headers.join(','),...rows].join('
+');
+  const blob = new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');a.href=url;a.download=`members-${td2()}.csv`;a.click();
+  URL.revokeObjectURL(url);
+  toast('تم تصدير الأعضاء ✅');
+}
+
+// ══════════════════════════════════════════════
+// FREEZE / UNFREEZE
+// ══════════════════════════════════════════════
+function openFreeze(id){
+  const m = allM.find(x=>x.id===id);if(!m)return;
+  document.getElementById('frz-id').value = id;
+  document.getElementById('frz-name').textContent = m.name;
+  document.getElementById('frz-end').textContent = fd(m.subscription_end);
+  document.getElementById('frz-start').value = td2();
+  openMo('freeze-mo');
+}
+
+async function saveFreeze(){
+  const id = document.getElementById('frz-id').value;
+  const start = document.getElementById('frz-start').value;
+  const months = parseInt(document.getElementById('frz-dur').value);
+  if(!start){toast(T().req,'error');return}
+  const m = allM.find(x=>x.id===id);if(!m)return;
+  // Extend subscription end by freeze months
+  const newEnd = ce(m.subscription_end, months);
+  const freezeEnd = ce(start, months);
+  const btn=document.getElementById('frz-save');btn.disabled=true;
+  try{
+    await sb.from('members').update({
+      is_frozen:true, freeze_start:start, freeze_end:freezeEnd,
+      freeze_months:months, subscription_end:newEnd,
+      category:'frozen'
+    }).eq('id',id);
+    toast('تم تجميد الاشتراك 🧊 — تم تمديد نهاية الاشتراك تلقائياً');
+    closeMo('freeze-mo');loadMems();
+  }catch(e){toast(T().err,'error')}finally{btn.disabled=false}
+}
+
+async function unfreeze(id){
+  const ok = await confirm_('هل تريد إلغاء تجميد هذا العضو؟');if(!ok)return;
+  try{
+    await sb.from('members').update({is_frozen:false,freeze_start:null,freeze_end:null}).eq('id',id);
+    toast('تم إلغاء التجميد ▶️');loadMems();
+  }catch(e){toast(T().err,'error')}
+}
+
+// ══════════════════════════════════════════════
+// QR SELF CHECK-IN KIOSK
+// ══════════════════════════════════════════════
+async function generateMemberQRToken(memberId){
+  // Generate unique token for member
+  const token = 'GP-' + memberId.split('-')[0].toUpperCase() + '-' + Date.now().toString(36).toUpperCase();
+  try{
+    // Upsert token
+    await sb.from('qr_tokens').upsert([{member_id:memberId, token}],{onConflict:'member_id'});
+    return token;
+  }catch(e){
+    // If table doesn't exist yet, just use member ID
+    return 'GP-' + memberId.split('-')[0].toUpperCase();
+  }
+}
+
+// Patch openQR to generate self-checkin QR
+const _origOpenQR = openQR;
+openQR = async function(id){
+  const m = allM.find(x=>x.id===id)||{name:'?',phone:'?'};
+  const token = await generateMemberQRToken(id);
+  document.getElementById('qr-name').textContent = m.name;
+  document.getElementById('qr-phone').textContent = m.phone;
+  document.getElementById('qr-title').textContent = 'QR — ' + m.name;
+  // QR contains the check-in URL
+  const checkinUrl = window.location.origin + '?checkin=' + token;
+  QRCode.toCanvas(document.getElementById('qr-canvas'), checkinUrl,
+    {width:220,margin:2,color:{dark:'#1A1B2E',light:'#ffffff'}},()=>{});
+  openMo('qr-mo');
+};
+
+async function processQRInput(){
+  const input = document.getElementById('qr-manual-input').value.trim();
+  if(!input)return;
+  // Extract token from URL or use directly
+  let token = input;
+  if(input.includes('checkin=')) token = new URL(input).searchParams.get('checkin');
+
+  const resEl = document.getElementById('qr-scan-result');
+  const avEl = document.getElementById('qr-res-av');
+  const nameEl = document.getElementById('qr-res-name');
+  const msgEl = document.getElementById('qr-res-msg');
+
+  try{
+    // Find member by token
+    const{data:tokenData} = await sb.from('qr_tokens').select('*,members(*)').eq('token',token).single();
+    const member = tokenData?.members;
+    if(!member){nameEl.textContent='❌ عضو غير موجود';msgEl.textContent='Token غير صحيح';resEl.style.display='block';resEl.style.borderColor='var(--da)';return;}
+
+    avEl.textContent = ini(member.name);
+    nameEl.textContent = member.name;
+    resEl.style.display='block';
+
+    if(member.status==='expired'||member.is_frozen){
+      msgEl.innerHTML = member.is_frozen?'<span style="color:#0277BD">🧊 الاشتراك مجمّد</span>':'<span style="color:var(--da)">❌ الاشتراك منتهٍ</span>';
+      resEl.style.borderColor = member.is_frozen ? '#0277BD' : 'var(--da)';
+      soundWarn();return;
+    }
+
+    // Check-in
+    const{data:ex} = await sb.from('checkins').select('id').eq('member_id',member.id).eq('date',td2());
+    if(ex&&ex.length){
+      msgEl.innerHTML = '<span style="color:var(--in)">ℹ️ تم تسجيل الحضور مسبقاً اليوم</span>';
+      resEl.style.borderColor = 'var(--in)';
+    }else{
+      await sb.from('checkins').insert([{member_id:member.id}]);
+      msgEl.innerHTML = '<span style="color:var(--su)">✅ تم تسجيل الحضور — ' + new Date().toLocaleTimeString('ar') + '</span>';
+      resEl.style.borderColor = 'var(--su)';
+      soundOk();
+    }
+    document.getElementById('qr-manual-input').value='';
+    setTimeout(()=>{resEl.style.display='none';},3000);
+  }catch(e){nameEl.textContent='❌ خطأ';msgEl.textContent=e.message;resEl.style.display='block';}
+}
+
+// Auto check-in from URL (when member scans QR)
+(function(){
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('checkin');
+  if(token){
+    document.getElementById('qr-manual-input').value = token;
+    document.getElementById('qr-checkin-page').style.display = 'flex';
+    setTimeout(processQRInput, 500);
+  }
+})();
+
+// ══════════════════════════════════════════════
+// RETENTION / CAMPAIGNS - in WhatsApp page
+// ══════════════════════════════════════════════
+async function loadRetentionCampaigns(){
+  const today = td2();
+  // Find expired members not renewed in last 30 days
+  const{data:lapsed} = await sb.from('members').select('id,name,phone,subscription_end,category')
+    .in('category',['expired','lapsed']).order('subscription_end',{ascending:false});
+
+  const el = document.getElementById('wa-auto-list');
+  if(!el)return;
+
+  const lapsedData = lapsed||[];
+  let html = '';
+
+  if(lapsedData.length){
+    html += `<div style="font-size:.78rem;font-weight:700;color:var(--da);margin-bottom:.5rem">🎯 ${lapsedData.length} عضو اشتراكه انتهى ولم يجدد</div>`;
+    html += lapsedData.slice(0,5).map(m=>{
+      const msg = `مرحباً ${m.name} 👋
+نشتاق إليك في الجيم! 💪
+اشتراكك انتهى في ${fd(m.subscription_end)}
+لدينا عروض خاصة للعودة — تواصل معنا الآن! 🏋️`;
+      const phone = (m.phone||'').replace(/\D/g,'');
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:.6rem;background:var(--bg);border:1px solid rgba(244,67,54,0.15);border-radius:var(--rs);margin-bottom:.35rem">
+        <div><div style="font-weight:700;font-size:.85rem">${m.name}</div><div style="font-size:.7rem;color:var(--tm)">انتهى: ${fd(m.subscription_end)}</div></div>
+        <button onclick="sendWa('${phone}',\`${msg.replace(/\`/g,"'")}\`,'${m.id}','retention')" class="btn btn-sm bd" style="background:linear-gradient(135deg,#25D366,#128C7E);color:white;border:none">📲 استرداد</button>
+      </div>`;
+    }).join('');
+  }
+
+  // Expiring soon
+  const in7 = new Date();in7.setDate(in7.getDate()+7);
+  const{data:expiring} = await sb.from('members').select('id,name,phone,subscription_end')
+    .eq('status','active').gte('subscription_end',today).lte('subscription_end',in7.toISOString().split('T')[0]);
+
+  const expiringData = expiring||[];
+  if(expiringData.length){
+    html += `<div style="font-size:.78rem;font-weight:700;color:var(--wa);margin:.75rem 0 .5rem">⏰ ${expiringData.length} عضو اشتراكه ينتهي خلال 7 أيام</div>`;
+    html += expiringData.map(m=>{
+      const days = dl(m.subscription_end);
+      const msg = `مرحباً ${m.name} 👋
+اشتراكك في الجيم سينتهي خلال ${days} أيام 📅
+(${fd(m.subscription_end)})
+جدد الآن واستمر في رحلتك! 💪🏋️`;
+      const phone = (m.phone||'').replace(/\D/g,'');
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:.6rem;background:var(--bg);border:1px solid rgba(255,193,7,0.2);border-radius:var(--rs);margin-bottom:.35rem">
+        <div><div style="font-weight:700;font-size:.85rem">${m.name}</div><div style="font-size:.7rem;color:var(--wa)">⏰ ${days} يوم متبقي</div></div>
+        <button onclick="sendWa('${phone}',\`${msg.replace(/\`/g,"'")}\`,'${m.id}','renewal')" class="btn btn-sm bp" style="background:linear-gradient(135deg,#25D366,#128C7E)">📲 تذكير</button>
+      </div>`;
+    }).join('');
+  }
+
+  el.innerHTML = html || `<div class="es" style="padding:1.5rem"><div class="ei">🎉</div><div class="et">لا يوجد أعضاء يحتاجون تواصل</div></div>`;
+}
+
+// Patch loadWaAutoList
+loadWaAutoList = loadRetentionCampaigns;
+
+// ══════════════════════════════════════════════
+// BIND NEW EVENTS
+// ══════════════════════════════════════════════
+document.getElementById('frz-save')?.addEventListener('click', saveFreeze);
+
+// QR kiosk keyboard
+document.getElementById('qr-manual-input')?.addEventListener('keydown', e=>{if(e.key==='Enter')processQRInput()});
+
+// Override applyLang to update category tabs
+const _origApplyLang = applyLang;
+applyLang = function(l){
+  _origApplyLang(l);
+  const cats = TX[l]?.cats_mem;
+  if(cats){
+    const tabs = document.querySelectorAll('.cat-tab');
+    tabs.forEach((tab,i)=>{if(cats[i])tab.textContent=cats[i]});
+  }
+};
 </script>
 
 </body>
