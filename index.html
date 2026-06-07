@@ -202,19 +202,19 @@ body.ltr .sb{left:0;right:auto;border-right:1px solid var(--br)}
 .mc{flex:1;min-height:100vh;display:flex;flex-direction:column;min-width:0;transition:margin .3s cubic-bezier(.4,0,.2,1)}
 body.rtl .mc{margin-right:var(--sw);margin-left:0}
 body.ltr .mc{margin-left:var(--sw);margin-right:0}
-.hdr{height:var(--hh);background:var(--bc);border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;padding:0 1.25rem;position:sticky;top:0;z-index:200;box-shadow:var(--sh1);width:100%}
-.hdr-l{display:flex;align-items:center;gap:.75rem;flex:1;min-width:0}
-.pg-title{font-size:1.05rem;font-weight:800;color:var(--t1);letter-spacing:-.01em}
-.hdr-r{display:flex;align-items:center;gap:.5rem;flex-shrink:0;position:relative}
+.hdr{height:var(--hh);background:var(--bc);border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;padding:0 1rem;position:sticky;top:0;z-index:200;box-shadow:var(--sh1);width:100%;box-sizing:border-box}
+.hdr-l{display:flex;align-items:center;gap:.5rem;min-width:0;overflow:hidden}
+.pg-title{font-size:1rem;font-weight:800;color:var(--t1);letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px}
+.hdr-r{display:flex;align-items:center;gap:.4rem;flex-shrink:0}
 
 /* Clock */
-.hdr-clock{display:flex;align-items:center;gap:.5rem;background:var(--bg);border:1px solid var(--br);border-radius:var(--rs);padding:.4rem .875rem;font-family:var(--mono);font-size:.8rem;color:var(--t2)}
+.hdr-clock{display:flex;align-items:center;gap:.4rem;background:var(--bg);border:1px solid var(--br);border-radius:var(--rs);padding:.35rem .65rem;font-family:var(--mono);font-size:.75rem;color:var(--t2);white-space:nowrap}
 .clk-dot{width:7px;height:7px;background:var(--su);border-radius:50%;animation:blink 2s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 
 /* Lang switcher */
 .lang-sw{position:relative}
-.lang-btn{display:flex;align-items:center;gap:.4rem;padding:.38rem .7rem;background:var(--bg);border:1.5px solid var(--br);border-radius:var(--rs);color:var(--t1);font-size:.8rem;font-weight:700;transition:all .2s;cursor:pointer}
+.lang-btn{display:flex;align-items:center;gap:.3rem;padding:.35rem .6rem;background:var(--bg);border:1.5px solid var(--br);border-radius:var(--rs);color:var(--t1);font-size:.75rem;font-weight:700;transition:all .2s;cursor:pointer;white-space:nowrap}
 .lang-btn:hover{border-color:var(--p);color:var(--p)}
 .lang-dd{position:fixed;background:var(--bc);border:1.5px solid var(--br);border-radius:var(--rs);min-width:160px;max-width:90vw;box-shadow:var(--sh3);display:none;z-index:9998;overflow:hidden}
 .lang-dd.open{display:block}
@@ -444,6 +444,11 @@ textarea{resize:vertical;min-height:75px}
 ::-webkit-scrollbar-thumb:hover{background:rgba(255,87,34,0.4)}
 
 @media(max-width:1200px){.sg{grid-template-columns:repeat(3,1fr)}} @media(max-width:800px){.sg{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){
+  .hdr-clock span:last-child{display:none}
+  .hdr-clock{padding:.3rem .5rem}
+  #lnb{display:none}
+}
 @media(max-width:900px){
 body.ltr .sb{transform:translateX(-100%)}body.rtl .sb{transform:translateX(100%)}
 .sb.open{transform:translateX(0)!important}.mc{margin-left:0!important;margin-right:0!important;width:100%}
@@ -555,6 +560,18 @@ body.dark .bg-ring{opacity:.08}
 .cat-tab[data-cat="frozen"].active{background:#0277BD}
 /* Freeze badge */
 .freeze-badge{display:inline-flex;align-items:center;gap:.3rem;padding:.2rem .55rem;border-radius:999px;font-size:.68rem;font-weight:700;background:rgba(2,119,189,0.15);color:#0277BD;border:1px solid rgba(2,119,189,0.25)}
+
+
+/* Header responsive fixes */
+@media(max-width:768px){
+  .hdr{padding:0 .75rem}
+  .pg-title{font-size:.9rem;max-width:150px}
+  .hdr-clock{display:none}
+  #theme-toggle{display:none}
+}
+@media(max-width:480px){
+  .hdr-l > div > div:last-child{display:none}
+}
 
 </style>
 </head>
@@ -1964,8 +1981,19 @@ async function logout(){await sb.auth.signOut();document.getElementById('app').s
   document.getElementById('rep-load-btn').addEventListener('click',loadReport);
   document.getElementById('add-ms-btn').addEventListener('click',()=>{document.getElementById('ms-mid').value='';document.getElementById('ms-dt').value=td2();openMo('ms-mo')});
   document.getElementById('ms-save').addEventListener('click',saveMs);
-  document.querySelectorAll('[data-close]').forEach(btn=>btn.addEventListener('click',()=>closeMo(btn.dataset.close)));
-  document.querySelectorAll('.mo').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('active')}));
+  // Event delegation for ALL modals - handles dynamically added ones too
+  document.addEventListener('click', function(e){
+    // Handle data-close buttons
+    const closeBtn = e.target.closest('[data-close]');
+    if(closeBtn){
+      closeMo(closeBtn.dataset.close);
+      return;
+    }
+    // Handle clicking outside modal
+    if(e.target.classList.contains('mo')){
+      e.target.classList.remove('active');
+    }
+  });
 })();
 </script>
 
