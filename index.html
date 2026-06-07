@@ -1346,7 +1346,8 @@ body.dark .bg-ring{opacity:.08}
 // ── LOAD LOGIN STATS ──
 async function loadLoginStats(){
   try{
-    const sb2=supabase.createClient('https://dpabrokcapjvcalasemk.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwYWJyb2tjYXBqdmNhbGFzZW1rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MDMwMDksImV4cCI6MjA5NTk3OTAwOX0.SAAp6GIJttkCF0ZOcPElxZEUIiCZHBXgN5EgQb_w9mc');
+    // Use global sb client to avoid multiple GoTrueClient instances
+    const sb2=window._gymProSb;
     const td=new Date().toISOString().split('T')[0];
     const[mr,pr,cr]=await Promise.all([
       sb2.from('members').select('id,status'),
@@ -1373,6 +1374,7 @@ loadLoginStats();
 // MAIN APP LOGIC
 // ══════════════════════════════════════════════
 const sb=supabase.createClient('https://dpabrokcapjvcalasemk.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwYWJyb2tjYXBqdmNhbGFzZW1rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MDMwMDksImV4cCI6MjA5NTk3OTAwOX0.SAAp6GIJttkCF0ZOcPElxZEUIiCZHBXgN5EgQb_w9mc');
+window._gymProSb=sb;
 
 const TX={
   ar:{f:'🇸🇦',n:'AR',d:'rtl',
@@ -1590,10 +1592,10 @@ async function loadDash(){
   try{
     const t=td2(),in10=new Date();in10.setDate(in10.getDate()+10);
     const[mr,pr,er,cr]=await Promise.all([
-      sb.from('members').select('id,status,subscription_type'),
+      sb.from('members').select('id,status,subscription_type').order('id'),
       sb.from('payments').select('amount'),
       sb.from('members').select('id,name,phone,subscription_end,photo_url').eq('status','active').gte('subscription_end',t).lte('subscription_end',in10.toISOString().split('T')[0]),
-      sb.from('checkins').select('*,members(name,phone,photo_url)').eq('date',t).order('checkin_time',{ascending:false})
+      sb.from('checkins').select('id,member_id,date,checkin_time,members(name,phone,photo_url)').eq('date',t).order('created_at',{ascending:false})
     ]);
     const mems=mr.data||[],act=mems.filter(m=>m.status==='active').length,exp=mems.filter(m=>m.status==='expired').length;
     document.getElementById('s-tot').textContent=mems.length;document.getElementById('s-act').textContent=act;
@@ -1771,7 +1773,16 @@ async function showReceipt(payId,memberName,memberPhone){
 // Checkin
 let acMs=[],selM=null;
 async function loadCI(){await loadAC();await refreshTdCI();}
-async function loadAC(){const{data}=await sb.from('members').select('id,name,phone,status,subscription_end,photo_url').order('name');acMs=data||[];}
+async function loadAC(){
+  try{
+    const{data}=await sb.from('members').select('id,name,phone,status,subscription_end,photo_url').order('name');
+    acMs=data||[];
+  }catch(e){
+    // Fallback without photo_url if column missing
+    try{const{data}=await sb.from('members').select('id,name,phone,status,subscription_end').order('name');acMs=data||[];}
+    catch(e2){console.warn('loadAC error:',e2);}
+  }
+}
 function showAC(q){
   const list=document.getElementById('ac-ls');
   if(!q||q.length<2){list.style.display='none';return}
@@ -1805,7 +1816,7 @@ async function doCI(){
   }catch(e){toast(T().err,'error')}finally{btn.disabled=false;selM=null;document.getElementById('ci-in').value='';}
 }
 async function refreshTdCI(){
-  const{data}=await sb.from('checkins').select('*,members(name,phone,photo_url)').eq('date',td2()).order('checkin_time',{ascending:false});
+  const{data}=await sb.from('checkins').select('id,member_id,date,checkin_time,members(name,phone,photo_url)').eq('date',td2()).order('created_at',{ascending:false});
   const list=data||[];document.getElementById('td-cnt').textContent=list.length;
   const el=document.getElementById('td-ci');
   el.innerHTML=list.length?list.map((c,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem 0;border-bottom:1px solid var(--br)"><div style="display:flex;align-items:center;gap:.75rem"><div style="font-family:var(--mono);font-size:.7rem;color:var(--tm);width:20px;text-align:center;font-weight:700">${i+1}</div>${mkAv(c.members?.name,c.members?.photo_url)}<div><div style="font-weight:700;font-size:.875rem">${c.members?.name||'?'}</div><div style="font-size:.7rem;color:var(--tm);font-family:var(--mono)">${c.members?.phone||''}</div></div></div><div style="font-family:var(--mono);font-size:.8rem;background:var(--bg);border:1px solid var(--br);padding:.2rem .5rem;border-radius:6px;color:var(--t2)">${ft(c.checkin_time)}</div></div>`).join(''):`<div class="es"><div class="ei">🏃</div><div class="et">${T().noci}</div></div>`;
@@ -1951,36 +1962,37 @@ async function logout(){await sb.auth.signOut();document.getElementById('app').s
 (async()=>{
   applyLang(lang);
   const upEnd=()=>{const s=document.getElementById('m-st').value,t=document.getElementById('m-ty').value;if(s)document.getElementById('m-en').value=ce(s,t)};
-  document.getElementById('m-st').addEventListener('change',upEnd);document.getElementById('m-ty').addEventListener('change',upEnd);
-  document.getElementById('ci-in').addEventListener('input',e=>{selM=null;document.getElementById('ab-exp').classList.remove('vis');document.getElementById('ab-soon').classList.remove('vis');showAC(e.target.value)});
+  document.getElementById('m-st')?.addEventListener('change',upEnd);document.getElementById('m-ty')?.addEventListener('change',upEnd);
+  document.getElementById('ci-in')?.addEventListener('input',e=>{selM=null;document.getElementById('ab-exp').classList.remove('vis');document.getElementById('ab-soon').classList.remove('vis');showAC(e.target.value)});
   document.addEventListener('click',e=>{if(!e.target.closest('#ci-wrap'))document.getElementById('ac-ls').style.display='none';if(!e.target.closest('.srch'))document.getElementById('ms-ac').style.display='none';});
   const{data:{session}}=await sb.auth.getSession();if(session)showApp(session.user.email);
-  document.getElementById('l-btn').addEventListener('click',login);
-  document.getElementById('l-p').addEventListener('keydown',e=>{if(e.key==='Enter')login()});
-  document.getElementById('logout-btn').addEventListener('click',logout);
+  document.getElementById('l-btn')?.addEventListener('click',login);
+  document.getElementById('l-p')?.addEventListener('keydown',e=>{if(e.key==='Enter')login()});
+  document.getElementById('logout-btn')?.addEventListener('click',logout);
   document.querySelectorAll('.ni[data-page]').forEach(el=>el.addEventListener('click',()=>nav(el.dataset.page)));
-  document.getElementById('mtg').addEventListener('click',()=>{
+  document.getElementById('mtg')?.addEventListener('click',()=>{
     const sb=document.getElementById('sbar');
     // On mobile: show/hide; On desktop: done by toggleSidebar
     if(window.innerWidth<=900){
       sb.classList.toggle('open');document.getElementById('sov').classList.toggle('vis');
     }
   });
-  document.getElementById('sov').addEventListener('click',()=>{document.getElementById('sbar').classList.remove('open');document.getElementById('sov').classList.remove('vis')});
+  document.getElementById('sov')?.addEventListener('click',()=>{document.getElementById('sbar').classList.remove('open');document.getElementById('sov').classList.remove('vis')});
   // Lang switchers
   ['l-btn2','l-btn2b'].forEach(id=>{const btn=document.getElementById(id);if(!btn)return;const ddId=id==='l-btn2'?'l-dd':'l-ddb';btn.addEventListener('click',e=>{e.stopPropagation();document.getElementById(ddId).classList.toggle('open')});});
   document.querySelectorAll('.lo').forEach(el=>el.addEventListener('click',()=>{document.querySelectorAll('.lang-dd').forEach(d=>d.classList.remove('open'));applyLang(el.dataset.lang);if(document.getElementById('app').style.display!=='none'){const p=document.querySelector('.ni.active[data-page]')?.dataset?.page||'dashboard';nav(p);}}));
   document.addEventListener('click',()=>document.querySelectorAll('.lang-dd').forEach(d=>d.classList.remove('open')));
-  document.getElementById('add-m-btn').addEventListener('click',openAddM);document.getElementById('m-save').addEventListener('click',saveM);
-  document.getElementById('m-srch').addEventListener('input',loadMems);document.getElementById('m-flt').addEventListener('change',loadMems);
-  document.getElementById('ci-btn').addEventListener('click',doCI);
-  document.getElementById('ci-in').addEventListener('keydown',e=>{if(e.key==='Enter'){document.getElementById('ac-ls').style.display='none';doCI()}});
-  document.getElementById('add-p-btn').addEventListener('click',openAddP);document.getElementById('p-save').addEventListener('click',saveP);
-  document.getElementById('p-srch').addEventListener('input',loadPays);
-  document.getElementById('renew-save').addEventListener('click',saveRenew);
-  document.getElementById('rep-load-btn').addEventListener('click',loadReport);
-  document.getElementById('add-ms-btn').addEventListener('click',()=>{document.getElementById('ms-mid').value='';document.getElementById('ms-dt').value=td2();openMo('ms-mo')});
-  document.getElementById('ms-save').addEventListener('click',saveMs);
+  document.getElementById('add-m-btn')?.addEventListener('click',openAddM);
+  document.getElementById('m-save')?.addEventListener('click',saveM);
+  document.getElementById('m-srch')?.addEventListener('input',loadMems);
+  document.getElementById('ci-btn')?.addEventListener('click',doCI);
+  document.getElementById('ci-in')?.addEventListener('keydown',e=>{if(e.key==='Enter'){document.getElementById('ac-ls').style.display='none';doCI()}});
+  document.getElementById('add-p-btn')?.addEventListener('click',openAddP);document.getElementById('p-save')?.addEventListener('click',saveP);
+  document.getElementById('p-srch')?.addEventListener('input',loadPays);
+  document.getElementById('renew-save')?.addEventListener('click',saveRenew);
+  document.getElementById('rep-load-btn')?.addEventListener('click',loadReport);
+  document.getElementById('add-ms-btn')?.addEventListener('click',()=>{document.getElementById('ms-mid').value='';document.getElementById('ms-dt').value=td2();openMo('ms-mo')});
+  document.getElementById('ms-save')?.addEventListener('click',saveMs);
   // Event delegation for ALL modals - handles dynamically added ones too
   document.addEventListener('click', function(e){
     // Handle data-close buttons
@@ -2707,8 +2719,9 @@ async function loadMems(){
   try{
     let q = sb.from('members').select('*').order('created_at',{ascending:false});
 
-    // Category filter
-    if(currentCat !== 'all') q = q.eq('category', currentCat);
+    // Category filter - if column doesn't exist, filter client-side after fetch
+    if(currentCat !== 'all' && currentCat !== 'frozen') q = q.eq('category', currentCat);
+    if(currentCat === 'frozen') q = q.eq('is_frozen', true);
 
     // Days filter
     const t = td2();
@@ -2921,7 +2934,7 @@ async function loadRetentionCampaigns(){
   const today = td2();
   // Find expired members not renewed in last 30 days
   const{data:lapsed} = await sb.from('members').select('id,name,phone,subscription_end,category')
-    .in('category',['expired','lapsed']).order('subscription_end',{ascending:false});
+    .lt('subscription_end', td2()).order('subscription_end',{ascending:false});
 
   const el = document.getElementById('wa-auto-list');
   if(!el)return;
