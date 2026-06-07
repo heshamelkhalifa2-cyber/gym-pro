@@ -1412,9 +1412,22 @@ function applyGymBranding(gym){
   if(gym.secondary_color){
     document.documentElement.style.setProperty('--s', gym.secondary_color);
   }
-  // Update logo if exists
-  if(gym.logo_url){
-    document.querySelectorAll('.sb-icon').forEach(el=>el.innerHTML=`<img src="${gym.logo_url}" style="width:100%;height:100%;object-fit:cover;border-radius:10px"/>`);
+  // Update logo in sidebar
+  const sbIcon = document.querySelector('.sb-icon');
+  if(sbIcon){
+    if(gym.logo_url){
+      sbIcon.innerHTML = `<img src="${gym.logo_url}" style="width:100%;height:100%;object-fit:cover;border-radius:10px"/>`;
+      sbIcon.style.background = 'transparent';
+      sbIcon.style.padding = '0';
+    } else {
+      sbIcon.innerHTML = '🏋️';
+      sbIcon.style.background = `linear-gradient(135deg,${gym.primary_color||'#FF5722'},#7C3AED)`;
+    }
+  }
+  // Update login page logo too if visible
+  const lpIcon = document.querySelector('.lp-logo-icon');
+  if(lpIcon && gym.logo_url){
+    lpIcon.innerHTML = `<img src="${gym.logo_url}" style="width:100%;height:100%;object-fit:cover;border-radius:14px"/>`;
   }
   // Show gym name in header
   const uem = document.getElementById('u-em');
@@ -3075,6 +3088,20 @@ document.getElementById('qr-manual-input')?.addEventListener('keydown', e=>{if(e
         <div style="font-size:.9rem;color:var(--t2)">مرحباً بك في GymPro! أنشئ جيمك الآن</div>
       </div>
       <div class="fg" style="grid-template-columns:1fr">
+        <!-- Logo upload -->
+        <div class="f2">
+          <label>لوجو الجيم</label>
+          <div style="display:flex;align-items:center;gap:1rem">
+            <div id="gs-logo-preview" style="width:64px;height:64px;border-radius:14px;background:linear-gradient(135deg,#FF5722,#7C3AED);display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0;overflow:hidden">🏋️</div>
+            <div style="flex:1">
+              <label style="display:inline-flex;align-items:center;gap:.5rem;padding:.5rem 1rem;background:var(--bg);border:1.5px solid var(--br);border-radius:var(--rs);cursor:pointer;font-size:.82rem;font-weight:600;color:var(--t2);transition:all .2s" onmouseenter="this.style.borderColor='var(--p)'" onmouseleave="this.style.borderColor='var(--br)'">
+                📁 اختر صورة
+                <input type="file" id="gs-logo-file" accept="image/*" style="display:none" onchange="previewGsLogo(this)"/>
+              </label>
+              <div style="font-size:.72rem;color:var(--tm);margin-top:.3rem">PNG, JPG — مربعة الشكل أفضل</div>
+            </div>
+          </div>
+        </div>
         <div class="f2"><label>اسم الجيم (عربي) <span class="req">*</span></label><input type="text" id="gs-name" placeholder="مثال: جيم الرياضة"/></div>
         <div class="f2"><label>اسم الجيم (إنجليزي)</label><input type="text" id="gs-name-en" placeholder="Sport Gym"/></div>
         <div class="f2"><label>رقم الهاتف</label><input type="tel" id="gs-phone" placeholder="+96550000000"/></div>
@@ -3110,6 +3137,30 @@ document.getElementById('qr-manual-input')?.addEventListener('keydown', e=>{if(e
 // ══════════════════════════════════════════════
 let _setupUserId = null;
 let _setupEmail = null;
+let _gsLogoBase64 = null;
+let _gs2LogoBase64 = null;
+
+function previewGsLogo(input){
+  const file = input.files[0]; if(!file)return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    _gsLogoBase64 = e.target.result;
+    const prev = document.getElementById('gs-logo-preview');
+    if(prev) prev.innerHTML = `<img src="${_gsLogoBase64}" style="width:100%;height:100%;object-fit:cover"/>`;
+  };
+  reader.readAsDataURL(file);
+}
+
+function previewGs2Logo(input){
+  const file = input.files[0]; if(!file)return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    _gs2LogoBase64 = e.target.result;
+    const prev = document.getElementById('gs2-logo-preview');
+    if(prev) prev.innerHTML = `<img src="${_gs2LogoBase64}" style="width:100%;height:100%;object-fit:cover"/>`;
+  };
+  reader.readAsDataURL(file);
+}
 
 function openGymSetup(userId, email){
   _setupUserId = userId;
@@ -3131,7 +3182,8 @@ async function saveGymSetup(){
       phone: document.getElementById('gs-phone').value.trim(),
       address: document.getElementById('gs-address').value.trim(),
       primary_color: document.getElementById('gs-color').value,
-      owner_email: _setupEmail
+      owner_email: _setupEmail,
+      logo_url: _gsLogoBase64||null
     }]).select().single();
     if(gymErr)throw gymErr;
 
@@ -3170,6 +3222,16 @@ async function openGymSettings(){
     <div class="mh"><h3 class="mt">⚙️ إعدادات الجيم</h3><button class="xbtn" onclick="this.closest('.mo').remove()">✕</button></div>
     <div class="mc2">
       <div class="fg" style="grid-template-columns:1fr">
+        <div class="f2">
+          <label>لوجو الجيم</label>
+          <div style="display:flex;align-items:center;gap:1rem">
+            <div id="gs2-logo-preview" style="width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--p),var(--s));display:flex;align-items:center;justify-content:center;font-size:1.5rem;overflow:hidden">${GYM_INFO.logo_url?`<img src="${GYM_INFO.logo_url}" style="width:100%;height:100%;object-fit:cover"/>`:'🏋️'}</div>
+            <label style="display:inline-flex;align-items:center;gap:.5rem;padding:.45rem .875rem;background:var(--bg);border:1.5px solid var(--br);border-radius:var(--rs);cursor:pointer;font-size:.82rem;font-weight:600;color:var(--t2)">
+              📁 تغيير اللوجو
+              <input type="file" id="gs2-logo-file" accept="image/*" style="display:none" onchange="previewGs2Logo(this)"/>
+            </label>
+          </div>
+        </div>
         <div class="f2"><label>اسم الجيم</label><input type="text" id="gs2-name" value="${GYM_INFO.name||''}"/></div>
         <div class="f2"><label>اسم الجيم (إنجليزي)</label><input type="text" id="gs2-name-en" value="${GYM_INFO.name_en||''}"/></div>
         <div class="f2"><label>الهاتف</label><input type="tel" id="gs2-phone" value="${GYM_INFO.phone||''}"/></div>
@@ -3195,7 +3257,8 @@ async function updateGymSettings(){
     name_en: document.getElementById('gs2-name-en').value.trim(),
     phone: document.getElementById('gs2-phone').value.trim(),
     address: document.getElementById('gs2-address').value.trim(),
-    primary_color: document.getElementById('gs2-color').value
+    primary_color: document.getElementById('gs2-color').value,
+    logo_url: _gs2LogoBase64||GYM_INFO.logo_url||null
   };
   try{
     await sb.from('gyms').update(updates).eq('id',GYM_ID);
