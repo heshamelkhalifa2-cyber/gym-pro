@@ -736,9 +736,36 @@ body.dark .bg-ring{opacity:.08}
         </div>
       </div>
 
-      <button class="login-btn" id="l-btn">
-        <span>🚀</span><span id="l-btn-t">تسجيل الدخول</span>
-      </button>
+      <!-- Toggle between login/register -->
+      <div style="display:flex;background:var(--bg);border-radius:var(--rs);padding:3px;margin-bottom:1.25rem;gap:2px">
+        <button id="tab-login" onclick="showLoginTab()" style="flex:1;padding:.5rem;border:none;border-radius:7px;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .2s;background:white;color:var(--p);box-shadow:0 2px 8px rgba(0,0,0,0.1);font-family:var(--font)">تسجيل الدخول</button>
+        <button id="tab-register" onclick="showRegisterTab()" style="flex:1;padding:.5rem;border:none;border-radius:7px;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .2s;background:transparent;color:var(--t2);font-family:var(--font)">إنشاء حساب جديد</button>
+      </div>
+
+      <!-- Login form -->
+      <div id="login-form-wrap">
+        <button class="login-btn" id="l-btn">
+          <span>🚀</span><span id="l-btn-t">تسجيل الدخول</span>
+        </button>
+      </div>
+
+      <!-- Register form -->
+      <div id="register-form-wrap" style="display:none">
+        <div class="lf-group">
+          <label class="lf-label">الاسم</label>
+          <div class="lf-input-wrap">
+            <span class="lf-icon">👤</span>
+            <input class="lf-input" type="text" id="r-name" placeholder="اسم الجيم أو المدير"/>
+          </div>
+        </div>
+        <div id="r-err" style="display:none;background:var(--dal);border:1.5px solid rgba(244,67,54,0.25);border-radius:var(--rs);padding:.75rem 1rem;color:var(--da);font-size:.85rem;margin-bottom:.75rem"></div>
+        <button class="login-btn" id="r-btn" onclick="doRegister()" style="background:linear-gradient(135deg,#7C3AED,#9F67FA)">
+          <span>✨</span><span>إنشاء حساب</span>
+        </button>
+        <div style="font-size:.75rem;color:var(--tm);text-align:center;margin-top:.75rem;line-height:1.6">
+          بإنشاء حساب ستحصل على جيم منفصل بكل بياناته الخاصة
+        </div>
+      </div>
 
       <div class="lp-divider" id="l-div">or</div>
 
@@ -3673,6 +3700,68 @@ document.getElementById('settings-tabs')?.querySelectorAll('.tab').forEach(tab=>
 });
 
 document.getElementById('sf-save')?.addEventListener('click', saveStaff);
+</script>
+
+
+<script>
+// ── LOGIN / REGISTER TOGGLE ──
+function showLoginTab(){
+  document.getElementById('tab-login').style.cssText='flex:1;padding:.5rem;border:none;border-radius:7px;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .2s;background:white;color:var(--p);box-shadow:0 2px 8px rgba(0,0,0,0.1);font-family:var(--font)';
+  document.getElementById('tab-register').style.cssText='flex:1;padding:.5rem;border:none;border-radius:7px;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .2s;background:transparent;color:var(--t2);font-family:var(--font)';
+  document.getElementById('login-form-wrap').style.display='block';
+  document.getElementById('register-form-wrap').style.display='none';
+  document.getElementById('l-head').textContent='مرحباً بعودتك 👋';
+  document.getElementById('l-sub').textContent='سجّل دخولك للوصول إلى لوحة التحكم';
+}
+
+function showRegisterTab(){
+  document.getElementById('tab-register').style.cssText='flex:1;padding:.5rem;border:none;border-radius:7px;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .2s;background:white;color:var(--s);box-shadow:0 2px 8px rgba(0,0,0,0.1);font-family:var(--font)';
+  document.getElementById('tab-login').style.cssText='flex:1;padding:.5rem;border:none;border-radius:7px;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .2s;background:transparent;color:var(--t2);font-family:var(--font)';
+  document.getElementById('login-form-wrap').style.display='none';
+  document.getElementById('register-form-wrap').style.display='block';
+  document.getElementById('l-head').textContent='إنشاء حساب جديد ✨';
+  document.getElementById('l-sub').textContent='أنشئ جيمك الخاص في دقيقة واحدة';
+}
+
+async function doRegister(){
+  const email = document.getElementById('l-e').value.trim();
+  const pass  = document.getElementById('l-p').value;
+  const name  = document.getElementById('r-name').value.trim();
+  const err   = document.getElementById('r-err');
+  err.style.display='none';
+
+  if(!email||!pass){err.textContent='يرجى إدخال البريد الإلكتروني وكلمة المرور';err.style.display='block';return}
+  if(pass.length < 6){err.textContent='كلمة المرور يجب أن تكون 6 أحرف على الأقل';err.style.display='block';return}
+
+  const btn = document.getElementById('r-btn');
+  btn.disabled=true;btn.innerHTML='<span>⏳</span><span>جاري الإنشاء...</span>';
+
+  try{
+    const{data,error} = await sb.auth.signUp({email, password:pass});
+    if(error)throw error;
+
+    if(data.user){
+      // User created - now show app and gym setup
+      showApp(data.user.email);
+      toast('تم إنشاء الحساب بنجاح! 🎉 أنشئ جيمك الآن');
+    } else {
+      // Email confirmation required
+      err.style.background='var(--inl)';err.style.color='var(--in)';err.style.borderColor='rgba(33,150,243,0.3)';
+      err.textContent='✅ تم إرسال رسالة تأكيد على بريدك الإلكتروني — تحقق منه ثم سجل دخولك';
+      err.style.display='block';
+    }
+  }catch(e){
+    err.style.background='var(--dal)';err.style.color='var(--da)';err.style.borderColor='rgba(244,67,54,0.25)';
+    if(e.message?.includes('already registered')){
+      err.textContent='هذا البريد مسجل بالفعل — جرب تسجيل الدخول';
+    } else {
+      err.textContent = e.message||'حدث خطأ';
+    }
+    err.style.display='block';
+  }finally{
+    btn.disabled=false;btn.innerHTML='<span>✨</span><span>إنشاء حساب</span>';
+  }
+}
 </script>
 
 </body>
