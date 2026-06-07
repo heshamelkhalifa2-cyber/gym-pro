@@ -1569,77 +1569,477 @@ function gymQ(table){
 
 const TX={
   ar:{f:'🇸🇦',n:'AR',d:'rtl',
-    nav:['لوحة التحكم','الأعضاء','تسجيل الحضور','المدفوعات','تسجيل الخروج','التقرير الشهري','القياسات'],
+    // Nav
+    nav:['لوحة التحكم','الأعضاء','تسجيل الحضور','المدفوعات','تسجيل الخروج','التقرير الشهري','القياسات','جدول الحصص','التمارين','واتساب','الإعدادات'],
+    navSec1:'الرئيسية', navSec2:'خدمات', navSec3:'التقارير',
+    // Dashboard
     ds:['إجمالي الأعضاء','الأعضاء النشطون','الاشتراكات المنتهية','إجمالي الإيرادات','حضور اليوم'],
     dc:['توزيع الأعضاء','أنواع الاشتراكات','تنتهي خلال 10 أيام','آخر تسجيلات الحضور'],
-    noexp:'لا توجد اشتراكات تنتهي قريباً 🎉',noci:'لا يوجد حضور اليوم',days:'يوم',
-    madd:'إضافة عضو',mact:'نشط',mexp:'منتهي',mall:'الكل',
-    mth:['الاسم','الهاتف','الاشتراك','انتهاء','الوزن','الحالة','إجراءات'],
-    nomen:'لا يوجد أعضاء',cdel:'هل أنت متأكد من الحذف؟',addtit:'إضافة عضو',edtit:'تعديل العضو',msave:'حفظ العضو',mcan:'إلغاء',
+    dashTitle:'لوحة التحكم', dashSub:'مرحباً! إليك ملخص اليوم', refresh:'تحديث',
+    noexp:'لا توجد اشتراكات تنتهي قريباً 🎉', noci:'لا يوجد حضور اليوم', days:'يوم',
+    // Members
+    madd:'إضافة عضو', mact:'نشط', mexp:'منتهي', mall:'الكل',
+    mth:['الاسم','الهاتف','الاشتراك','انتهاء','الوزن','الفئة','الحالة','إجراءات'],
+    nomen:'لا يوجد أعضاء', cdel:'هل أنت متأكد من الحذف؟',
+    addtit:'إضافة عضو', edtit:'تعديل العضو', msave:'حفظ العضو', mcan:'إلغاء',
+    memTitle:'الأعضاء', memSub:'إدارة بيانات الأعضاء',
+    exportBtn:'تصدير', allPeriods:'كل الفترات',
+    exp7:'ينتهي خلال 7 أيام', exp15:'ينتهي خلال 15 يوم', exp30:'ينتهي خلال 30 يوم',
+    new30:'انضم خلال 30 يوم', new90:'انضم خلال 90 يوم',
+    allSubs:'كل الاشتراكات',
     sub:['شهر','شهران','3 شهور','4 شهور','5 شهور','6 شهور','7 شهور','8 شهور','9 شهور','10 شهور','11 شهر','سنة'],
     cats_mem:['👥 الكل','✅ حاليون','⏰ قرب الانتهاء','❌ منتهي','💤 قديم +شهر','🆕 جديد -3شهور','🏆 قديم +سنة','🧊 مجمّد'],
     cat_labels:{all:'الكل',current:'حالي',expiring_soon:'قرب الانتهاء',expired:'منتهي',lapsed:'قديم',new:'جديد',veteran:'قديم جداً',frozen:'مجمّد'},
-    cttl:'البحث عن عضو',cph:'اكتب الاسم أو أول 4 أرقام...',cbtn:'تسجيل دخول',ctd:'حضور اليوم',
-    cok:'تم تسجيل الحضور ✅',calr:'تم تسجيل الحضور مسبقاً ℹ️',cnf:'العضو غير موجود ❌',
-    cexp:'🚫 اشتراك منتهٍ!',csoon:'⚠️ الاشتراك سينتهي خلال {d} أيام!',
-    padd:'تسجيل دفعة',pth:['العضو','المبلغ','التاريخ','ملاحظات'],ptot:'المجموع',nopay:'لا توجد مدفوعات',
-    saved:'تم الحفظ ✅',deleted:'تم الحذف',payed:'تم تسجيل الدفعة ✅',req:'يرجى ملء الحقول المطلوبة',err:'حدث خطأ',
-    renew:'تجديد الاشتراك',renewed:'تم التجديد بنجاح 🎉',
-    lhead:'مرحباً بعودتك 👋',lsub:'سجّل دخولك للوصول إلى لوحة التحكم'},
+    // Checkin
+    cttl:'البحث عن عضو', cph:'اكتب الاسم أو أول 4 أرقام...',
+    cbtn:'تسجيل دخول', ctd:'حضور اليوم', ciTitle:'تسجيل الحضور',
+    cok:'تم تسجيل الحضور ✅', calr:'تم تسجيل الحضور مسبقاً ℹ️',
+    cnf:'العضو غير موجود ❌', cexp:'🚫 اشتراك منتهٍ!', csoon:'⚠️ الاشتراك سينتهي خلال {d} أيام!',
+    // Payments
+    padd:'تسجيل دفعة', pth:['العضو','المبلغ','التاريخ','ملاحظات'],
+    ptot:'المجموع', nopay:'لا توجد مدفوعات', payTitle:'المدفوعات', paySub:'سجل الدفعات والإيرادات',
+    // Report
+    repTitle:'التقرير الشهري', repSub:'تحليل الأداء والإيرادات',
+    repChoose:'اختر الشهر', repShow:'عرض التقرير', repPrint:'طباعة',
+    repStats:['إجمالي الإيرادات','أعضاء جدد','إجمالي الحضور','أيام مفتوحة','متوسط الحضور/يوم','الأعضاء النشطون'],
+    repNewMem:'الأعضاء الجدد', repPays:'المدفوعات',
+    // Measurements
+    measTitle:'القياسات', measSub:'متابعة الوزن والقياسات', measSearch:'ابحث عن عضو',
+    measAdd:'إضافة قياسات', measEmpty:'ابحث عن عضو لعرض قياساته',
+    measLabels:['⚖️ الوزن (كجم)','📐 الصدر (سم)','📐 الخصر (سم)','📐 الأرداف (سم)','💪 الذراع (سم)','📅 التاريخ'],
+    // Schedule
+    schedTitle:'جدول الحصص', schedSub:'إدارة الكلاسات والحصص اليومية',
+    schedAddClass:'إضافة حصة', schedDays:['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'],
+    schedAddBtn:'+ إضافة حصة',
+    // Exercises
+    exTitle:'التمارين', exSub:'مكتبة التمارين وخطط التدريب',
+    exAdd:'تمرين جديد', exPlan:'خطة تدريب', exLib:'💪 مكتبة التمارين',
+    exPlans:'📋 خطط التدريب', exSearchMem:'ابحث عن عضو', exEmpty:'اضغط "+ إضافة تمرين"',
+    // WhatsApp
+    waTitle:'واتساب', waSub:'إرسال رسائل للأعضاء',
+    waSend:'📤 إرسال رسالة', waSendType:'نوع الإرسال',
+    waTypes:['عضو واحد','الاشتراكات المنتهية قريباً (خلال 7 أيام)','الاشتراكات المنتهية','كل الأعضاء النشطين','كل الأعضاء'],
+    waTemplate:'القالب', waMsg:'نص الرسالة', waPreview:'معاينة الرسالة',
+    waBtn:'📲 فتح واتساب وإرسال', waNote:'سيفتح واتساب ويملأ الرسالة تلقائياً',
+    waLog:'📋 سجل الرسائل', waAutoTitle:'⚡ تذكيرات تلقائية',
+    waChooseMem:'اختر عضو', waTemplates:['رسالة مخصصة','تذكير بتجديد الاشتراك','إشعار انتهاء الاشتراك','ترحيب بعضو جديد','عرض خاص'],
+    // Settings
+    settTitle:'الإعدادات', settSub:'إعدادات الجيم والموظفين',
+    settTabs:['🏋️ معلومات الجيم','👥 الموظفون','💰 الأسعار','🔔 الإشعارات'],
+    settSave:'💾 حفظ', settLogoHint:'الحجم المثالي: 200×200 بكسل',
+    settChangeLogo:'تغيير اللوجو', settAddStaff:'＋ إضافة موظف',
+    settNoStaff:'لا يوجد موظفون بعد', settSavePrices:'💾 حفظ الأسعار',
+    settPriceHint:'حدد سعر كل نوع اشتراك — اتركه فارغاً لإخفائه',
+    settRemindDays:'إرسال تذكير انتهاء الاشتراك قبل', settRemindUnit:'أيام من تاريخ الانتهاء',
+    settWelcomeMsg:'رسالة الترحيب للأعضاء الجدد',
+    settRoles:['مدير — صلاحيات كاملة','موظف استقبال — أعضاء وحضور فقط','مدرب — أعضاء وتمارين فقط','محاسب — مدفوعات وتقارير فقط'],
+    settPerms:['👥 إدارة الأعضاء','✅ تسجيل الحضور','💰 المدفوعات','📈 التقارير','📅 جدول الحصص','⚙️ الإعدادات'],
+    settStaffWarn:'⚠️ الموظف يحتاج أن يُنشئ حساب بنفس الـ Email في صفحة تسجيل الدخول',
+    // Login
+    lhead:'مرحباً بعودتك 👋', lsub:'سجّل دخولك للوصول إلى لوحة التحكم',
+    loginTab:'تسجيل الدخول', registerTab:'إنشاء حساب جديد',
+    loginBtn:'تسجيل الدخول', registerBtn:'إنشاء حساب',
+    registerHint:'بإنشاء حساب ستحصل على جيم منفصل بكل بياناته الخاصة',
+    nameLabel:'الاسم', emailLabel:'البريد الإلكتروني', passLabel:'كلمة المرور',
+    // Sidebar
+    qrKiosk:'كشك الحضور QR', aboutApp:'حول التطبيق', logout2:'تسجيل الخروج',
+    gymSettings:'إعدادات الجيم', devBy:'تطوير وتصميم', allRights:'جميع الحقوق محفوظة',
+    // Modals
+    addClassTitle:'إضافة حصة', classNameLbl:'اسم الحصة', instructorLbl:'المدرب',
+    dayLbl:'اليوم', capacityLbl:'السعة القصوى', startTimeLbl:'وقت البداية', endTimeLbl:'وقت النهاية',
+    colorLbl:'لون الحصة', saveClass:'💾 حفظ الحصة',
+    bookTitle:'حجوزات الحصة', bookMem:'اختر عضو للحجز', bookBtn:'+ حجز مقعد',
+    addExTitle:'إضافة تمرين', exNameLbl:'اسم التمرين', exCatLbl:'الفئة',
+    exMuscleLbl:'مجموعة العضلات', exSetsLbl:'عدد الجولات', exRepsLbl:'عدد التكرارات',
+    exRestLbl:'راحة (ثانية)', exDescLbl:'وصف', saveEx:'💾 حفظ التمرين',
+    planTitle:'خطة تدريب', planNameLbl:'اسم الخطة', planMemLbl:'العضو',
+    planNotesLbl:'ملاحظات', planExs:'💪 التمارين', planAddEx:'+ إضافة تمرين', savePlan:'💾 حفظ الخطة',
+    freezeTitle:'تجميد الاشتراك', freezeStart:'تاريخ بداية التجميد',
+    freezeDur:'مدة التجميد', freezeInfo:'سيمتد الاشتراك تلقائياً بعد انتهاء التجميد',
+    freezeWarn:'مدة التجميد لن تُحتسب من مدة الاشتراك', saveFreeze:'🧊 تجميد الاشتراك',
+    renewTitle:'تجديد الاشتراك', renewCurrent:'الاشتراك الحالي',
+    renewType:'نوع الاشتراك الجديد', renewAmount:'مبلغ التجديد (KWD)',
+    renewStart:'تاريخ بداية التجديد', renewEndPrev:'سينتهي الاشتراك في',
+    saveRenew:'🔄 تجديد الاشتراك', renewed:'تم التجديد بنجاح 🎉',
+    receiptTitle:'إيصال الدفع', receiptMem:'العضو', receiptPhone:'الهاتف',
+    receiptDate:'التاريخ', receiptDesc:'الوصف', receiptTotal:'المبلغ المدفوع',
+    receiptPrint:'🖨️ طباعة', receiptThanks:'شكراً لثقتك في GymPro 💪',
+    payTitle2:'تسجيل دفعة', payMem:'العضو', payAmount:'المبلغ (KWD)',
+    payDate:'التاريخ', payNotes:'ملاحظات', savePayment:'💾 تسجيل الدفعة',
+    msTitle:'إضافة قياسات', msMem:'العضو', msSave:'💾 حفظ القياسات',
+    profileTitle:'ملف العضو', profTabs:['📋 البيانات','💰 المدفوعات','✅ الحضور','📏 التقدم'],
+    profPhone:'الهاتف', profExpiry:'الانتهاء', profSub:'الاشتراك', profWeight:'الوزن',
+    profGift:'هدية', profNotes:'ملاحظات', profEdit:'✏️ تعديل',
+    profRenew:'🔄 تجديد', profQR:'📱 QR Code', profClose:'إغلاق',
+    profTotalPays:'إجمالي المدفوعات', profNoPays:'لا توجد مدفوعات',
+    profNoCI:'لا يوجد حضور', profNoMeas:'لا توجد قياسات', profAddMeas:'+ إضافة قياسات',
+    profWeightChange:'تغير الوزن منذ أول قياس',
+    // General
+    saved:'تم الحفظ ✅', deleted:'تم الحذف', payed:'تم تسجيل الدفعة ✅',
+    req:'يرجى ملء الحقول المطلوبة', err:'حدث خطأ', renew:'تجديد الاشتراك',
+    confirm_delete:'هل أنت متأكد من الحذف؟', cancel:'إلغاء', close:'إغلاق',
+    // About modal
+    aboutTitle:'حول التطبيق', aboutVersion:'الإصدار 2.0.0', aboutDev:'المطوّر',
+    aboutFeatures:'المميزات', aboutCopy:'حقوق النشر والملكية الفكرية',
+    aboutCopyText:'© 2025 Hesham El-Khalifa — All Rights Reserved',
+    // Gym setup
+    gymSetupTitle:'إعداد الجيم', gymSetupSub:'مرحباً بك في GymPro! أنشئ جيمك الآن',
+    gymNameAr:'اسم الجيم (عربي)', gymNameEn:'اسم الجيم (إنجليزي)',
+    gymPhone:'رقم الهاتف', gymAddress:'العنوان', gymColor:'اللون الرئيسي',
+    gymLogo:'لوجو الجيم', gymLogoHint:'PNG, JPG — مربعة الشكل أفضل',
+    gymCreateBtn:'🚀 إنشاء الجيم والبدء', gymPrivacy:'بياناتك مفصولة تماماً عن باقي الجيمات',
+    // QR Kiosk
+    qrScanTitle:'امسح الـ QR للدخول', qrManual:'أو أدخل الـ Token يدوياً...',
+    qrCheckinBtn:'✅ تسجيل دخول', qrBack:'رجوع',
+    // Staff
+    staffAdd:'إضافة موظف', staffName:'الاسم', staffEmail:'البريد الإلكتروني',
+    staffRole:'الصلاحية', staffPermsTitle:'الصلاحيات التفصيلية',
+    staffSave:'➕ إضافة الموظف', staffActive:'نشط', staffInactive:'موقوف',
+    staffStop:'⏸️ إيقاف', staffActivate:'▶️ تفعيل',
+    // Gym info fields
+    gymOpenHr:'ساعة الفتح', gymCloseHr:'ساعة الغلق',
+    gymRevenueGoal:'هدف الإيراد الشهري (KWD)', gymWaNum:'رقم واتساب',
+    waSelectMem:'اختر عضو'
+  },
   en:{f:'🇺🇸',n:'EN',d:'ltr',
-    nav:['Dashboard','Members','Check-in','Payments','Logout','Monthly Report','Measurements'],
+    nav:['Dashboard','Members','Check-in','Payments','Logout','Monthly Report','Measurements','Schedule','Exercises','WhatsApp','Settings'],
+    navSec1:'Main', navSec2:'Services', navSec3:'Reports',
     ds:['Total Members','Active Members','Expired','Total Revenue',"Today's Check-ins"],
     dc:['Member Status','Subscription Types','Expiring in 10 Days','Recent Check-ins'],
-    noexp:'No expiring subscriptions 🎉',noci:'No check-ins today',days:'days',
-    madd:'Add Member',mact:'Active',mexp:'Expired',mall:'All',
-    mth:['Name','Phone','Subscription','Expires','Weight','Status','Actions'],
-    nomen:'No members found',cdel:'Are you sure?',addtit:'Add Member',edtit:'Edit Member',msave:'Save Member',mcan:'Cancel',
+    dashTitle:'Dashboard', dashSub:"Welcome! Here's today's summary", refresh:'Refresh',
+    noexp:'No expiring subscriptions 🎉', noci:'No check-ins today', days:'days',
+    madd:'Add Member', mact:'Active', mexp:'Expired', mall:'All',
+    mth:['Name','Phone','Subscription','Expires','Weight','Category','Status','Actions'],
+    nomen:'No members found', cdel:'Are you sure you want to delete?',
+    addtit:'Add Member', edtit:'Edit Member', msave:'Save Member', mcan:'Cancel',
+    memTitle:'Members', memSub:'Manage member data',
+    exportBtn:'Export', allPeriods:'All Periods',
+    exp7:'Expires in 7 days', exp15:'Expires in 15 days', exp30:'Expires in 30 days',
+    new30:'Joined in last 30 days', new90:'Joined in last 90 days',
+    allSubs:'All Subscriptions',
     sub:['1M','2M','3M','4M','5M','6M','7M','8M','9M','10M','11M','1Y'],
-    cats_mem:['👥 All','✅ Current','⏰ Expiring Soon','❌ Expired','💤 Lapsed +1M','🆕 New -3M','🏆 Veteran +1Y','🧊 Frozen'],
-    cat_labels:{all:'All',current:'Current',expiring_soon:'Expiring Soon',expired:'Expired',lapsed:'Lapsed',new:'New',veteran:'Veteran',frozen:'Frozen'},
-    cttl:'Search Member',cph:'Type name or first 4 digits...',cbtn:'Check In',ctd:"Today's Check-ins",
-    cok:'Checked in ✅',calr:'Already checked in ℹ️',cnf:'Member not found ❌',
-    cexp:'🚫 Subscription expired!',csoon:'⚠️ Expires in {d} days!',
-    padd:'Record Payment',pth:['Member','Amount','Date','Notes'],ptot:'Total',nopay:'No payments',
-    saved:'Saved ✅',deleted:'Deleted',payed:'Payment recorded ✅',req:'Fill required fields',err:'Error',
-    renew:'Renew',renewed:'Renewed 🎉',
-    lhead:'Welcome Back 👋',lsub:'Sign in to access your dashboard'},
+    cats_mem:['👥 All','✅ Current','⏰ Expiring','❌ Expired','💤 Lapsed','🆕 New','🏆 Veteran','🧊 Frozen'],
+    cat_labels:{all:'All',current:'Current',expiring_soon:'Expiring',expired:'Expired',lapsed:'Lapsed',new:'New',veteran:'Veteran',frozen:'Frozen'},
+    cttl:'Search Member', cph:'Type name or first 4 digits...',
+    cbtn:'Check In', ctd:"Today's Check-ins", ciTitle:'Check-in',
+    cok:'Checked in ✅', calr:'Already checked in ℹ️',
+    cnf:'Member not found ❌', cexp:'🚫 Subscription expired!', csoon:'⚠️ Expires in {d} days!',
+    padd:'Record Payment', pth:['Member','Amount','Date','Notes'],
+    ptot:'Total', nopay:'No payments', payTitle:'Payments', paySub:'Payments & revenue log',
+    repTitle:'Monthly Report', repSub:'Performance & revenue analysis',
+    repChoose:'Select Month', repShow:'View Report', repPrint:'Print',
+    repStats:['Total Revenue','New Members','Total Check-ins','Open Days','Avg Check-ins/Day','Active Members'],
+    repNewMem:'New Members', repPays:'Payments',
+    measTitle:'Measurements', measSub:'Track weight & measurements', measSearch:'Search member',
+    measAdd:'Add Measurements', measEmpty:'Search for a member to view measurements',
+    measLabels:['⚖️ Weight (kg)','📐 Chest (cm)','📐 Waist (cm)','📐 Hips (cm)','💪 Arms (cm)','📅 Date'],
+    schedTitle:'Class Schedule', schedSub:'Manage classes and sessions',
+    schedAddClass:'Add Class', schedDays:['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
+    schedAddBtn:'+ Add Class',
+    exTitle:'Exercises', exSub:'Exercise library & workout plans',
+    exAdd:'New Exercise', exPlan:'Workout Plan', exLib:'💪 Exercise Library',
+    exPlans:'📋 Workout Plans', exSearchMem:'Search member', exEmpty:'Press "+ Add Exercise"',
+    waTitle:'WhatsApp', waSub:'Send messages to members',
+    waSend:'📤 Send Message', waSendType:'Send Type',
+    waTypes:['Single member','Expiring soon (within 7 days)','Expired subscriptions','All active members','All members'],
+    waTemplate:'Template', waMsg:'Message text', waPreview:'Message Preview',
+    waBtn:'📲 Open WhatsApp & Send', waNote:'WhatsApp will open and fill the message automatically',
+    waLog:'📋 Message Log', waAutoTitle:'⚡ Auto Reminders',
+    waChooseMem:'Select member', waTemplates:['Custom message','Renewal reminder','Expiry notification','New member welcome','Special offer'],
+    settTitle:'Settings', settSub:'Gym settings & staff management',
+    settTabs:['🏋️ Gym Info','👥 Staff','💰 Pricing','🔔 Notifications'],
+    settSave:'💾 Save', settLogoHint:'Best size: 200×200 pixels',
+    settChangeLogo:'Change Logo', settAddStaff:'＋ Add Staff',
+    settNoStaff:'No staff members yet', settSavePrices:'💾 Save Prices',
+    settPriceHint:'Set price for each subscription type — leave empty to hide',
+    settRemindDays:'Send renewal reminder before', settRemindUnit:'days before expiry',
+    settWelcomeMsg:'Welcome message for new members',
+    settRoles:['Admin — Full access','Receptionist — Members & check-in only','Trainer — Members & exercises only','Accountant — Payments & reports only'],
+    settPerms:['👥 Members','✅ Check-in','💰 Payments','📈 Reports','📅 Schedule','⚙️ Settings'],
+    settStaffWarn:'⚠️ Staff member needs to create an account with the same Email',
+    lhead:'Welcome Back 👋', lsub:'Sign in to access your dashboard',
+    loginTab:'Sign In', registerTab:'Create New Account',
+    loginBtn:'Sign In', registerBtn:'Create Account',
+    registerHint:'Creating an account gives you a separate gym with its own data',
+    nameLabel:'Name', emailLabel:'Email', passLabel:'Password',
+    qrKiosk:'QR Check-in Kiosk', aboutApp:'About', logout2:'Sign Out',
+    gymSettings:'Gym Settings', devBy:'Developed by', allRights:'All Rights Reserved',
+    addClassTitle:'Add Class', classNameLbl:'Class Name', instructorLbl:'Instructor',
+    dayLbl:'Day', capacityLbl:'Max Capacity', startTimeLbl:'Start Time', endTimeLbl:'End Time',
+    colorLbl:'Class Color', saveClass:'💾 Save Class',
+    bookTitle:'Class Bookings', bookMem:'Select member to book', bookBtn:'+ Book Seat',
+    addExTitle:'Add Exercise', exNameLbl:'Exercise Name', exCatLbl:'Category',
+    exMuscleLbl:'Muscle Group', exSetsLbl:'Sets', exRepsLbl:'Reps',
+    exRestLbl:'Rest (sec)', exDescLbl:'Description', saveEx:'💾 Save Exercise',
+    planTitle:'Workout Plan', planNameLbl:'Plan Name', planMemLbl:'Member',
+    planNotesLbl:'Notes', planExs:'💪 Exercises', planAddEx:'+ Add Exercise', savePlan:'💾 Save Plan',
+    freezeTitle:'Freeze Subscription', freezeStart:'Freeze Start Date',
+    freezeDur:'Freeze Duration', freezeInfo:'Subscription will auto-extend after freeze ends',
+    freezeWarn:'Freeze period will not count from subscription duration', saveFreeze:'🧊 Freeze Subscription',
+    renewTitle:'Renew Subscription', renewCurrent:'Current Subscription',
+    renewType:'New Subscription Type', renewAmount:'Renewal Amount (KWD)',
+    renewStart:'Renewal Start Date', renewEndPrev:'Subscription will end on',
+    saveRenew:'🔄 Renew Subscription', renewed:'Renewed successfully 🎉',
+    receiptTitle:'Payment Receipt', receiptMem:'Member', receiptPhone:'Phone',
+    receiptDate:'Date', receiptDesc:'Description', receiptTotal:'Amount Paid',
+    receiptPrint:'🖨️ Print', receiptThanks:'Thank you for choosing GymPro 💪',
+    payTitle2:'Record Payment', payMem:'Member', payAmount:'Amount (KWD)',
+    payDate:'Date', payNotes:'Notes', savePayment:'💾 Record Payment',
+    msTitle:'Add Measurements', msMem:'Member', msSave:'💾 Save Measurements',
+    profileTitle:'Member Profile', profTabs:['📋 Info','💰 Payments','✅ Check-ins','📏 Progress'],
+    profPhone:'Phone', profExpiry:'Expiry', profSub:'Subscription', profWeight:'Weight',
+    profGift:'Gift Months', profNotes:'Notes', profEdit:'✏️ Edit',
+    profRenew:'🔄 Renew', profQR:'📱 QR Code', profClose:'Close',
+    profTotalPays:'Total Payments', profNoPays:'No payments',
+    profNoCI:'No check-ins', profNoMeas:'No measurements', profAddMeas:'+ Add Measurements',
+    profWeightChange:'Weight change since first measurement',
+    saved:'Saved ✅', deleted:'Deleted', payed:'Payment recorded ✅',
+    req:'Please fill required fields', err:'An error occurred', renew:'Renew',
+    confirm_delete:'Are you sure you want to delete?', cancel:'Cancel', close:'Close',
+    aboutTitle:'About', aboutVersion:'Version 2.0.0', aboutDev:'Developer',
+    aboutFeatures:'Features', aboutCopy:'Copyright & Intellectual Property',
+    aboutCopyText:'© 2025 Hesham El-Khalifa — All Rights Reserved',
+    gymSetupTitle:'Gym Setup', gymSetupSub:'Welcome to GymPro! Create your gym now',
+    gymNameAr:'Gym Name (Arabic)', gymNameEn:'Gym Name (English)',
+    gymPhone:'Phone', gymAddress:'Address', gymColor:'Primary Color',
+    gymLogo:'Gym Logo', gymLogoHint:'PNG, JPG — Square shape is best',
+    gymCreateBtn:'🚀 Create Gym & Start', gymPrivacy:'Your data is completely separate from other gyms',
+    qrScanTitle:'Scan QR to Check In', qrManual:'Or enter Token manually...',
+    qrCheckinBtn:'✅ Check In', qrBack:'Back',
+    staffAdd:'Add Staff', staffName:'Name', staffEmail:'Email',
+    staffRole:'Role', staffPermsTitle:'Detailed Permissions',
+    staffSave:'➕ Add Staff Member', staffActive:'Active', staffInactive:'Inactive',
+    staffStop:'⏸️ Suspend', staffActivate:'▶️ Activate',
+    gymOpenHr:'Opening Time', gymCloseHr:'Closing Time',
+    gymRevenueGoal:'Monthly Revenue Goal (KWD)', gymWaNum:'WhatsApp Number',
+    waSelectMem:'Select member'
+  },
   tl:{f:'🇵🇭',n:'TL',d:'ltr',
-    nav:['Dashboard','Mga Miyembro','Check-in','Mga Bayad','Mag-logout','Ulat','Mga Sukat'],
+    nav:['Dashboard','Mga Miyembro','Check-in','Mga Bayad','Mag-logout','Ulat','Mga Sukat','Iskedyul','Mga Ehersisyo','WhatsApp','Mga Setting'],
+    navSec1:'Pangunahin', navSec2:'Mga Serbisyo', navSec3:'Mga Ulat',
     ds:['Kabuuang Miyembro','Mga Aktibo','Nag-expire','Kabuuang Kita','Check-in Ngayon'],
     dc:['Katayuan','Uri ng Sub','Mag-e-expire','Kamakailang Check-ins'],
-    noexp:'Walang malapit na mag-expire 🎉',noci:'Walang check-in ngayon',days:'araw',
-    madd:'Magdagdag',mact:'Aktibo',mexp:'Nag-expire',mall:'Lahat',
-    mth:['Pangalan','Telepono','Subscription','Magtatapos','Timbang','Katayuan','Aksyon'],
-    nomen:'Walang miyembro',cdel:'Sigurado ka?',addtit:'Magdagdag',edtit:'I-edit',msave:'I-save',mcan:'Kanselahin',
+    dashTitle:'Dashboard', dashSub:'Kamusta! Narito ang buod ngayon', refresh:'I-refresh',
+    noexp:'Walang malapit na mag-expire 🎉', noci:'Walang check-in ngayon', days:'araw',
+    madd:'Magdagdag', mact:'Aktibo', mexp:'Nag-expire', mall:'Lahat',
+    mth:['Pangalan','Telepono','Subscription','Magtatapos','Timbang','Kategorya','Katayuan','Aksyon'],
+    nomen:'Walang miyembro', cdel:'Sigurado ka?',
+    addtit:'Magdagdag ng Miyembro', edtit:'I-edit', msave:'I-save', mcan:'Kanselahin',
+    memTitle:'Mga Miyembro', memSub:'Pamahalaan ang data ng miyembro',
+    exportBtn:'I-export', allPeriods:'Lahat ng Panahon',
+    exp7:'Mag-eexpire sa 7 araw', exp15:'Mag-eexpire sa 15 araw', exp30:'Mag-eexpire sa 30 araw',
+    new30:'Sumali sa nakaraang 30 araw', new90:'Sumali sa nakaraang 90 araw',
+    allSubs:'Lahat ng Subscription',
     sub:['1B','2B','3B','4B','5B','6B','7B','8B','9B','10B','11B','1T'],
     cats_mem:['👥 Lahat','✅ Kasalukuyan','⏰ Malapit','❌ Nag-expire','💤 Luma','🆕 Bago','🏆 Beterano','🧊 Naka-freeze'],
     cat_labels:{all:'Lahat',current:'Kasalukuyan',expiring_soon:'Malapit na',expired:'Nag-expire',lapsed:'Luma',new:'Bago',veteran:'Beterano',frozen:'Naka-freeze'},
-    cttl:'Maghanap ng Miyembro',cph:'I-type ang pangalan...',cbtn:'Mag-check in',ctd:'Check-in Ngayon',
-    cok:'Naka-check in ✅',calr:'Naka-check in na ℹ️',cnf:'Hindi nahanap ❌',
-    cexp:'🚫 Nag-expire na!',csoon:'⚠️ Mag-e-expire sa {d} araw!',
-    padd:'Itala ang Bayad',pth:['Miyembro','Halaga','Petsa','Tala'],ptot:'Kabuuan',nopay:'Walang bayad',
-    saved:'Na-save ✅',deleted:'Nabura',payed:'Naitala ✅',req:'Punan ang mga field',err:'May error',
-    renew:'I-renew',renewed:'Na-renew 🎉',
-    lhead:'Maligayang Pagbabalik 👋',lsub:'Mag-login para ma-access ang dashboard'},
+    cttl:'Maghanap ng Miyembro', cph:'I-type ang pangalan...',
+    cbtn:'Mag-check in', ctd:'Check-in Ngayon', ciTitle:'Check-in',
+    cok:'Naka-check in ✅', calr:'Naka-check in na ℹ️',
+    cnf:'Hindi nahanap ❌', cexp:'🚫 Nag-expire na!', csoon:'⚠️ Mag-eexpire sa {d} araw!',
+    padd:'Itala ang Bayad', pth:['Miyembro','Halaga','Petsa','Tala'],
+    ptot:'Kabuuan', nopay:'Walang bayad', payTitle:'Mga Bayad', paySub:'Talaan ng bayad at kita',
+    repTitle:'Buwanang Ulat', repSub:'Pagsusuri ng pagganap at kita',
+    repChoose:'Pumili ng Buwan', repShow:'Tingnan ang Ulat', repPrint:'I-print',
+    repStats:['Kabuuang Kita','Bagong Miyembro','Kabuuang Check-in','Bukas na Araw','Average Check-in/Araw','Aktibong Miyembro'],
+    repNewMem:'Bagong Miyembro', repPays:'Mga Bayad',
+    measTitle:'Mga Sukat', measSub:'Subaybayan ang timbang at sukat', measSearch:'Hanapin ang miyembro',
+    measAdd:'Magdagdag ng Sukat', measEmpty:'Maghanap ng miyembro para tingnan ang kanilang mga sukat',
+    measLabels:['⚖️ Timbang (kg)','📐 Dibdib (cm)','📐 Baywang (cm)','📐 Balakang (cm)','💪 Braso (cm)','📅 Petsa'],
+    schedTitle:'Iskedyul ng Klase', schedSub:'Pamahalaan ang mga klase',
+    schedAddClass:'Magdagdag ng Klase', schedDays:['Linggo','Lunes','Martes','Miyerkules','Huwebes','Biyernes','Sabado'],
+    schedAddBtn:'+ Magdagdag ng Klase',
+    exTitle:'Mga Ehersisyo', exSub:'Library ng ehersisyo at workout plan',
+    exAdd:'Bagong Ehersisyo', exPlan:'Workout Plan', exLib:'💪 Library ng Ehersisyo',
+    exPlans:'📋 Workout Plans', exSearchMem:'Hanapin ang miyembro', exEmpty:'Pindutin ang "+ Magdagdag"',
+    waTitle:'WhatsApp', waSub:'Magpadala ng mensahe sa mga miyembro',
+    waSend:'📤 Magpadala', waSendType:'Uri ng Pagpapadala',
+    waTypes:['Isang miyembro','Malapit nang mag-expire (7 araw)','Nag-expire na','Lahat ng aktibo','Lahat ng miyembro'],
+    waTemplate:'Template', waMsg:'Teksto ng mensahe', waPreview:'Preview ng Mensahe',
+    waBtn:'📲 Buksan ang WhatsApp', waNote:'Awtomatikong mapupuno ang mensahe',
+    waLog:'📋 Talaan ng Mensahe', waAutoTitle:'⚡ Auto Reminders',
+    waChooseMem:'Pumili ng miyembro', waTemplates:['Custom na mensahe','Renewal reminder','Abiso ng pag-expire','Maligayang pagdating','Espesyal na alok'],
+    settTitle:'Mga Setting', settSub:'Mga setting ng gym at staff',
+    settTabs:['🏋️ Info ng Gym','👥 Staff','💰 Presyo','🔔 Abiso'],
+    settSave:'💾 I-save', settLogoHint:'Pinakamainam na sukat: 200×200 pixel',
+    settChangeLogo:'Baguhin ang Logo', settAddStaff:'＋ Magdagdag ng Staff',
+    settNoStaff:'Wala pang staff', settSavePrices:'💾 I-save ang Presyo',
+    settPriceHint:'Itakda ang presyo para sa bawat uri ng subscription',
+    settRemindDays:'Magpadala ng reminder bago', settRemindUnit:'araw bago mag-expire',
+    settWelcomeMsg:'Mensahe ng maligayang pagdating para sa bagong miyembro',
+    settRoles:['Admin — Buong access','Receptionist — Miyembro at check-in lamang','Trainer — Miyembro at ehersisyo lamang','Accountant — Bayad at ulat lamang'],
+    settPerms:['👥 Mga Miyembro','✅ Check-in','💰 Mga Bayad','📈 Mga Ulat','📅 Iskedyul','⚙️ Mga Setting'],
+    settStaffWarn:'⚠️ Kailangan ng staff na gumawa ng account gamit ang parehong Email',
+    lhead:'Maligayang Pagbabalik 👋', lsub:'Mag-login para ma-access ang dashboard',
+    loginTab:'Mag-login', registerTab:'Gumawa ng Bagong Account',
+    loginBtn:'Mag-login', registerBtn:'Gumawa ng Account',
+    registerHint:'Sa paggawa ng account, magkakaroon ka ng hiwalay na gym na may sariling data',
+    nameLabel:'Pangalan', emailLabel:'Email', passLabel:'Password',
+    qrKiosk:'QR Check-in Kiosk', aboutApp:'Tungkol sa App', logout2:'Mag-logout',
+    gymSettings:'Mga Setting ng Gym', devBy:'Ginawa ni', allRights:'Lahat ng Karapatan ay Nakalaan',
+    addClassTitle:'Magdagdag ng Klase', classNameLbl:'Pangalan ng Klase', instructorLbl:'Instructor',
+    dayLbl:'Araw', capacityLbl:'Max na Kapasidad', startTimeLbl:'Oras ng Simula', endTimeLbl:'Oras ng Pagtatapos',
+    colorLbl:'Kulay ng Klase', saveClass:'💾 I-save ang Klase',
+    bookTitle:'Mga Booking ng Klase', bookMem:'Pumili ng miyembro para mag-book', bookBtn:'+ Mag-book ng Upuan',
+    addExTitle:'Magdagdag ng Ehersisyo', exNameLbl:'Pangalan ng Ehersisyo', exCatLbl:'Kategorya',
+    exMuscleLbl:'Grupo ng Kalamnan', exSetsLbl:'Mga Set', exRepsLbl:'Mga Paulit-ulit',
+    exRestLbl:'Pahinga (sec)', exDescLbl:'Paglalarawan', saveEx:'💾 I-save ang Ehersisyo',
+    planTitle:'Workout Plan', planNameLbl:'Pangalan ng Plan', planMemLbl:'Miyembro',
+    planNotesLbl:'Mga Tala', planExs:'💪 Mga Ehersisyo', planAddEx:'+ Magdagdag ng Ehersisyo', savePlan:'💾 I-save ang Plan',
+    freezeTitle:'I-freeze ang Subscription', freezeStart:'Petsa ng Simula ng Freeze',
+    freezeDur:'Tagal ng Freeze', freezeInfo:'Awtomatikong mapapalawak ang subscription pagkatapos ng freeze',
+    freezeWarn:'Hindi mabibilang ang freeze period sa subscription', saveFreeze:'🧊 I-freeze ang Subscription',
+    renewTitle:'I-renew ang Subscription', renewCurrent:'Kasalukuyang Subscription',
+    renewType:'Bagong Uri ng Subscription', renewAmount:'Halaga ng Renewal (KWD)',
+    renewStart:'Petsa ng Simula ng Renewal', renewEndPrev:'Magtatapos ang subscription sa',
+    saveRenew:'🔄 I-renew ang Subscription', renewed:'Na-renew na 🎉',
+    receiptTitle:'Resibo ng Bayad', receiptMem:'Miyembro', receiptPhone:'Telepono',
+    receiptDate:'Petsa', receiptDesc:'Paglalarawan', receiptTotal:'Halagang Binayad',
+    receiptPrint:'🖨️ I-print', receiptThanks:'Salamat sa pagpili ng GymPro 💪',
+    payTitle2:'Itala ang Bayad', payMem:'Miyembro', payAmount:'Halaga (KWD)',
+    payDate:'Petsa', payNotes:'Mga Tala', savePayment:'💾 Itala ang Bayad',
+    msTitle:'Magdagdag ng Sukat', msMem:'Miyembro', msSave:'💾 I-save ang Mga Sukat',
+    profileTitle:'Profile ng Miyembro', profTabs:['📋 Impormasyon','💰 Mga Bayad','✅ Check-ins','📏 Progreso'],
+    profPhone:'Telepono', profExpiry:'Petsa ng Pagtatapos', profSub:'Subscription', profWeight:'Timbang',
+    profGift:'Gift Months', profNotes:'Mga Tala', profEdit:'✏️ I-edit',
+    profRenew:'🔄 I-renew', profQR:'📱 QR Code', profClose:'Isara',
+    profTotalPays:'Kabuuang Bayad', profNoPays:'Walang bayad',
+    profNoCI:'Walang check-in', profNoMeas:'Walang sukat', profAddMeas:'+ Magdagdag ng Sukat',
+    profWeightChange:'Pagbabago ng timbang mula sa unang sukat',
+    saved:'Na-save ✅', deleted:'Nabura', payed:'Naitala ang bayad ✅',
+    req:'Punan ang mga kinakailangang field', err:'May naganap na error', renew:'I-renew',
+    confirm_delete:'Sigurado ka bang gusto mong burahin?', cancel:'Kanselahin', close:'Isara',
+    aboutTitle:'Tungkol sa App', aboutVersion:'Bersyon 2.0.0', aboutDev:'Developer',
+    aboutFeatures:'Mga Feature', aboutCopy:'Copyright at Intellectual Property',
+    aboutCopyText:'© 2025 Hesham El-Khalifa — All Rights Reserved',
+    gymSetupTitle:'Setup ng Gym', gymSetupSub:'Maligayang pagdating sa GymPro! Gumawa ng iyong gym ngayon',
+    gymNameAr:'Pangalan ng Gym (Arabic)', gymNameEn:'Pangalan ng Gym (English)',
+    gymPhone:'Telepono', gymAddress:'Address', gymColor:'Pangunahing Kulay',
+    gymLogo:'Logo ng Gym', gymLogoHint:'PNG, JPG — Mas maganda ang kwadradong hugis',
+    gymCreateBtn:'🚀 Gumawa ng Gym at Magsimula', gymPrivacy:'Ang iyong data ay ganap na hiwalay sa ibang mga gym',
+    qrScanTitle:'I-scan ang QR para Mag-check In', qrManual:'O ipasok ang Token nang mano-mano...',
+    qrCheckinBtn:'✅ Mag-check In', qrBack:'Bumalik',
+    staffAdd:'Magdagdag ng Staff', staffName:'Pangalan', staffEmail:'Email',
+    staffRole:'Papel', staffPermsTitle:'Detalyadong Pahintulot',
+    staffSave:'➕ Idagdag ang Staff Member', staffActive:'Aktibo', staffInactive:'Hindi Aktibo',
+    staffStop:'⏸️ Suspindihin', staffActivate:'▶️ I-activate',
+    gymOpenHr:'Oras ng Pagbubukas', gymCloseHr:'Oras ng Pagsasara',
+    gymRevenueGoal:'Buwanang Layunin sa Kita (KWD)', gymWaNum:'WhatsApp Number',
+    waSelectMem:'Pumili ng miyembro'
+  },
   hi:{f:'🇮🇳',n:'HI',d:'ltr',
-    nav:['डैशबोर्ड','सदस्य','चेक-इन','भुगतान','लॉगआउट','मासिक रिपोर्ट','माप'],
+    nav:['डैशबोर्ड','सदस्य','चेक-इन','भुगतान','लॉगआउट','मासिक रिपोर्ट','माप','शेड्यूल','व्यायाम','WhatsApp','सेटिंग्स'],
+    navSec1:'मुख्य', navSec2:'सेवाएं', navSec3:'रिपोर्ट',
     ds:['कुल सदस्य','सक्रिय सदस्य','समाप्त','कुल राजस्व','आज के चेक-इन'],
     dc:['सदस्य स्थिति','सदस्यता प्रकार','10 दिनों में समाप्त','हाल के चेक-इन'],
-    noexp:'कोई समाप्त होने वाला नहीं 🎉',noci:'आज कोई चेक-इन नहीं',days:'दिन',
-    madd:'सदस्य जोड़ें',mact:'सक्रिय',mexp:'समाप्त',mall:'सभी',
-    mth:['नाम','फोन','सदस्यता','समाप्ति','वजन','स्थिति','कार्रवाई'],
-    nomen:'कोई सदस्य नहीं',cdel:'क्या आप वाकई हटाना चाहते हैं?',addtit:'सदस्य जोड़ें',edtit:'संपादित करें',msave:'सहेजें',mcan:'रद्द करें',
-        sub:['1M','2M','3M','4M','5M','6M','7M','8M','9M','10M','11M','1Y'],
+    dashTitle:'डैशबोर्ड', dashSub:'नमस्ते! यहाँ आज का सारांश है', refresh:'रीफ्रेश',
+    noexp:'कोई समाप्त होने वाला नहीं 🎉', noci:'आज कोई चेक-इन नहीं', days:'दिन',
+    madd:'सदस्य जोड़ें', mact:'सक्रिय', mexp:'समाप्त', mall:'सभी',
+    mth:['नाम','फोन','सदस्यता','समाप्ति','वजन','श्रेणी','स्थिति','कार्रवाई'],
+    nomen:'कोई सदस्य नहीं', cdel:'क्या आप वाकई हटाना चाहते हैं?',
+    addtit:'सदस्य जोड़ें', edtit:'संपादित करें', msave:'सहेजें', mcan:'रद्द करें',
+    memTitle:'सदस्य', memSub:'सदस्य डेटा प्रबंधित करें',
+    exportBtn:'निर्यात', allPeriods:'सभी अवधि',
+    exp7:'7 दिनों में समाप्त', exp15:'15 दिनों में समाप्त', exp30:'30 दिनों में समाप्त',
+    new30:'पिछले 30 दिनों में शामिल', new90:'पिछले 90 दिनों में शामिल',
+    allSubs:'सभी सदस्यताएं',
+    sub:['1M','2M','3M','4M','5M','6M','7M','8M','9M','10M','11M','1Y'],
     cats_mem:['👥 सभी','✅ वर्तमान','⏰ समाप्त होने वाला','❌ समाप्त','💤 पुराना','🆕 नया','🏆 अनुभवी','🧊 फ्रोज़न'],
     cat_labels:{all:'सभी',current:'वर्तमान',expiring_soon:'समाप्त होने वाला',expired:'समाप्त',lapsed:'पुराना',new:'नया',veteran:'अनुभवी',frozen:'फ्रोज़न'},
-    cttl:'सदस्य खोजें',cph:'नाम या पहले 4 अंक...',cbtn:'चेक इन',ctd:'आज के चेक-इन',
-    cok:'चेक-इन सफल ✅',calr:'पहले से चेक-इन ℹ️',cnf:'सदस्य नहीं मिला ❌',
-    cexp:'🚫 सदस्यता समाप्त!',csoon:'⚠️ {d} दिनों में समाप्त!',
-    padd:'भुगतान दर्ज',pth:['सदस्य','राशि','तारीख','नोट्स'],ptot:'कुल',nopay:'कोई भुगतान नहीं',
-    saved:'सहेजा गया ✅',deleted:'हटाया गया',payed:'भुगतान दर्ज ✅',req:'आवश्यक फ़ील्ड भरें',err:'त्रुटि',
-    renew:'नवीनीकरण',renewed:'नवीनीकृत ✅',
-    lhead:'वापसी पर स्वागत है 👋',lsub:'डैशबोर्ड एक्सेस करने के लिए साइन इन करें'}
+    cttl:'सदस्य खोजें', cph:'नाम या पहले 4 अंक...',
+    cbtn:'चेक इन', ctd:'आज के चेक-इन', ciTitle:'चेक-इन',
+    cok:'चेक-इन सफल ✅', calr:'पहले से चेक-इन ℹ️',
+    cnf:'सदस्य नहीं मिला ❌', cexp:'🚫 सदस्यता समाप्त!', csoon:'⚠️ {d} दिनों में समाप्त!',
+    padd:'भुगतान दर्ज', pth:['सदस्य','राशि','तारीख','नोट्स'],
+    ptot:'कुल', nopay:'कोई भुगतान नहीं', payTitle:'भुगतान', paySub:'भुगतान और राजस्व लॉग',
+    repTitle:'मासिक रिपोर्ट', repSub:'प्रदर्शन और राजस्व विश्लेषण',
+    repChoose:'महीना चुनें', repShow:'रिपोर्ट देखें', repPrint:'प्रिंट',
+    repStats:['कुल राजस्व','नए सदस्य','कुल चेक-इन','खुले दिन','औसत चेक-इन/दिन','सक्रिय सदस्य'],
+    repNewMem:'नए सदस्य', repPays:'भुगतान',
+    measTitle:'माप', measSub:'वजन और माप ट्रैक करें', measSearch:'सदस्य खोजें',
+    measAdd:'माप जोड़ें', measEmpty:'माप देखने के लिए सदस्य खोजें',
+    measLabels:['⚖️ वजन (kg)','📐 छाती (cm)','📐 कमर (cm)','📐 कूल्हे (cm)','💪 बाहें (cm)','📅 तारीख'],
+    schedTitle:'कक्षा अनुसूची', schedSub:'कक्षाएं और सत्र प्रबंधित करें',
+    schedAddClass:'कक्षा जोड़ें', schedDays:['रविवार','सोमवार','मंगलवार','बुधवार','गुरुवार','शुक्रवार','शनिवार'],
+    schedAddBtn:'+ कक्षा जोड़ें',
+    exTitle:'व्यायाम', exSub:'व्यायाम लाइब्रेरी और वर्कआउट प्लान',
+    exAdd:'नया व्यायाम', exPlan:'वर्कआउट प्लान', exLib:'💪 व्यायाम लाइब्रेरी',
+    exPlans:'📋 वर्कआउट प्लान', exSearchMem:'सदस्य खोजें', exEmpty:'"+जोड़ें" दबाएं',
+    waTitle:'WhatsApp', waSub:'सदस्यों को संदेश भेजें',
+    waSend:'📤 संदेश भेजें', waSendType:'भेजने का प्रकार',
+    waTypes:['एकल सदस्य','जल्द समाप्त (7 दिन)','समाप्त सदस्यताएं','सभी सक्रिय सदस्य','सभी सदस्य'],
+    waTemplate:'टेम्पलेट', waMsg:'संदेश पाठ', waPreview:'संदेश पूर्वावलोकन',
+    waBtn:'📲 WhatsApp खोलें', waNote:'WhatsApp स्वचालित रूप से संदेश भरेगा',
+    waLog:'📋 संदेश लॉग', waAutoTitle:'⚡ स्वचालित अनुस्मारक',
+    waChooseMem:'सदस्य चुनें', waTemplates:['कस्टम संदेश','नवीनीकरण अनुस्मारक','समाप्ति अधिसूचना','नए सदस्य का स्वागत','विशेष ऑफर'],
+    settTitle:'सेटिंग्स', settSub:'जिम सेटिंग्स और स्टाफ प्रबंधन',
+    settTabs:['🏋️ जिम जानकारी','👥 स्टाफ','💰 मूल्य निर्धारण','🔔 सूचनाएं'],
+    settSave:'💾 सहेजें', settLogoHint:'सर्वोत्तम आकार: 200×200 पिक्सेल',
+    settChangeLogo:'लोगो बदलें', settAddStaff:'＋ स्टाफ जोड़ें',
+    settNoStaff:'अभी कोई स्टाफ नहीं', settSavePrices:'💾 मूल्य सहेजें',
+    settPriceHint:'प्रत्येक सदस्यता प्रकार के लिए मूल्य निर्धारित करें',
+    settRemindDays:'नवीनीकरण अनुस्मारक भेजें', settRemindUnit:'समाप्ति से पहले दिन',
+    settWelcomeMsg:'नए सदस्यों के लिए स्वागत संदेश',
+    settRoles:['एडमिन — पूर्ण पहुंच','रिसेप्शनिस्ट — सदस्य और चेक-इन केवल','ट्रेनर — सदस्य और व्यायाम केवल','अकाउंटेंट — भुगतान और रिपोर्ट केवल'],
+    settPerms:['👥 सदस्य','✅ चेक-इन','💰 भुगतान','📈 रिपोर्ट','📅 शेड्यूल','⚙️ सेटिंग्स'],
+    settStaffWarn:'⚠️ स्टाफ को उसी Email से अकाउंट बनाना होगा',
+    lhead:'वापसी पर स्वागत है 👋', lsub:'डैशबोर्ड एक्सेस करने के लिए साइन इन करें',
+    loginTab:'साइन इन', registerTab:'नया अकाउंट बनाएं',
+    loginBtn:'साइन इन', registerBtn:'अकाउंट बनाएं',
+    registerHint:'अकाउंट बनाने पर आपको अपने डेटा के साथ एक अलग जिम मिलेगा',
+    nameLabel:'नाम', emailLabel:'ईमेल', passLabel:'पासवर्ड',
+    qrKiosk:'QR चेक-इन कियोस्क', aboutApp:'ऐप के बारे में', logout2:'साइन आउट',
+    gymSettings:'जिम सेटिंग्स', devBy:'द्वारा विकसित', allRights:'सर्वाधिकार सुरक्षित',
+    addClassTitle:'कक्षा जोड़ें', classNameLbl:'कक्षा का नाम', instructorLbl:'प्रशिक्षक',
+    dayLbl:'दिन', capacityLbl:'अधिकतम क्षमता', startTimeLbl:'शुरुआत का समय', endTimeLbl:'समाप्ति का समय',
+    colorLbl:'कक्षा का रंग', saveClass:'💾 कक्षा सहेजें',
+    bookTitle:'कक्षा बुकिंग', bookMem:'बुकिंग के लिए सदस्य चुनें', bookBtn:'+ सीट बुक करें',
+    addExTitle:'व्यायाम जोड़ें', exNameLbl:'व्यायाम का नाम', exCatLbl:'श्रेणी',
+    exMuscleLbl:'मांसपेशी समूह', exSetsLbl:'सेट', exRepsLbl:'दोहराव',
+    exRestLbl:'आराम (सेकंड)', exDescLbl:'विवरण', saveEx:'💾 व्यायाम सहेजें',
+    planTitle:'वर्कआउट प्लान', planNameLbl:'प्लान का नाम', planMemLbl:'सदस्य',
+    planNotesLbl:'नोट्स', planExs:'💪 व्यायाम', planAddEx:'+ व्यायाम जोड़ें', savePlan:'💾 प्लान सहेजें',
+    freezeTitle:'सदस्यता फ्रीज़ करें', freezeStart:'फ्रीज़ शुरू होने की तारीख',
+    freezeDur:'फ्रीज़ अवधि', freezeInfo:'फ्रीज़ समाप्त होने के बाद सदस्यता स्वचालित रूप से बढ़ेगी',
+    freezeWarn:'फ्रीज़ अवधि सदस्यता से नहीं गिनी जाएगी', saveFreeze:'🧊 सदस्यता फ्रीज़ करें',
+    renewTitle:'सदस्यता नवीनीकृत करें', renewCurrent:'वर्तमान सदस्यता',
+    renewType:'नई सदस्यता प्रकार', renewAmount:'नवीनीकरण राशि (KWD)',
+    renewStart:'नवीनीकरण शुरू होने की तारीख', renewEndPrev:'सदस्यता समाप्त होगी',
+    saveRenew:'🔄 सदस्यता नवीनीकृत करें', renewed:'नवीनीकृत ✅',
+    receiptTitle:'भुगतान रसीद', receiptMem:'सदस्य', receiptPhone:'फोन',
+    receiptDate:'तारीख', receiptDesc:'विवरण', receiptTotal:'भुगतान राशि',
+    receiptPrint:'🖨️ प्रिंट', receiptThanks:'GymPro चुनने के लिए धन्यवाद 💪',
+    payTitle2:'भुगतान दर्ज', payMem:'सदस्य', payAmount:'राशि (KWD)',
+    payDate:'तारीख', payNotes:'नोट्स', savePayment:'💾 भुगतान दर्ज करें',
+    msTitle:'माप जोड़ें', msMem:'सदस्य', msSave:'💾 माप सहेजें',
+    profileTitle:'सदस्य प्रोफ़ाइल', profTabs:['📋 जानकारी','💰 भुगतान','✅ चेक-इन','📏 प्रगति'],
+    profPhone:'फोन', profExpiry:'समाप्ति', profSub:'सदस्यता', profWeight:'वजन',
+    profGift:'उपहार महीने', profNotes:'नोट्स', profEdit:'✏️ संपादित',
+    profRenew:'🔄 नवीनीकृत', profQR:'📱 QR Code', profClose:'बंद करें',
+    profTotalPays:'कुल भुगतान', profNoPays:'कोई भुगतान नहीं',
+    profNoCI:'कोई चेक-इन नहीं', profNoMeas:'कोई माप नहीं', profAddMeas:'+ माप जोड़ें',
+    profWeightChange:'पहले माप से वजन में परिवर्तन',
+    saved:'सहेजा गया ✅', deleted:'हटाया गया', payed:'भुगतान दर्ज ✅',
+    req:'कृपया आवश्यक फ़ील्ड भरें', err:'एक त्रुटि हुई', renew:'नवीनीकृत',
+    confirm_delete:'क्या आप वाकई हटाना चाहते हैं?', cancel:'रद्द करें', close:'बंद करें',
+    aboutTitle:'ऐप के बारे में', aboutVersion:'संस्करण 2.0.0', aboutDev:'डेवलपर',
+    aboutFeatures:'विशेषताएं', aboutCopy:'कॉपीराइट और बौद्धिक संपदा',
+    aboutCopyText:'© 2025 Hesham El-Khalifa — All Rights Reserved',
+    gymSetupTitle:'जिम सेटअप', gymSetupSub:'GymPro में आपका स्वागत है! अभी अपना जिम बनाएं',
+    gymNameAr:'जिम का नाम (Arabic)', gymNameEn:'जिम का नाम (English)',
+    gymPhone:'फोन', gymAddress:'पता', gymColor:'मुख्य रंग',
+    gymLogo:'जिम लोगो', gymLogoHint:'PNG, JPG — वर्गाकार आकार सबसे अच्छा है',
+    gymCreateBtn:'🚀 जिम बनाएं और शुरू करें', gymPrivacy:'आपका डेटा अन्य जिम से पूरी तरह अलग है',
+    qrScanTitle:'चेक इन के लिए QR स्कैन करें', qrManual:'या मैन्युअल रूप से Token दर्ज करें...',
+    qrCheckinBtn:'✅ चेक इन', qrBack:'वापस',
+    staffAdd:'स्टाफ जोड़ें', staffName:'नाम', staffEmail:'ईमेल',
+    staffRole:'भूमिका', staffPermsTitle:'विस्तृत अनुमतियाँ',
+    staffSave:'➕ स्टाफ सदस्य जोड़ें', staffActive:'सक्रिय', staffInactive:'निष्क्रिय',
+    staffStop:'⏸️ निलंबित करें', staffActivate:'▶️ सक्रिय करें',
+    gymOpenHr:'खुलने का समय', gymCloseHr:'बंद होने का समय',
+    gymRevenueGoal:'मासिक राजस्व लक्ष्य (KWD)', gymWaNum:'WhatsApp नंबर',
+    waSelectMem:'सदस्य चुनें'
+  }
 };
 let lang=localStorage.getItem('g_lang')||'ar';
 const T=()=>TX[lang];
@@ -1653,49 +2053,182 @@ function updateCatTabs(l){
 }
 
 function applyLang(l){
-  lang=l;localStorage.setItem('g_lang',l);const x=TX[l];
-  document.documentElement.lang=l;document.documentElement.dir=x.d;
-  document.body.classList.toggle('rtl',x.d==='rtl');document.body.classList.toggle('ltr',x.d==='ltr');
+  lang=l; localStorage.setItem('g_lang',l);
+  const x=TX[l];
+  document.documentElement.lang=l;
+  document.documentElement.dir=x.d;
+  document.body.classList.toggle('rtl',x.d==='rtl');
+  document.body.classList.toggle('ltr',x.d==='ltr');
+
+  const s=(id,t)=>{const e=document.getElementById(id);if(e&&t!==undefined)e.textContent=t};
+  const sp=(id,t)=>{const e=document.getElementById(id);if(e&&t!==undefined)e.placeholder=t};
+  const sv=(id,v)=>{const e=document.getElementById(id);if(e&&v!==undefined)e.value=v};
+
+  // Lang switchers
   ['lf','lfb'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=x.f});
   ['ln','lnb'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=x.n});
   document.querySelectorAll('.lo').forEach(o=>o.classList.toggle('cur',o.dataset.lang===l));
-  // Login
-  const lh=document.getElementById('l-head');if(lh)lh.textContent=x.lhead;
-  const ls=document.getElementById('l-sub');if(ls)ls.textContent=x.lsub;
-  const ll=document.getElementById('l-el');if(ll)ll.textContent=l==='ar'?'البريد الإلكتروني':'Email';
-  const lp=document.getElementById('l-pl');if(lp)lp.textContent=l==='ar'?'كلمة المرور':'Password';
-  // Nav
-  ['n-dash','n-mem','n-ci','n-pay','n-out','n-rep','n-meas'].forEach((id,i)=>{const e=document.getElementById(id);if(e)e.textContent=x.nav[i]});
-  // Stats
-  ['s-tot-l','s-act-l','s-exp-l','s-rev-l','s-ci-l'].forEach((id,i)=>{const e=document.getElementById(id);if(e)e.textContent=x.ds[i]});
-  ['ch-st','ch-sb','ch-ex','ch-ci'].forEach((id,i)=>{const e=document.getElementById(id);if(e)e.textContent=x.dc[i]});
-  // Members
-  const am=document.getElementById('add-m-t');if(am)am.textContent=x.madd;
-  ['f-all','f-act','f-exp'].forEach((id,v)=>{const e=document.getElementById(id);if(e)e.textContent=[x.mall,x.mact,x.mexp][v]});
-  ['th-n','th-ph','th-sb','th-en','th-wt','th-st','th-ac'].forEach((id,i)=>{const e=document.getElementById(id);if(e)e.textContent=x.mth[i]});
-  const mmt=document.getElementById('m-mo-t');if(mmt)mmt.textContent=x.addtit;
+
+  // Login page
+  s('l-head',x.lhead); s('l-sub',x.lsub);
+  s('l-el',x.emailLabel); s('l-pl',x.passLabel);
+  s('l-btn-t',x.loginBtn);
+  s('tab-login',x.loginTab); s('tab-register',x.registerTab);
+  const rHint=document.querySelector('#register-form-wrap div[style*="font-size:.75rem"]');
+  if(rHint)rHint.textContent=x.registerHint;
+  const rNameLbl=document.querySelector('label[for="r-name"],#register-form-wrap .lf-label');
+  if(rNameLbl)rNameLbl.textContent=x.nameLabel;
+  const rBtn=document.getElementById('r-btn');
+  if(rBtn)rBtn.innerHTML=`<span>✨</span><span>${x.registerBtn}</span>`;
+
+  // Sidebar nav
+  s('n-tag','MANAGEMENT');
+  const navSec = document.querySelectorAll('.nav-section');
+  if(navSec[0])navSec[0].textContent=x.navSec1;
+  if(navSec[1])navSec[1].textContent=x.navSec2;
+  if(navSec[2])navSec[2].textContent=x.navSec3;
+  const niPages=['dashboard','members','checkin','payments','report','measurements','schedule','exercises','whatsapp','settings'];
+  const niLabels=[x.nav[0],x.nav[1],x.nav[2],x.nav[3],x.nav[5],x.nav[6],x.nav[7],x.nav[8],x.nav[9],x.nav[10]];
+  niPages.forEach((pg,i)=>{
+    const ni=document.querySelector(`.ni[data-page="${pg}"] span:last-child`);
+    if(ni)ni.textContent=niLabels[i];
+  });
+  // Sidebar footer items
+  const niQR=document.querySelector('.ni[onclick*="qr-checkin"]');
+  if(niQR){const sp2=niQR.querySelector('span:last-child');if(sp2)sp2.textContent=x.qrKiosk;}
+  const niSettings=document.querySelector('.ni[onclick*="openGymSettings"]');
+  if(niSettings){const sp2=niSettings.querySelector('span:last-child');if(sp2)sp2.textContent=x.gymSettings;}
+  const niAbout=document.querySelector('.ni[onclick*="about-mo"]');
+  if(niAbout){const sp2=niAbout.querySelector('span:last-child');if(sp2)sp2.textContent=x.aboutApp;}
+  const niLogout=document.getElementById('logout-btn');
+  if(niLogout){const sp2=niLogout.querySelector('span:last-child');if(sp2)sp2.textContent=x.nav[4];}
+  // Sidebar copyright
+  const sideDevBy=document.querySelector('.sb-ft div[style*="border-bottom"] div:nth-child(2)');
+  if(sideDevBy)sideDevBy.textContent=x.devBy;
+  const sideRights=document.querySelector('.sb-ft div[style*="border-bottom"] div:last-child');
+  if(sideRights)sideRights.textContent='© 2025 '+x.allRights;
+
+  // Dashboard
+  s('dash-title',x.dashTitle); s('dash-sub',x.dashSub);
+  ['s-tot-l','s-act-l','s-exp-l','s-rev-l','s-ci-l'].forEach((id,i)=>s(id,x.ds[i]));
+  ['ch-st','ch-sb','ch-ex','ch-ci'].forEach((id,i)=>s(id,x.dc[i]));
+
+  // Members page
+  s('mem-t',x.memTitle); s('mem-sub-t',x.memSub);
+  s('add-m-t',x.madd);
+  // Category tabs
+  const catTabs=document.querySelectorAll('.cat-tab');
+  if(x.cats_mem)catTabs.forEach((t,i)=>{if(x.cats_mem[i])t.textContent=x.cats_mem[i]});
+  // Filter options
+  const daysFlt=document.getElementById('m-days-flt');
+  if(daysFlt){
+    const opts=daysFlt.options;
+    if(opts[0])opts[0].text=x.allPeriods;
+    if(opts[1])opts[1].text=x.exp7;
+    if(opts[2])opts[2].text=x.exp15;
+    if(opts[3])opts[3].text=x.exp30;
+    if(opts[4])opts[4].text=x.new30;
+    if(opts[5])opts[5].text=x.new90;
+  }
+  const subFlt=document.getElementById('m-sub-flt');
+  if(subFlt&&subFlt.options[0])subFlt.options[0].text=x.allSubs;
+  const exportBtn=document.querySelector('button[onclick="exportMembers()"]');
+  if(exportBtn)exportBtn.innerHTML=`📥 ${x.exportBtn}`;
+  // Table headers
+  ['th-n','th-ph','th-sb','th-en','th-wt','th-st','th-ac'].forEach((id,i)=>{
+    const e=document.getElementById(id);if(e&&x.mth[i])e.textContent=x.mth[i];
+  });
+
   // Checkin
-  const ci=document.getElementById('ci-in');if(ci)ci.placeholder=x.cph;
-  const cbt=document.getElementById('ci-btn-t');if(cbt)cbt.textContent=x.cbtn;
-  const cet=document.getElementById('ab-exp-t');if(cet)cet.textContent=x.cexp;
+  s('ci-ttl',x.cttl); sp('ci-in',x.cph);
+  s('ci-btn-t',x.cbtn); s('ci-td-t',x.ctd);
+  s('ab-exp-t',x.cexp);
+
   // Payments
-  const apt=document.getElementById('add-p-t');if(apt)apt.textContent=x.padd;
-  ['tp-m','tp-a','tp-d','tp-n'].forEach((id,i)=>{const e=document.getElementById(id);if(e)e.textContent=x.pth[i]});
-  const tpt=document.getElementById('tp-tot');if(tpt)tpt.textContent=x.ptot;
-  Array.from(document.getElementById('m-ty').options).forEach((o,i)=>{if(x.sub[i])o.textContent=x.sub[i]});
-  Array.from(document.getElementById('renew-type').options).forEach((o,i)=>{if(x.sub[i])o.textContent=x.sub[i]});
+  s('pay-t',x.payTitle);
+  s('add-p-t',x.padd); s('p-mo-t',x.payTitle2);
+  ['tp-m','tp-a','tp-d','tp-n'].forEach((id,i)=>{s(id,x.pth[i])});
+  s('tp-tot',x.ptot);
+
+  // Report
+  s('rep-t',x.repTitle);
+  const repLoadBtn=document.getElementById('rep-load-btn');
+  if(repLoadBtn)repLoadBtn.textContent=`📊 ${x.repShow}`;
+  const repPrintBtn=document.querySelector('button[onclick="printReport()"]');
+  if(repPrintBtn)repPrintBtn.textContent=`🖨️ ${x.repPrint}`;
+
+  // Measurements
+  s('meas-t',x.measTitle); sp('ms-srch',x.measSearch);
+  s('add-ms-t',x.measAdd);
+
+  // Schedule
+  s('sched-t',x.schedTitle);
+  const schedAddBtn=document.getElementById('add-class-btn');
+  if(schedAddBtn)schedAddBtn.textContent=`＋ ${x.schedAddClass}`;
+  // Day headers
+  const dayHdrs=document.querySelectorAll('.sched-day-hdr');
+  if(x.schedDays)dayHdrs.forEach((h,i)=>{if(x.schedDays[i])h.textContent=x.schedDays[i]});
+
+  // Exercises
+  s('ex-t',x.exTitle);
+  const exAddBtn=document.getElementById('add-ex-btn');if(exAddBtn)exAddBtn.textContent=`＋ ${x.exAdd}`;
+  const exPlanBtn=document.getElementById('add-plan-btn');if(exPlanBtn)exPlanBtn.textContent=`📋 ${x.exPlan}`;
+  const exLibTitle=document.querySelector('#pg-exercises .card:first-child .ct');
+  if(exLibTitle)exLibTitle.textContent=x.exLib;
+
+  // WhatsApp
+  s('wa-t',x.waTitle);
+  const waTypes=document.getElementById('wa-type');
+  if(waTypes&&x.waTypes){Array.from(waTypes.options).forEach((o,i)=>{if(x.waTypes[i])o.text=x.waTypes[i]});}
+  const waTemplateEl=document.getElementById('wa-template');
+  if(waTemplateEl&&x.waTemplates){Array.from(waTemplateEl.options).forEach((o,i)=>{if(x.waTemplates[i])o.text=x.waTemplates[i]});}
+  const waSendBtn=document.getElementById('wa-send-btn');
+  if(waSendBtn)waSendBtn.innerHTML=`${x.waBtn}`;
+  const waMemWrap=document.getElementById('wa-member-wrap');
+  if(waMemWrap){const lbl=waMemWrap.querySelector('label');if(lbl)lbl.textContent=x.waChooseMem;}
+
+  // Settings
+  s('settTitle',x.settTitle);
+  const stTabs=document.querySelectorAll('#settings-tabs .tab');
+  if(x.settTabs)stTabs.forEach((t,i)=>{if(x.settTabs[i])t.textContent=x.settTabs[i]});
+
+  // Modals - subscription type options
+  ['m-ty','renew-type'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)Array.from(el.options).forEach((o,i)=>{if(x.sub&&x.sub[i])o.text=x.sub[i]});
+  });
+  // Cancel/close buttons
+  document.querySelectorAll('[data-close]').forEach(btn=>{
+    if(btn.textContent.trim()==='إلغاء'||btn.textContent.trim()==='Cancel'||btn.textContent.trim()==='Kanselahin'||btn.textContent.trim()==='रद्द करें')
+      btn.textContent=x.mcan;
+    if(btn.textContent.trim()==='إغلاق'||btn.textContent.trim()==='Close'||btn.textContent.trim()==='Isara'||btn.textContent.trim()==='बंद करें')
+      btn.textContent=x.close;
+  });
+  s('m-can',x.mcan); s('m-mo-t',x.addtit);
+  s('p-mo-t',x.payTitle2);
+
+  // QR Kiosk
+  s('qrScanTitleEl',x.qrScanTitle);
+  sp('qr-manual-input',x.qrManual);
+  const qrCheckinBtn=document.querySelector('#qr-checkin-page button.bp');
+  if(qrCheckinBtn)qrCheckinBtn.textContent=x.qrCheckinBtn;
+  const qrBackBtn=document.querySelector('#qr-checkin-page button.bs2');
+  if(qrBackBtn)qrBackBtn.textContent=x.qrBack;
+
   // Update category tabs
   updateCatTabs(l);
-  // Fix sidebar margin after lang change (RTL/LTR switch)
-  const sb=document.getElementById('sbar');
-  const mc=document.querySelector('.mc');
-  if(sb&&mc){
-    const isCollapsed=sb.classList.contains('collapsed');
+
+  // Fix sidebar margin after lang change
+  const sb2=document.getElementById('sbar');
+  const mc2=document.querySelector('.mc');
+  if(sb2&&mc2){
+    const isCollapsed=sb2.classList.contains('collapsed');
     const margin=isCollapsed?'64px':'var(--sw)';
-    if(x.d==='rtl'){mc.style.marginRight=margin;mc.style.marginLeft='0';}
-    else{mc.style.marginLeft=margin;mc.style.marginRight='0';}
+    if(x.d==='rtl'){mc2.style.marginRight=margin;mc2.style.marginLeft='0';}
+    else{mc2.style.marginLeft=margin;mc2.style.marginRight='0';}
   }
 }
+
 
 // Utils
 const fd=d=>d?new Date(d).toLocaleDateString('en-GB',{year:'numeric',month:'short',day:'numeric'}):'-';
@@ -2887,7 +3420,7 @@ function toggleTheme(){
   <div style="text-align:center;max-width:400px;width:100%">
     <div style="width:60px;height:60px;background:linear-gradient(135deg,#FF5722,#7C3AED);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto 1rem">🏋️</div>
     <h2 style="font-size:1.4rem;font-weight:900;margin-bottom:.5rem">GymPro</h2>
-    <p style="color:var(--t2);font-size:.875rem;margin-bottom:2rem">امسح الـ QR للدخول</p>
+    <p id="qrScanTitleEl" style="color:var(--t2);font-size:.875rem;margin-bottom:2rem">امسح الـ QR للدخول</p>
     <div id="qr-scan-result" style="display:none;background:var(--bc);border:2px solid var(--su);border-radius:var(--r);padding:1.5rem;margin-bottom:1rem">
       <div class="av av-lg" id="qr-res-av" style="margin:0 auto 1rem">?</div>
       <div style="font-size:1.2rem;font-weight:900" id="qr-res-name">-</div>
