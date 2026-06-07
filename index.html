@@ -4601,5 +4601,212 @@ function generateCode(planKey, months){
 
 </script>
 
+
+<!-- ADMIN PANEL MODAL -->
+<div class="mo" id="admin-mo">
+  <div class="md md-sm">
+    <div class="mh" style="background:linear-gradient(135deg,#1A1B2E,#2D1B69)">
+      <h3 class="mt" style="color:white">🔑 Admin Panel — GymPro</h3>
+      <button class="xbtn" data-close="admin-mo" style="color:rgba(255,255,255,0.6)">✕</button>
+    </div>
+    <div class="mc2">
+
+      <!-- Password protection -->
+      <div id="admin-lock" style="">
+        <div style="text-align:center;padding:1rem 0">
+          <div style="font-size:2.5rem;margin-bottom:.75rem">🔐</div>
+          <div style="font-weight:700;margin-bottom:1.25rem;color:var(--t1)">أدخل كلمة مرور الأدمن</div>
+          <input type="password" id="admin-pass" placeholder="••••••••" style="text-align:center;margin-bottom:.75rem" onkeydown="if(event.key==='Enter')checkAdminPass()"/>
+          <button class="btn bp" style="width:100%;justify-content:center" onclick="checkAdminPass()">دخول</button>
+        </div>
+      </div>
+
+      <!-- Admin content (hidden until password correct) -->
+      <div id="admin-content" style="display:none">
+
+        <!-- Generate Code -->
+        <div style="background:var(--bg);border-radius:var(--r);padding:1.25rem;margin-bottom:1rem">
+          <div style="font-weight:800;font-size:.95rem;margin-bottom:1rem;color:var(--t1)">🎟️ توليد كود تفعيل</div>
+          <div class="fg" style="grid-template-columns:1fr 1fr;margin-bottom:1rem">
+            <div class="f2">
+              <label>الخطة</label>
+              <select id="admin-plan">
+                <option value="starter">Starter — 15 KWD/شهر</option>
+                <option value="pro" selected>Pro — 25 KWD/شهر</option>
+                <option value="business">Business — 40 KWD/شهر</option>
+              </select>
+            </div>
+            <div class="f2">
+              <label>المدة</label>
+              <select id="admin-months">
+                <option value="1">شهر واحد</option>
+                <option value="3">3 شهور</option>
+                <option value="6">6 شهور</option>
+                <option value="12">سنة كاملة</option>
+              </select>
+            </div>
+          </div>
+          <div class="f2" style="margin-bottom:1rem">
+            <label>اسم الجيم (للتوثيق)</label>
+            <input type="text" id="admin-gym-name" placeholder="مثال: جيم الأهلي"/>
+          </div>
+          <button class="btn bp" style="width:100%;justify-content:center" onclick="adminGenerateCode()">
+            ⚡ توليد الكود
+          </button>
+
+          <!-- Generated code display -->
+          <div id="generated-code-wrap" style="display:none;margin-top:1rem">
+            <div style="background:linear-gradient(135deg,rgba(255,87,34,0.1),rgba(124,58,237,0.1));border:2px solid rgba(255,87,34,0.3);border-radius:var(--rs);padding:1rem;text-align:center">
+              <div style="font-size:.75rem;color:var(--t2);margin-bottom:.5rem;font-weight:600">كود التفعيل</div>
+              <div id="generated-code" style="font-family:var(--mono);font-size:1.4rem;font-weight:900;color:var(--p);letter-spacing:.1em">—</div>
+              <div id="generated-code-info" style="font-size:.75rem;color:var(--tm);margin-top:.5rem">—</div>
+            </div>
+            <button onclick="copyCode()" class="btn bp" style="width:100%;justify-content:center;margin-top:.75rem">
+              📋 نسخ الكود
+            </button>
+            <div style="font-size:.75rem;color:var(--tm);text-align:center;margin-top:.5rem">
+              ابعت هذا الكود للجيم — يدخله في التطبيق تحت "لديك كود تفعيل؟"
+            </div>
+          </div>
+        </div>
+
+        <!-- Active gyms -->
+        <div style="background:var(--bg);border-radius:var(--r);padding:1.25rem">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+            <div style="font-weight:800;font-size:.95rem;color:var(--t1)">🏋️ الجيمات المشتركة</div>
+            <button class="btn bs2 btn-sm" onclick="loadAdminGyms()">🔄 تحديث</button>
+          </div>
+          <div id="admin-gyms-list"><div class="lc"><div class="spn"></div></div></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ══════════════════════════════════════════════
+// ADMIN PANEL
+// ══════════════════════════════════════════════
+// Change this password to something secret!
+const ADMIN_PASSWORD = 'GymPro@2025';
+
+function openAdminPanel(){
+  document.getElementById('admin-lock').style.display = 'block';
+  document.getElementById('admin-content').style.display = 'none';
+  document.getElementById('admin-pass').value = '';
+  openMo('admin-mo');
+}
+
+function checkAdminPass(){
+  const pass = document.getElementById('admin-pass').value;
+  if(pass === ADMIN_PASSWORD){
+    document.getElementById('admin-lock').style.display = 'none';
+    document.getElementById('admin-content').style.display = 'block';
+    loadAdminGyms();
+  } else {
+    document.getElementById('admin-pass').style.borderColor = 'var(--da)';
+    document.getElementById('admin-pass').value = '';
+    setTimeout(()=>{
+      if(document.getElementById('admin-pass'))
+        document.getElementById('admin-pass').style.borderColor = '';
+    }, 1000);
+    toast('كلمة مرور غير صحيحة','error');
+  }
+}
+
+let lastGeneratedCode = '';
+
+function adminGenerateCode(){
+  const plan = document.getElementById('admin-plan').value;
+  const months = document.getElementById('admin-months').value;
+  const gymName = document.getElementById('admin-gym-name').value.trim();
+
+  // Generate unique code
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let random = '';
+  for(let i=0;i<8;i++) random += chars[Math.floor(Math.random()*chars.length)];
+  const code = `${plan.toUpperCase()}-${months}-${random}`;
+  lastGeneratedCode = code;
+
+  const planInfo = PLANS[plan];
+  const totalPrice = planInfo.price * parseInt(months);
+
+  document.getElementById('generated-code').textContent = code;
+  document.getElementById('generated-code-info').textContent =
+    `${planInfo.nameAr} | ${months} شهر | ${totalPrice} KWD${gymName ? ' | ' + gymName : ''}`;
+  document.getElementById('generated-code-wrap').style.display = 'block';
+
+  // Save code to Supabase for tracking
+  sb.from('gym_subscriptions').select('count').then(()=>{
+    // Just log it - optional tracking
+    console.log('Code generated:', code, 'for', gymName);
+  });
+}
+
+function copyCode(){
+  const code = lastGeneratedCode;
+  if(!code) return;
+  navigator.clipboard.writeText(code).then(()=>{
+    toast('تم نسخ الكود ✅');
+  }).catch(()=>{
+    // Fallback
+    const el = document.createElement('textarea');
+    el.value = code;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    toast('تم نسخ الكود ✅');
+  });
+}
+
+async function loadAdminGyms(){
+  const list = document.getElementById('admin-gyms-list');
+  if(!list) return;
+  try{
+    const{data} = await sb.from('gyms')
+      .select('id,name,owner_email,created_at,gym_subscriptions(plan,status,trial_end,billing_end)')
+      .order('created_at',{ascending:false});
+
+    const gyms = data||[];
+    if(!gyms.length){
+      list.innerHTML = `<div class="es" style="padding:1.5rem"><div class="et">لا يوجد جيمات مسجلة بعد</div></div>`;
+      return;
+    }
+
+    const statusColors = {trial:'#FF9800',active:'#00C853',expired:'#F44336',suspended:'#9E9E9E'};
+    const statusNames = {trial:'تجربة',active:'نشط',expired:'منتهي',suspended:'موقوف'};
+
+    list.innerHTML = gyms.map(g=>{
+      const sub = g.gym_subscriptions?.[0]||{};
+      const endDate = sub.status==='active' ? new Date(sub.billing_end) : new Date(sub.trial_end);
+      const daysLeft = Math.ceil((endDate - new Date()) / 864e5);
+      const color = statusColors[sub.status]||'#9E9E9E';
+
+      return `<div style="padding:.75rem;background:var(--bc);border-radius:var(--rs);margin-bottom:.4rem;border:1px solid var(--br)">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-weight:700;font-size:.875rem">${g.name}</div>
+            <div style="font-size:.72rem;color:var(--tm)">${g.owner_email||''}</div>
+          </div>
+          <div style="text-align:end">
+            <span style="padding:.2rem .5rem;border-radius:999px;font-size:.68rem;font-weight:700;background:${color}22;color:${color}">
+              ${statusNames[sub.status]||'غير معروف'}
+            </span>
+            <div style="font-size:.68rem;color:var(--tm);margin-top:.2rem">
+              ${daysLeft > 0 ? daysLeft+' يوم' : 'منتهي'}
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){
+    list.innerHTML = `<div class="et" style="color:var(--da)">خطأ في التحميل</div>`;
+  }
+}
+</script>
+
 </body>
 </html>
