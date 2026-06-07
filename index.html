@@ -809,7 +809,7 @@ body.dark .bg-ring{opacity:.08}
         </div>
       </div>
       <div class="ni" onclick="document.getElementById('qr-checkin-page').style.display='flex'"><span class="ni-ic">📲</span><span>كشك الحضور QR</span></div>
-      <div class="ni" onclick="openGymSettings()"><span class="ni-ic">⚙️</span><span>إعدادات الجيم</span></div>
+      <div class="ni" data-page="settings"><span class="ni-ic">⚙️</span><span>الإعدادات</span></div>
       <div class="ni" onclick="openMo('about-mo')"><span class="ni-ic">ℹ️</span><span>حول التطبيق</span></div>
       <div class="ni" id="logout-btn"><span class="ni-ic">🚪</span><span id="n-out">تسجيل الخروج</span></div>
     </div>
@@ -1163,6 +1163,105 @@ body.dark .bg-ring{opacity:.08}
           </div>
         </div>
       </div>
+
+      <!-- SETTINGS -->
+      <div id="pg-settings" class="pg2">
+        <div class="pg-hdr">
+          <div class="pg-hdr-left"><h2>الإعدادات</h2><p>إعدادات الجيم والموظفين</p></div>
+        </div>
+
+        <!-- Settings Tabs -->
+        <div class="tabs" id="settings-tabs">
+          <div class="tab active" data-tab="st-gym">🏋️ معلومات الجيم</div>
+          <div class="tab" data-tab="st-staff">👥 الموظفون</div>
+          <div class="tab" data-tab="st-pricing">💰 الأسعار</div>
+          <div class="tab" data-tab="st-notif">🔔 الإشعارات</div>
+        </div>
+
+        <!-- Gym Info Tab -->
+        <div id="tab-st-gym" class="tab-content active">
+          <div class="card">
+            <div class="ch"><h3 class="ct">🏋️ معلومات الجيم</h3><button class="btn bp btn-sm" onclick="saveGymInfo()">💾 حفظ</button></div>
+            <div style="display:flex;align-items:center;gap:1.5rem;margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--br)">
+              <div id="st-logo-prev" style="width:80px;height:80px;border-radius:16px;background:linear-gradient(135deg,var(--p),var(--s));display:flex;align-items:center;justify-content:center;font-size:2rem;overflow:hidden;flex-shrink:0">🏋️</div>
+              <div>
+                <label style="display:inline-flex;align-items:center;gap:.5rem;padding:.5rem 1rem;background:var(--bg);border:1.5px solid var(--br);border-radius:var(--rs);cursor:pointer;font-size:.85rem;font-weight:600;color:var(--t2)">
+                  📁 تغيير اللوجو
+                  <input type="file" id="st-logo-file" accept="image/*" style="display:none" onchange="previewStLogo(this)"/>
+                </label>
+                <div style="font-size:.75rem;color:var(--tm);margin-top:.35rem">الحجم المثالي: 200×200 بكسل</div>
+              </div>
+            </div>
+            <div class="fg">
+              <div class="f2"><label>اسم الجيم (عربي) <span class="req">*</span></label><input type="text" id="st-name" placeholder="جيم الرياضة"/></div>
+              <div class="f2"><label>اسم الجيم (إنجليزي)</label><input type="text" id="st-name-en" placeholder="Sport Gym"/></div>
+              <div class="f2"><label>رقم الهاتف</label><input type="tel" id="st-phone" placeholder="+96550000000"/></div>
+              <div class="f2"><label>رقم واتساب</label><input type="tel" id="st-wa" placeholder="+96550000000"/></div>
+              <div class="f2 full"><label>العنوان</label><input type="text" id="st-address" placeholder="المنطقة، المدينة"/></div>
+              <div class="f2"><label>ساعة الفتح</label><input type="time" id="st-open" value="06:00"/></div>
+              <div class="f2"><label>ساعة الغلق</label><input type="time" id="st-close" value="23:00"/></div>
+              <div class="f2">
+                <label>اللون الرئيسي</label>
+                <div style="display:flex;align-items:center;gap:.75rem">
+                  <input type="color" id="st-color" value="#FF5722" style="height:38px;width:56px;cursor:pointer;border-radius:8px;padding:2px"/>
+                  <div style="display:flex;gap:.4rem">
+                    <div onclick="document.getElementById('st-color').value='#FF5722'" style="width:26px;height:26px;border-radius:6px;background:#FF5722;cursor:pointer"></div>
+                    <div onclick="document.getElementById('st-color').value='#7C3AED'" style="width:26px;height:26px;border-radius:6px;background:#7C3AED;cursor:pointer"></div>
+                    <div onclick="document.getElementById('st-color').value='#00897B'" style="width:26px;height:26px;border-radius:6px;background:#00897B;cursor:pointer"></div>
+                    <div onclick="document.getElementById('st-color').value='#1565C0'" style="width:26px;height:26px;border-radius:6px;background:#1565C0;cursor:pointer"></div>
+                    <div onclick="document.getElementById('st-color').value='#E91E63'" style="width:26px;height:26px;border-radius:6px;background:#E91E63;cursor:pointer"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="f2"><label>هدف الإيراد الشهري (KWD)</label><input type="number" id="st-goal" placeholder="1000" min="0"/></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Staff Tab -->
+        <div id="tab-st-staff" class="tab-content">
+          <div class="card">
+            <div class="ch"><h3 class="ct">👥 الموظفون</h3><button class="btn bp" onclick="openAddStaff()">＋ إضافة موظف</button></div>
+            <div id="staff-list"><div class="lc"><div class="spn"></div></div></div>
+          </div>
+        </div>
+
+        <!-- Pricing Tab -->
+        <div id="tab-st-pricing" class="tab-content">
+          <div class="card">
+            <div class="ch"><h3 class="ct">💰 أسعار الاشتراكات</h3><button class="btn bp btn-sm" onclick="savePricing()">💾 حفظ الأسعار</button></div>
+            <div style="background:var(--inl);border:1px solid rgba(33,150,243,0.2);border-radius:var(--rs);padding:.875rem;margin-bottom:1.25rem;font-size:.83rem;color:var(--in)">
+              ℹ️ حدد سعر كل نوع اشتراك — اتركه فارغاً لإخفائه
+            </div>
+            <div class="fg" id="pricing-grid">
+              <div class="lc"><div class="spn"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notifications Tab -->
+        <div id="tab-st-notif" class="tab-content">
+          <div class="card">
+            <div class="ch"><h3 class="ct">🔔 إعدادات الإشعارات</h3><button class="btn bp btn-sm" onclick="saveNotifSettings()">💾 حفظ</button></div>
+            <div class="fg" style="grid-template-columns:1fr">
+              <div class="f2">
+                <label>إرسال تذكير انتهاء الاشتراك قبل</label>
+                <div style="display:flex;align-items:center;gap:.75rem">
+                  <input type="number" id="st-remind-days" value="7" min="1" max="30" style="width:100px"/>
+                  <span style="color:var(--t2);font-size:.875rem">أيام من تاريخ الانتهاء</span>
+                </div>
+              </div>
+              <div class="f2">
+                <label>رسالة الترحيب للأعضاء الجدد</label>
+                <textarea id="st-welcome-msg" rows="4" placeholder="مرحباً {name}! يسعدنا انضمامك لجيمنا 🏋️&#10;اشتراكك مفعّل حتى {end_date}&#10;نتمنى لك رحلة رياضية ممتعة 💪"></textarea>
+                <div style="font-size:.72rem;color:var(--tm);margin-top:.25rem">متغيرات: {name} {end_date} {phone}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
     </div>
   </main>
 </div>
@@ -1634,7 +1733,8 @@ function nav(page){
   const titles={
     dashboard:T().nav[0],members:T().nav[1],checkin:T().nav[2],
     payments:T().nav[3],report:T().nav[5],measurements:T().nav[6],
-    schedule:'جدول الحصص',exercises:'التمارين',whatsapp:'واتساب'
+    schedule:'جدول الحصص',exercises:'التمارين',whatsapp:'واتساب',
+    settings:'الإعدادات'
   };
   const t=titles[page]||page;
   const ptEl=document.getElementById('pg-t');if(ptEl)ptEl.textContent=t;
@@ -1650,6 +1750,7 @@ function nav(page){
   else if(page==='schedule')loadSchedule();
   else if(page==='exercises'){loadExercises();setupPlanAc();}
   else if(page==='whatsapp'){loadRetentionCampaigns();loadWaLog();loadWaMembers();}
+  else if(page==='settings')loadSettings();
 }
 
 // Dashboard
@@ -3268,6 +3369,310 @@ async function updateGymSettings(){
     toast('تم حفظ إعدادات الجيم ✅');
   }catch(e){toast('خطأ: '+e.message,'error')}
 }
+</script>
+
+
+<!-- ADD STAFF MODAL -->
+<div class="mo" id="staff-mo">
+  <div class="md md-sm">
+    <div class="mh"><h3 class="mt">👤 إضافة موظف</h3><button class="xbtn" data-close="staff-mo">✕</button></div>
+    <div class="mc2">
+      <div class="fg" style="grid-template-columns:1fr">
+        <div class="f2"><label>الاسم <span class="req">*</span></label><input type="text" id="sf-name" placeholder="اسم الموظف"/></div>
+        <div class="f2"><label>البريد الإلكتروني <span class="req">*</span></label><input type="email" id="sf-email" placeholder="staff@gym.com"/></div>
+        <div class="f2">
+          <label>الصلاحية</label>
+          <select id="sf-role">
+            <option value="admin">مدير — صلاحيات كاملة</option>
+            <option value="receptionist">موظف استقبال — أعضاء وحضور فقط</option>
+            <option value="trainer">مدرب — أعضاء وتمارين فقط</option>
+            <option value="accountant">محاسب — مدفوعات وتقارير فقط</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Permissions -->
+      <div style="margin-top:1rem;background:var(--bg);border-radius:var(--rs);padding:1rem">
+        <div style="font-size:.75rem;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem">الصلاحيات التفصيلية</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem" id="sf-perms">
+          <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;text-transform:none;font-size:.85rem;color:var(--t1);font-weight:500">
+            <input type="checkbox" id="perm-members" checked style="width:16px;height:16px;accent-color:var(--p)"/> 👥 إدارة الأعضاء
+          </label>
+          <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;text-transform:none;font-size:.85rem;color:var(--t1);font-weight:500">
+            <input type="checkbox" id="perm-checkin" checked style="width:16px;height:16px;accent-color:var(--p)"/> ✅ تسجيل الحضور
+          </label>
+          <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;text-transform:none;font-size:.85rem;color:var(--t1);font-weight:500">
+            <input type="checkbox" id="perm-payments" style="width:16px;height:16px;accent-color:var(--p)"/> 💰 المدفوعات
+          </label>
+          <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;text-transform:none;font-size:.85rem;color:var(--t1);font-weight:500">
+            <input type="checkbox" id="perm-reports" style="width:16px;height:16px;accent-color:var(--p)"/> 📈 التقارير
+          </label>
+          <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;text-transform:none;font-size:.85rem;color:var(--t1);font-weight:500">
+            <input type="checkbox" id="perm-schedule" checked style="width:16px;height:16px;accent-color:var(--p)"/> 📅 جدول الحصص
+          </label>
+          <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;text-transform:none;font-size:.85rem;color:var(--t1);font-weight:500">
+            <input type="checkbox" id="perm-settings" style="width:16px;height:16px;accent-color:var(--p)"/> ⚙️ الإعدادات
+          </label>
+        </div>
+      </div>
+
+      <div style="background:var(--wal);border:1px solid rgba(255,193,7,0.2);border-radius:var(--rs);padding:.75rem;margin-top:.75rem;font-size:.82rem;color:#E65100">
+        ⚠️ الموظف يحتاج أن يُنشئ حساب بنفس الـ Email في صفحة تسجيل الدخول
+      </div>
+    </div>
+    <div class="mft"><button class="btn bs2" data-close="staff-mo">إلغاء</button><button class="btn bp" id="sf-save">➕ إضافة الموظف</button></div>
+  </div>
+</div>
+
+
+<script>
+// ══════════════════════════════════════════════
+// SETTINGS PAGE
+// ══════════════════════════════════════════════
+let stLogoBase64 = null;
+let gymSettings = null;
+
+async function loadSettings(){
+  // Load gym info
+  if(GYM_INFO){
+    const si = id => document.getElementById(id);
+    if(si('st-name')) si('st-name').value = GYM_INFO.name||'';
+    if(si('st-name-en')) si('st-name-en').value = GYM_INFO.name_en||'';
+    if(si('st-phone')) si('st-phone').value = GYM_INFO.phone||'';
+    if(si('st-address')) si('st-address').value = GYM_INFO.address||'';
+    if(si('st-color')) si('st-color').value = GYM_INFO.primary_color||'#FF5722';
+    // Logo preview
+    const prev = document.getElementById('st-logo-prev');
+    if(prev){
+      if(GYM_INFO.logo_url) prev.innerHTML = `<img src="${GYM_INFO.logo_url}" style="width:100%;height:100%;object-fit:cover"/>`;
+      else prev.innerHTML = '🏋️';
+    }
+  }
+  // Load gym settings
+  try{
+    const{data} = await sb.from('gym_settings').select('*').eq('gym_id',GYM_ID).single();
+    gymSettings = data;
+    if(data){
+      const si = id => document.getElementById(id);
+      if(si('st-wa')) si('st-wa').value = data.whatsapp_number||'';
+      if(si('st-open')) si('st-open').value = data.working_hours_from||'06:00';
+      if(si('st-close')) si('st-close').value = data.working_hours_to||'23:00';
+      if(si('st-goal')) si('st-goal').value = data.monthly_revenue_goal||'';
+      if(si('st-remind-days')) si('st-remind-days').value = data.renewal_reminder_days||7;
+      if(si('st-welcome-msg')) si('st-welcome-msg').value = data.welcome_message||'';
+    }
+  }catch(e){}
+  // Load staff and pricing
+  loadStaff();
+  loadPricingForm();
+}
+
+function previewStLogo(input){
+  const file = input.files[0]; if(!file)return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    stLogoBase64 = e.target.result;
+    const prev = document.getElementById('st-logo-prev');
+    if(prev) prev.innerHTML = `<img src="${stLogoBase64}" style="width:100%;height:100%;object-fit:cover"/>`;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function saveGymInfo(){
+  const name = document.getElementById('st-name').value.trim();
+  if(!name){toast('اسم الجيم مطلوب','error');return}
+  try{
+    const updates = {
+      name,
+      name_en: document.getElementById('st-name-en').value.trim(),
+      phone: document.getElementById('st-phone').value.trim(),
+      address: document.getElementById('st-address').value.trim(),
+      primary_color: document.getElementById('st-color').value,
+      logo_url: stLogoBase64||GYM_INFO?.logo_url||null
+    };
+    await sb.from('gyms').update(updates).eq('id',GYM_ID);
+
+    // Save settings
+    const settingsData = {
+      gym_id: GYM_ID,
+      whatsapp_number: document.getElementById('st-wa').value.trim(),
+      working_hours_from: document.getElementById('st-open').value,
+      working_hours_to: document.getElementById('st-close').value,
+      monthly_revenue_goal: parseFloat(document.getElementById('st-goal').value||0)
+    };
+    await sb.from('gym_settings').upsert([settingsData],{onConflict:'gym_id'});
+
+    GYM_INFO = {...GYM_INFO,...updates};
+    applyGymBranding(GYM_INFO);
+    toast('تم حفظ معلومات الجيم ✅');
+  }catch(e){toast('خطأ: '+e.message,'error')}
+}
+
+async function saveNotifSettings(){
+  try{
+    await sb.from('gym_settings').upsert([{
+      gym_id: GYM_ID,
+      renewal_reminder_days: parseInt(document.getElementById('st-remind-days').value||7),
+      welcome_message: document.getElementById('st-welcome-msg').value.trim()
+    }],{onConflict:'gym_id'});
+    toast('تم حفظ إعدادات الإشعارات ✅');
+  }catch(e){toast('خطأ: '+e.message,'error')}
+}
+
+// ── STAFF ──
+async function loadStaff(){
+  const list = document.getElementById('staff-list');
+  if(!list)return;
+  try{
+    const{data} = await sb.from('gym_staff').select('*').eq('gym_id',GYM_ID).order('invited_at');
+    const staff = data||[];
+    if(!staff.length){
+      list.innerHTML = `<div class="es"><div class="ei">👥</div><div class="et">لا يوجد موظفون بعد</div></div>`;
+      return;
+    }
+    const roleColors = {admin:'var(--p)',receptionist:'var(--in)',trainer:'var(--su)',accountant:'var(--wa)'};
+    const roleNames = {admin:'مدير',receptionist:'موظف استقبال',trainer:'مدرب',accountant:'محاسب'};
+    list.innerHTML = staff.map(s=>`
+      <div style="display:flex;align-items:center;gap:1rem;padding:.875rem;background:var(--bg);border:1px solid var(--br);border-radius:var(--rs);margin-bottom:.5rem">
+        <div style="width:40px;height:40px;border-radius:10px;background:${roleColors[s.role]||'var(--tm)'}22;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0">
+          ${{admin:'👑',receptionist:'🖥️',trainer:'💪',accountant:'💰'}[s.role]||'👤'}
+        </div>
+        <div style="flex:1">
+          <div style="font-weight:700">${s.name||s.email}</div>
+          <div style="font-size:.78rem;color:var(--tm)">${s.email}</div>
+          <div style="margin-top:.3rem;display:flex;gap:.3rem;flex-wrap:wrap">
+            <span style="padding:.1rem .45rem;border-radius:999px;font-size:.65rem;font-weight:700;background:${roleColors[s.role]||'var(--tm)'}22;color:${roleColors[s.role]||'var(--tm)'}">${roleNames[s.role]||s.role}</span>
+            ${s.is_active?'<span class="badge bgs" style="font-size:.62rem">نشط</span>':'<span class="badge bgd" style="font-size:.62rem">موقوف</span>'}
+          </div>
+        </div>
+        <div style="display:flex;gap:.35rem">
+          <button onclick="toggleStaff('${s.id}',${!s.is_active})" class="btn btn-sm ${s.is_active?'bd':'bg'}">${s.is_active?'⏸️ إيقاف':'▶️ تفعيل'}</button>
+          <button onclick="deleteStaff('${s.id}')" class="btn btn-sm bd">🗑️</button>
+        </div>
+      </div>
+    `).join('');
+  }catch(e){list.innerHTML=`<div class="es"><div class="et">خطأ في تحميل الموظفين</div></div>`}
+}
+
+function openAddStaff(){
+  document.getElementById('sf-name').value='';
+  document.getElementById('sf-email').value='';
+  document.getElementById('sf-role').value='receptionist';
+  // Set default permissions for receptionist
+  document.getElementById('perm-members').checked=true;
+  document.getElementById('perm-checkin').checked=true;
+  document.getElementById('perm-payments').checked=false;
+  document.getElementById('perm-reports').checked=false;
+  document.getElementById('perm-schedule').checked=true;
+  document.getElementById('perm-settings').checked=false;
+  openMo('staff-mo');
+}
+
+// Auto-set permissions based on role
+document.getElementById('sf-role')?.addEventListener('change',function(){
+  const perms = {
+    admin:       {members:true, checkin:true, payments:true, reports:true, schedule:true, settings:true},
+    receptionist:{members:true, checkin:true, payments:false,reports:false,schedule:true, settings:false},
+    trainer:     {members:true, checkin:true, payments:false,reports:false,schedule:true, settings:false},
+    accountant:  {members:false,checkin:false,payments:true, reports:true, schedule:false,settings:false}
+  };
+  const p = perms[this.value]||perms.receptionist;
+  Object.entries(p).forEach(([key,val])=>{
+    const el = document.getElementById('perm-'+key);
+    if(el) el.checked = val;
+  });
+});
+
+async function saveStaff(){
+  const name = document.getElementById('sf-name').value.trim();
+  const email = document.getElementById('sf-email').value.trim();
+  if(!email){toast('البريد الإلكتروني مطلوب','error');return}
+  const perms = {
+    members:  document.getElementById('perm-members').checked,
+    checkin:  document.getElementById('perm-checkin').checked,
+    payments: document.getElementById('perm-payments').checked,
+    reports:  document.getElementById('perm-reports').checked,
+    schedule: document.getElementById('perm-schedule').checked,
+    settings: document.getElementById('perm-settings').checked
+  };
+  const btn = document.getElementById('sf-save');btn.disabled=true;
+  try{
+    await sb.from('gym_staff').insert([{
+      gym_id:GYM_ID, name, email,
+      role:document.getElementById('sf-role').value,
+      permissions:perms, is_active:true
+    }]);
+    // Also add to gym_users so they can access
+    const{data:{user}} = await sb.auth.getUser();
+    toast('تم إضافة الموظف ✅ — يمكنه الدخول بنفس الـ Email');
+    closeMo('staff-mo');loadStaff();
+  }catch(e){toast('خطأ: '+e.message,'error')}
+  finally{btn.disabled=false}
+}
+
+async function toggleStaff(id, active){
+  await sb.from('gym_staff').update({is_active:active}).eq('id',id);
+  toast(active?'تم تفعيل الموظف':'تم إيقاف الموظف');
+  loadStaff();
+}
+
+async function deleteStaff(id){
+  const ok = await confirm_('هل تريد حذف هذا الموظف؟');if(!ok)return;
+  await sb.from('gym_staff').delete().eq('id',id);
+  toast('تم الحذف');loadStaff();
+}
+
+// ── PRICING ──
+const SUB_LABELS = ['شهر','شهران','3 شهور','4 شهور','5 شهور','6 شهور','7 شهور','8 شهور','9 شهور','10 شهور','11 شهر','سنة كاملة'];
+
+async function loadPricingForm(){
+  const grid = document.getElementById('pricing-grid');
+  if(!grid)return;
+  try{
+    const{data} = await sb.from('gym_pricing').select('*').eq('gym_id',GYM_ID).order('months');
+    const prices = {};
+    (data||[]).forEach(p=>prices[p.months]=p);
+    grid.innerHTML = [1,2,3,6,12].map(m=>`
+      <div class="f2">
+        <label>${SUB_LABELS[m-1]} (KWD)</label>
+        <input type="number" id="price-${m}" placeholder="0.000" step="0.001" min="0"
+          value="${prices[m]?prices[m].price:''}"/>
+      </div>
+    `).join('');
+  }catch(e){grid.innerHTML='<div class="et">خطأ في تحميل الأسعار</div>'}
+}
+
+async function savePricing(){
+  try{
+    // Delete existing prices for this gym
+    await sb.from('gym_pricing').delete().eq('gym_id',GYM_ID);
+    // Insert new ones
+    const inserts = [];
+    [1,2,3,6,12].forEach(m=>{
+      const val = document.getElementById('price-'+m)?.value;
+      if(val && parseFloat(val)>0){
+        inserts.push({gym_id:GYM_ID, months:m, price:parseFloat(val), label:SUB_LABELS[m-1]});
+      }
+    });
+    if(inserts.length) await sb.from('gym_pricing').insert(inserts);
+    toast('تم حفظ الأسعار ✅');
+  }catch(e){toast('خطأ: '+e.message,'error')}
+}
+
+// ── SETTINGS TABS ──
+document.getElementById('settings-tabs')?.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.getElementById('settings-tabs').querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    ['tab-st-gym','tab-st-staff','tab-st-pricing','tab-st-notif'].forEach(id=>{
+      const el=document.getElementById(id);if(el)el.classList.remove('active');
+    });
+    tab.classList.add('active');
+    const target = document.getElementById('tab-'+tab.dataset.tab);
+    if(target) target.classList.add('active');
+  });
+});
+
+document.getElementById('sf-save')?.addEventListener('click', saveStaff);
 </script>
 
 </body>
