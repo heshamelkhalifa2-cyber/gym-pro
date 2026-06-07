@@ -809,6 +809,7 @@ body.dark .bg-ring{opacity:.08}
         </div>
       </div>
       <div class="ni" onclick="document.getElementById('qr-checkin-page').style.display='flex'"><span class="ni-ic">📲</span><span>كشك الحضور QR</span></div>
+      <div class="ni" onclick="openGymSettings()"><span class="ni-ic">⚙️</span><span>إعدادات الجيم</span></div>
       <div class="ni" onclick="openMo('about-mo')"><span class="ni-ic">ℹ️</span><span>حول التطبيق</span></div>
       <div class="ni" id="logout-btn"><span class="ni-ic">🚪</span><span id="n-out">تسجيل الخروج</span></div>
     </div>
@@ -1376,6 +1377,57 @@ loadLoginStats();
 const sb=supabase.createClient('https://dpabrokcapjvcalasemk.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwYWJyb2tjYXBqdmNhbGFzZW1rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MDMwMDksImV4cCI6MjA5NTk3OTAwOX0.SAAp6GIJttkCF0ZOcPElxZEUIiCZHBXgN5EgQb_w9mc');
 window._gymProSb=sb;
 
+// ── MULTI-TENANT ──
+let GYM_ID = null;
+let GYM_INFO = null;
+
+async function loadGymContext(userId){
+  try{
+    // Get gym for this user
+    const{data:gu} = await sb.from('gym_users').select('gym_id,role,gyms(*)').eq('user_id',userId).single();
+    if(gu){
+      GYM_ID = gu.gym_id;
+      GYM_INFO = gu.gyms;
+      applyGymBranding(GYM_INFO);
+      return true;
+    }
+  }catch(e){
+    // No gym yet - show setup
+    console.log('No gym found for user');
+  }
+  return false;
+}
+
+function applyGymBranding(gym){
+  if(!gym)return;
+  // Update title and sidebar name
+  document.title = gym.name + ' — GymPro';
+  const sbTitle = document.querySelector('.sb-title');
+  if(sbTitle) sbTitle.textContent = gym.name;
+  // Apply custom colors
+  if(gym.primary_color){
+    document.documentElement.style.setProperty('--p', gym.primary_color);
+    document.documentElement.style.setProperty('--pd', gym.primary_color);
+  }
+  if(gym.secondary_color){
+    document.documentElement.style.setProperty('--s', gym.secondary_color);
+  }
+  // Update logo if exists
+  if(gym.logo_url){
+    document.querySelectorAll('.sb-icon').forEach(el=>el.innerHTML=`<img src="${gym.logo_url}" style="width:100%;height:100%;object-fit:cover;border-radius:10px"/>`);
+  }
+  // Show gym name in header
+  const uem = document.getElementById('u-em');
+  if(uem) uem.textContent = gym.name;
+  const subEl = document.getElementById('n-tag');
+  if(subEl) subEl.textContent = gym.name_en || gym.name;
+}
+
+// Helper: always filter by gym_id
+function gymQ(table){
+  return sb.from(table).select('*').eq('gym_id', GYM_ID);
+}
+
 const TX={
   ar:{f:'🇸🇦',n:'AR',d:'rtl',
     nav:['لوحة التحكم','الأعضاء','تسجيل الحضور','المدفوعات','تسجيل الخروج','التقرير الشهري','القياسات'],
@@ -1592,10 +1644,10 @@ async function loadDash(){
   try{
     const t=td2(),in10=new Date();in10.setDate(in10.getDate()+10);
     const[mr,pr,er,cr]=await Promise.all([
-      sb.from('members').select('id,status,subscription_type').order('id'),
-      sb.from('payments').select('amount'),
-      sb.from('members').select('id,name,phone,subscription_end,photo_url').eq('status','active').gte('subscription_end',t).lte('subscription_end',in10.toISOString().split('T')[0]),
-      sb.from('checkins').select('id,member_id,date,checkin_time,members(name,phone,photo_url)').eq('date',t).order('created_at',{ascending:false})
+      sb.from('members').select('id,status,subscription_type').eq('gym_id',GYM_ID||''),
+      sb.from('payments').select('amount').eq('gym_id',GYM_ID||''),
+      sb.from('members').select('id,name,phone,subscription_end,photo_url').eq('gym_id',GYM_ID||'').eq('status','active').gte('subscription_end',t).lte('subscription_end',in10.toISOString().split('T')[0]),
+      sb.from('checkins').select('id,member_id,date,checkin_time,members(name,phone,photo_url)').eq('gym_id',GYM_ID||'').eq('date',t).order('created_at',{ascending:false})
     ]);
     const mems=mr.data||[],act=mems.filter(m=>m.status==='active').length,exp=mems.filter(m=>m.status==='expired').length;
     document.getElementById('s-tot').textContent=mems.length;document.getElementById('s-act').textContent=act;
@@ -1654,7 +1706,8 @@ async function saveM(){
   try{
     const data={name,phone,email:document.getElementById('m-em').value.trim(),subscription_type:type,subscription_start:start,subscription_end:finalEnd,
       notes:document.getElementById('m-nt').value.trim(),weight:document.getElementById('m-wt').value?parseFloat(document.getElementById('m-wt').value):null,
-      free_months:freeM,pause_months:parseInt(document.getElementById('m-pm').value||0),photo_url:photoBase64||null};
+      free_months:freeM,pause_months:parseInt(document.getElementById('m-pm').value||0),photo_url:photoBase64||null,
+      gym_id:GYM_ID};
     if(id){const{error}=await sb.from('members').update(data).eq('id',id);if(error)throw error;}
     else{const{error}=await sb.from('members').insert([data]);if(error)throw error;}
     toast(T().saved);closeMo('m-mo');loadMems();photoBase64='';
@@ -1692,7 +1745,7 @@ async function openProfile(id){
     </div>`).join('')}`:`<div class="es"><div class="ei">💰</div><div class="et">${T().nopay}</div></div>`;
   const{data:cis}=await sb.from('checkins').select('*').eq('member_id',id).order('checkin_time',{ascending:false}).limit(30);
   document.getElementById('prof-ci-list').innerHTML=(cis&&cis.length)?cis.map(c=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:.6rem .75rem;border-bottom:1px solid var(--br)"><span style="font-size:.875rem;color:var(--t2)">${fd(c.date)}</span><span class="mono" style="font-size:.8rem;background:var(--bg);border:1px solid var(--br);padding:.2rem .5rem;border-radius:6px;color:var(--t2)">${ft(c.checkin_time)}</span></div>`).join(''):`<div class="es"><div class="ei">🏃</div><div class="et">لا يوجد حضور</div></div>`;
-  const{data:ms}=await sb.from('measurements').select('*').eq('member_id',id).order('measured_at',{ascending:false});
+  const{data:ms}=await sb.from('measurements').select('*').eq('member_id',id).eq('gym_id',GYM_ID||'').order('measured_at',{ascending:false});
   if(ms&&ms.length){
     const first=ms[ms.length-1],last=ms[0];const wdiff=last.weight&&first.weight?(last.weight-first.weight).toFixed(1):null;
     document.getElementById('prof-prog-list').innerHTML=`
@@ -1750,7 +1803,7 @@ async function saveRenew(){
   const btn=document.getElementById('renew-save');btn.disabled=true;
   try{
     await sb.from('members').update({subscription_type:type,subscription_start:start,subscription_end:ce(start,type)}).eq('id',id);
-    if(amount&&parseFloat(amount)>0)await sb.from('payments').insert([{member_id:id,amount:parseFloat(amount),payment_date:start,notes:'تجديد اشتراك'}]);
+    if(amount&&parseFloat(amount)>0)await sb.from('payments').insert([{member_id:id,amount:parseFloat(amount),payment_date:start,notes:'تجديد اشتراك',gym_id:GYM_ID}]);
     toast(T().renewed);closeMo('renew-mo');loadMems();
   }catch(e){toast(T().err,'error')}finally{btn.disabled=false}
 }
@@ -1775,7 +1828,7 @@ let acMs=[],selM=null;
 async function loadCI(){await loadAC();await refreshTdCI();}
 async function loadAC(){
   try{
-    const{data}=await sb.from('members').select('id,name,phone,status,subscription_end,photo_url').order('name');
+    const{data}=await sb.from('members').select('id,name,phone,status,subscription_end,photo_url').eq('gym_id',GYM_ID||'').order('name');
     acMs=data||[];
   }catch(e){
     // Fallback without photo_url if column missing
@@ -1812,7 +1865,7 @@ async function doCI(){
   try{
     const{data:ex}=await sb.from('checkins').select('id').eq('member_id',m.id).eq('date',td2());
     if(ex&&ex.length){document.getElementById('ci-msg').innerHTML=`<span style="color:var(--in);font-weight:600">${T().calr}</span>`;toast(T().calr,'info');}
-    else{await sb.from('checkins').insert([{member_id:m.id}]);document.getElementById('ci-msg').innerHTML=`<span style="color:#00895A;font-weight:600">${T().cok} — ${ft(new Date().toISOString())}</span>`;toast(T().cok);if(m.status!=='expired')soundOk();await refreshTdCI();await loadAC();}
+    else{await sb.from('checkins').insert([{member_id:m.id,gym_id:GYM_ID}]);document.getElementById('ci-msg').innerHTML=`<span style="color:#00895A;font-weight:600">${T().cok} — ${ft(new Date().toISOString())}</span>`;toast(T().cok);if(m.status!=='expired')soundOk();await refreshTdCI();await loadAC();}
   }catch(e){toast(T().err,'error')}finally{btn.disabled=false;selM=null;document.getElementById('ci-in').value='';}
 }
 async function refreshTdCI(){
@@ -1827,7 +1880,7 @@ async function loadPays(){
   const srch=document.getElementById('p-srch').value.toLowerCase();
   const tbody=document.getElementById('p-tbody');tbody.innerHTML='<tr><td colspan="5"><div class="lc"><div class="spn"></div></div></td></tr>';
   try{
-    const{data,error}=await sb.from('payments').select('*,members(name,phone)').order('payment_date',{ascending:false});if(error)throw error;
+    const{data,error}=await sb.from('payments').select('*,members(name,phone)').eq('gym_id',GYM_ID||'').order('payment_date',{ascending:false});if(error)throw error;
     let pays=data||[];if(srch)pays=pays.filter(p=>(p.members?.name||'').toLowerCase().includes(srch)||(p.notes||'').toLowerCase().includes(srch));
     document.getElementById('p-total').textContent=fc(pays.reduce((s,p)=>s+Number(p.amount||0),0));
     tbody.innerHTML=pays.length?pays.map(p=>`<tr>
@@ -1839,7 +1892,7 @@ async function loadPays(){
   }catch(e){toast(T().err,'error')}
 }
 async function openAddP(){
-  const{data}=await sb.from('members').select('id,name,phone').order('name');
+  const{data}=await sb.from('members').select('id,name,phone').eq('gym_id',GYM_ID||'').order('name');
   document.getElementById('p-mem').innerHTML=`<option value="">--</option>`+(data||[]).map(m=>`<option value="${m.id}">${m.name} (${m.phone})</option>`).join('');
   ['p-amt','p-nt'].forEach(id=>document.getElementById(id).value='');document.getElementById('p-dt').value=td2();openMo('p-mo');
 }
@@ -1848,7 +1901,7 @@ async function saveP(){
   if(!mid||!amt||!dt){toast(T().req,'error');return}
   const btn=document.getElementById('p-save');btn.disabled=true;
   try{
-    const{error}=await sb.from('payments').insert([{member_id:mid,amount:parseFloat(amt),payment_date:dt,notes:document.getElementById('p-nt').value.trim()}]);
+    const{error}=await sb.from('payments').insert([{member_id:mid,amount:parseFloat(amt),payment_date:dt,notes:document.getElementById('p-nt').value.trim(),gym_id:GYM_ID}]);
     if(error)throw error;toast(T().payed);closeMo('p-mo');loadPays();
     const{data}=await sb.from('payments').select('*,members(name,phone)').eq('member_id',mid).order('created_at',{ascending:false}).limit(1);
     if(data&&data[0])showReceipt(data[0].id,data[0].members?.name,data[0].members?.phone);
@@ -1865,10 +1918,10 @@ async function loadReport(){
   const rc=document.getElementById('rep-content');rc.innerHTML='<div class="lc"><div class="spn"></div></div>';
   try{
     const[pays,newM,actM,cis]=await Promise.all([
-      sb.from('payments').select('amount,notes,payment_date,members(name)').gte('payment_date',start).lte('payment_date',end).order('payment_date',{ascending:false}),
-      sb.from('members').select('id,name,phone,subscription_type,subscription_start').gte('subscription_start',start).lte('subscription_start',end),
-      sb.from('members').select('id').eq('status','active'),
-      sb.from('checkins').select('id,date').gte('date',start).lte('date',end)
+      sb.from('payments').select('amount,notes,payment_date,members(name)').eq('gym_id',GYM_ID||'').gte('payment_date',start).lte('payment_date',end).order('payment_date',{ascending:false}),
+      sb.from('members').select('id,name,phone,subscription_type,subscription_start').eq('gym_id',GYM_ID||'').gte('subscription_start',start).lte('subscription_start',end),
+      sb.from('members').select('id').eq('gym_id',GYM_ID||'').eq('status','active'),
+      sb.from('checkins').select('id,date').eq('gym_id',GYM_ID||'').gte('date',start).lte('date',end)
     ]);
     const totalRev=(pays.data||[]).reduce((s,p)=>s+Number(p.amount||0),0),totalCis=(cis.data||[]).length;
     const uniqDays=[...new Set((cis.data||[]).map(c=>c.date))].length;
@@ -1919,7 +1972,7 @@ async function saveMs(){
   const mid=document.getElementById('ms-mem').value||document.getElementById('ms-mid').value;if(!mid){toast(T().req,'error');return}
   const btn=document.getElementById('ms-save');btn.disabled=true;const get=id=>document.getElementById(id).value;
   try{
-    const{error}=await sb.from('measurements').insert([{member_id:mid,weight:get('ms-wt')?parseFloat(get('ms-wt')):null,chest:get('ms-ch')?parseFloat(get('ms-ch')):null,waist:get('ms-wa')?parseFloat(get('ms-wa')):null,hips:get('ms-hi')?parseFloat(get('ms-hi')):null,arms:get('ms-ar')?parseFloat(get('ms-ar')):null,measured_at:get('ms-dt')||td2(),notes:get('ms-nt')}]);
+    const{error}=await sb.from('measurements').insert([{member_id:mid,weight:get('ms-wt')?parseFloat(get('ms-wt')):null,chest:get('ms-ch')?parseFloat(get('ms-ch')):null,waist:get('ms-wa')?parseFloat(get('ms-wa')):null,hips:get('ms-hi')?parseFloat(get('ms-hi')):null,arms:get('ms-ar')?parseFloat(get('ms-ar')):null,measured_at:get('ms-dt')||td2(),notes:get('ms-nt'),gym_id:GYM_ID}]);
     if(error)throw error;toast(T().saved);closeMo('ms-mo');loadMsForMember(mid);
   }catch(e){toast(T().err,'error')}finally{btn.disabled=false}
 }
@@ -1938,13 +1991,25 @@ async function login(){
   finally{btn.disabled=false;document.getElementById('l-btn-t').textContent=lang==='ar'?'تسجيل الدخول':'Sign In'}
 }
 
-function showApp(email){
+async function showApp(email){
   document.getElementById('lp').classList.remove('active');document.getElementById('app').style.display='flex';
   const short=(email||'admin').split('@')[0];
-  document.getElementById('u-em').textContent=email||'admin';
   document.getElementById('sb-uav').textContent=short[0].toUpperCase();
-  applyLang(lang);initCharts();nav('dashboard');loadAC();
-  // Check for QR checkin URL param
+  applyLang(lang);initCharts();
+
+  // Load gym context
+  const{data:{user}} = await sb.auth.getUser();
+  if(user){
+    const hasGym = await loadGymContext(user.id);
+    if(!hasGym){
+      // First time - show gym setup
+      openGymSetup(user.id, email);
+      return;
+    }
+  }
+
+  document.getElementById('u-em').textContent = GYM_INFO?.name || email || 'admin';
+  nav('dashboard');loadAC();
   setTimeout(checkQRFromURL, 1000);
   // Apply sidebar state
   const mc=document.querySelector('.mc');
@@ -2123,7 +2188,7 @@ async function loadSchedule(){
   const grid = document.getElementById('schedule-grid');
   grid.innerHTML = Array(7).fill('').map((_,i) => `<div id="day-col-${i}" style="display:flex;flex-direction:column;gap:.4rem;min-height:300px"></div>`).join('');
   try{
-    const{data,error} = await sb.from('classes').select('*').order('start_time');
+    const{data,error} = await sb.from('classes').select('*').eq('gym_id',GYM_ID||'').order('start_time');
     if(error)throw error;
     (data||[]).forEach(cls => {
       const col = document.getElementById('day-col-'+cls.day_of_week);
@@ -2165,7 +2230,7 @@ async function saveClass(){
   if(!name||!start||!end){toast(T().req,'error');return}
   const btn=document.getElementById('cl-save');btn.disabled=true;
   try{
-    await sb.from('classes').insert([{name,instructor:document.getElementById('cl-inst').value.trim(),day_of_week:parseInt(day),start_time:start,end_time:end,max_capacity:parseInt(document.getElementById('cl-cap').value||20),color:selectedColor}]);
+    await sb.from('classes').insert([{name,instructor:document.getElementById('cl-inst').value.trim(),day_of_week:parseInt(day),start_time:start,end_time:end,max_capacity:parseInt(document.getElementById('cl-cap').value||20),color:selectedColor,gym_id:GYM_ID}]);
     toast('تم إضافة الحصة ✅');closeMo('class-mo');loadSchedule();
   }catch(e){toast(T().err,'error')}finally{btn.disabled=false}
 }
@@ -2219,7 +2284,7 @@ let planAcMembers = [];
 
 async function loadExercises(){
   try{
-    const{data,error}=await sb.from('exercises').select('*').order('category').order('name');
+    const{data,error}=await sb.from('exercises').select('*').eq('gym_id',GYM_ID||'').order('category').order('name');
     if(error)throw error;
     allExercises=data||[];
     renderExercises();
@@ -2256,7 +2321,7 @@ async function saveExercise(){
   if(!name){toast(T().req,'error');return}
   const btn=document.getElementById('ex-save');btn.disabled=true;
   try{
-    await sb.from('exercises').insert([{name,category:document.getElementById('ex-cat').value,muscle_group:document.getElementById('ex-muscle').value.trim(),description:document.getElementById('ex-desc').value.trim(),sets:document.getElementById('ex-sets').value?parseInt(document.getElementById('ex-sets').value):null,reps:document.getElementById('ex-reps').value.trim(),rest_seconds:document.getElementById('ex-rest').value?parseInt(document.getElementById('ex-rest').value):null}]);
+    await sb.from('exercises').insert([{name,category:document.getElementById('ex-cat').value,muscle_group:document.getElementById('ex-muscle').value.trim(),description:document.getElementById('ex-desc').value.trim(),sets:document.getElementById('ex-sets').value?parseInt(document.getElementById('ex-sets').value):null,reps:document.getElementById('ex-reps').value.trim(),rest_seconds:document.getElementById('ex-rest').value?parseInt(document.getElementById('ex-rest').value):null,gym_id:GYM_ID}]);
     toast('تم إضافة التمرين ✅');closeMo('ex-mo');loadExercises();
   }catch(e){toast(T().err,'error')}finally{btn.disabled=false}
 }
@@ -2432,7 +2497,7 @@ async function sendWa(phone,msg,memberId,type){
   window.open(`https://wa.me/${phone}?text=${encoded}`,'_blank');
   // Log it
   if(memberId){
-    try{await sb.from('whatsapp_log').insert([{member_id:memberId,phone,message:msg,type:type||'custom',status:'sent'}]);}catch(e){}
+    try{await sb.from('whatsapp_log').insert([{member_id:memberId,phone,message:msg,type:type||'custom',status:'sent',gym_id:GYM_ID}]);}catch(e){}
     loadWaLog();
   }
 }
@@ -2473,7 +2538,7 @@ async function sendWaToGroup(){
 }
 
 async function loadWaLog(){
-  const{data}=await sb.from('whatsapp_log').select('*,members(name)').order('sent_at',{ascending:false}).limit(30);
+  const{data}=await sb.from('whatsapp_log').select('*,members(name)').eq('gym_id',GYM_ID||'').order('sent_at',{ascending:false}).limit(30);
   const list=document.getElementById('wa-log');
   if(!data||!data.length){list.innerHTML=`<div class="es"><div class="ei">💬</div><div class="et">لا توجد رسائل بعد</div></div>`;return}
   const typeColors={renewal:'#FF9800',expired:'#F44336',welcome:'#00C853',promo:'#7C3AED',bulk:'#2196F3',custom:'#9E9E9E'};
@@ -2718,8 +2783,9 @@ async function loadMems(){
 
   try{
     let q = sb.from('members').select('*').order('created_at',{ascending:false});
+    if(GYM_ID) q = q.eq('gym_id', GYM_ID);
 
-    // Category filter - if column doesn't exist, filter client-side after fetch
+    // Category filter
     if(currentCat !== 'all' && currentCat !== 'frozen') q = q.eq('category', currentCat);
     if(currentCat === 'frozen') q = q.eq('is_frozen', true);
 
@@ -2934,7 +3000,7 @@ async function loadRetentionCampaigns(){
   const today = td2();
   // Find expired members not renewed in last 30 days
   const{data:lapsed} = await sb.from('members').select('id,name,phone,subscription_end,category')
-    .lt('subscription_end', td2()).order('subscription_end',{ascending:false});
+    .eq('gym_id',GYM_ID||'').lt('subscription_end', td2()).order('subscription_end',{ascending:false});
 
   const el = document.getElementById('wa-auto-list');
   if(!el)return;
@@ -2960,7 +3026,7 @@ async function loadRetentionCampaigns(){
   // Expiring soon
   const in7 = new Date();in7.setDate(in7.getDate()+7);
   const{data:expiring} = await sb.from('members').select('id,name,phone,subscription_end')
-    .eq('status','active').gte('subscription_end',today).lte('subscription_end',in7.toISOString().split('T')[0]);
+    .eq('gym_id',GYM_ID||'').eq('status','active').gte('subscription_end',today).lte('subscription_end',in7.toISOString().split('T')[0]);
 
   const expiringData = expiring||[];
   if(expiringData.length){
@@ -2995,6 +3061,150 @@ document.getElementById('qr-manual-input')?.addEventListener('keydown', e=>{if(e
 
 // Update category tabs when lang changes
 
+</script>
+
+
+<!-- GYM SETUP MODAL (first time) -->
+<div class="mo active" id="gym-setup-mo" style="display:none">
+  <div class="md md-sm">
+    <div class="mh" style="background:linear-gradient(135deg,#FF5722,#7C3AED);border-bottom:none;border-radius:var(--rl) var(--rl) 0 0">
+      <h3 class="mt" style="color:white">🏋️ إعداد الجيم</h3>
+    </div>
+    <div class="mc2">
+      <div style="text-align:center;margin-bottom:1.5rem">
+        <div style="font-size:.9rem;color:var(--t2)">مرحباً بك في GymPro! أنشئ جيمك الآن</div>
+      </div>
+      <div class="fg" style="grid-template-columns:1fr">
+        <div class="f2"><label>اسم الجيم (عربي) <span class="req">*</span></label><input type="text" id="gs-name" placeholder="مثال: جيم الرياضة"/></div>
+        <div class="f2"><label>اسم الجيم (إنجليزي)</label><input type="text" id="gs-name-en" placeholder="Sport Gym"/></div>
+        <div class="f2"><label>رقم الهاتف</label><input type="tel" id="gs-phone" placeholder="+96550000000"/></div>
+        <div class="f2"><label>العنوان</label><input type="text" id="gs-address" placeholder="المنطقة، المدينة"/></div>
+        <div class="f2">
+          <label>اللون الرئيسي</label>
+          <div style="display:flex;gap:.75rem;align-items:center">
+            <input type="color" id="gs-color" value="#FF5722" style="width:50px;height:38px;cursor:pointer;border-radius:8px;padding:2px"/>
+            <div style="display:flex;gap:.4rem;flex-wrap:wrap">
+              <div onclick="document.getElementById('gs-color').value='#FF5722'" style="width:24px;height:24px;border-radius:6px;background:#FF5722;cursor:pointer;border:2px solid transparent" onmouseenter="this.style.borderColor='white'" onmouseleave="this.style.borderColor='transparent'"></div>
+              <div onclick="document.getElementById('gs-color').value='#7C3AED'" style="width:24px;height:24px;border-radius:6px;background:#7C3AED;cursor:pointer;border:2px solid transparent" onmouseenter="this.style.borderColor='white'" onmouseleave="this.style.borderColor='transparent'"></div>
+              <div onclick="document.getElementById('gs-color').value='#00897B'" style="width:24px;height:24px;border-radius:6px;background:#00897B;cursor:pointer;border:2px solid transparent" onmouseenter="this.style.borderColor='white'" onmouseleave="this.style.borderColor='transparent'"></div>
+              <div onclick="document.getElementById('gs-color').value='#1565C0'" style="width:24px;height:24px;border-radius:6px;background:#1565C0;cursor:pointer;border:2px solid transparent" onmouseenter="this.style.borderColor='white'" onmouseleave="this.style.borderColor='transparent'"></div>
+              <div onclick="document.getElementById('gs-color').value='#E91E63'" style="width:24px;height:24px;border-radius:6px;background:#E91E63;cursor:pointer;border:2px solid transparent" onmouseenter="this.style.borderColor='white'" onmouseleave="this.style.borderColor='transparent'"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="background:var(--inl);border:1px solid rgba(33,150,243,0.2);border-radius:var(--rs);padding:.875rem;margin-top:1rem;font-size:.82rem;color:var(--in)">
+        ℹ️ بياناتك مفصولة تماماً عن باقي الجيمات — لا أحد يرى بياناتك
+      </div>
+    </div>
+    <div class="mft" style="justify-content:center">
+      <button class="btn bp" id="gs-save" style="padding:.85rem 2rem;font-size:.95rem">🚀 إنشاء الجيم والبدء</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ══════════════════════════════════════════════
+// GYM SETUP & SETTINGS
+// ══════════════════════════════════════════════
+let _setupUserId = null;
+let _setupEmail = null;
+
+function openGymSetup(userId, email){
+  _setupUserId = userId;
+  _setupEmail = email;
+  document.getElementById('gym-setup-mo').style.display = 'flex';
+  document.getElementById('gym-setup-mo').classList.add('active');
+}
+
+async function saveGymSetup(){
+  const name = document.getElementById('gs-name').value.trim();
+  if(!name){toast('اسم الجيم مطلوب','error');return}
+  const btn = document.getElementById('gs-save');
+  btn.disabled = true; btn.textContent = '⏳ جاري الإنشاء...';
+  try{
+    // Create gym
+    const{data:gym, error:gymErr} = await sb.from('gyms').insert([{
+      name,
+      name_en: document.getElementById('gs-name-en').value.trim()||name,
+      phone: document.getElementById('gs-phone').value.trim(),
+      address: document.getElementById('gs-address').value.trim(),
+      primary_color: document.getElementById('gs-color').value,
+      owner_email: _setupEmail
+    }]).select().single();
+    if(gymErr)throw gymErr;
+
+    // Link user to gym
+    await sb.from('gym_users').insert([{
+      gym_id: gym.id,
+      user_id: _setupUserId,
+      role: 'admin'
+    }]);
+
+    GYM_ID = gym.id;
+    GYM_INFO = gym;
+    applyGymBranding(gym);
+
+    document.getElementById('gym-setup-mo').style.display = 'none';
+    document.getElementById('gym-setup-mo').classList.remove('active');
+    document.getElementById('u-em').textContent = gym.name;
+
+    toast('تم إنشاء الجيم بنجاح! 🎉');
+    nav('dashboard'); loadAC();
+  }catch(e){
+    toast('خطأ: ' + (e.message||''), 'error');
+    btn.disabled = false; btn.textContent = '🚀 إنشاء الجيم والبدء';
+  }
+}
+
+document.getElementById('gs-save')?.addEventListener('click', saveGymSetup);
+
+// ── GYM SETTINGS in sidebar
+// Add settings option
+async function openGymSettings(){
+  if(!GYM_INFO)return;
+  const o = document.createElement('div');
+  o.className = 'mo active';
+  o.innerHTML = `<div class="md md-sm">
+    <div class="mh"><h3 class="mt">⚙️ إعدادات الجيم</h3><button class="xbtn" onclick="this.closest('.mo').remove()">✕</button></div>
+    <div class="mc2">
+      <div class="fg" style="grid-template-columns:1fr">
+        <div class="f2"><label>اسم الجيم</label><input type="text" id="gs2-name" value="${GYM_INFO.name||''}"/></div>
+        <div class="f2"><label>اسم الجيم (إنجليزي)</label><input type="text" id="gs2-name-en" value="${GYM_INFO.name_en||''}"/></div>
+        <div class="f2"><label>الهاتف</label><input type="tel" id="gs2-phone" value="${GYM_INFO.phone||''}"/></div>
+        <div class="f2"><label>العنوان</label><input type="text" id="gs2-address" value="${GYM_INFO.address||''}"/></div>
+        <div class="f2"><label>اللون الرئيسي</label><input type="color" id="gs2-color" value="${GYM_INFO.primary_color||'#FF5722'}" style="height:38px;cursor:pointer"/></div>
+      </div>
+      <div style="margin-top:1rem;padding:1rem;background:var(--bg);border-radius:var(--rs);font-size:.82rem;color:var(--tm)">
+        🆔 Gym ID: <span style="font-family:var(--mono);font-size:.75rem">${GYM_ID}</span>
+      </div>
+    </div>
+    <div class="mft">
+      <button class="btn bs2" onclick="this.closest('.mo').remove()">إلغاء</button>
+      <button class="btn bp" onclick="updateGymSettings()">💾 حفظ</button>
+    </div>
+  </div>`;
+  document.body.appendChild(o);
+  o.onclick = e=>{if(e.target===o)o.remove()};
+}
+
+async function updateGymSettings(){
+  const updates = {
+    name: document.getElementById('gs2-name').value.trim(),
+    name_en: document.getElementById('gs2-name-en').value.trim(),
+    phone: document.getElementById('gs2-phone').value.trim(),
+    address: document.getElementById('gs2-address').value.trim(),
+    primary_color: document.getElementById('gs2-color').value
+  };
+  try{
+    await sb.from('gyms').update(updates).eq('id',GYM_ID);
+    GYM_INFO = {...GYM_INFO,...updates};
+    applyGymBranding(GYM_INFO);
+    document.querySelector('.mo')?.remove();
+    toast('تم حفظ إعدادات الجيم ✅');
+  }catch(e){toast('خطأ: '+e.message,'error')}
+}
 </script>
 
 </body>
