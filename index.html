@@ -2784,9 +2784,14 @@ document.querySelectorAll('.tab').forEach(tab=>{tab.addEventListener('click',()=
 })});
 
 // QR
-function openQR(id){
+async function openQR(id){
   window._currentQRMemberId = id;
-  const m=allM.find(x=>x.id===id)||{name:'?',phone:'?'};
+  // Get member from allM or fetch from DB
+  let m = allM.find(x=>x.id===id);
+  if(!m){
+    try{ const{data}=await sb.from('members').select('*').eq('id',id).single(); m=data||{name:'?',phone:'?'}; }
+    catch(e){ m={name:'?',phone:'?'}; }
+  }
   document.getElementById('qr-name').textContent=m.name;
   document.getElementById('qr-phone').textContent=m.phone;
   document.getElementById('qr-title').textContent='QR — '+m.name;
