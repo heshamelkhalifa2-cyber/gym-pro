@@ -6,7 +6,7 @@
 <title>GymPro — نظام إدارة الجيم | Hesham El-Khalifa</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Tajawal:wght@300;400;500;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
@@ -2940,7 +2940,11 @@ async function doCI(){
   try{
     const{data:ex}=await sb.from('checkins').select('id').eq('member_id',m.id).eq('date',td2());
     if(ex&&ex.length){document.getElementById('ci-msg').innerHTML=`<span style="color:var(--in);font-weight:600">${T().calr}</span>`;toast(T().calr,'info');}
-    else{await sb.from('checkins').insert([{member_id:m.id,gym_id:GYM_ID,branch_id:(BRANCH_ID&&GYM_BRANCHES.length>=2)?BRANCH_ID:null}]);document.getElementById('ci-msg').innerHTML=`<span style="color:#00895A;font-weight:600">${T().cok} — ${ft(new Date().toISOString())}</span>`;toast(T().cok);if(m.status!=='expired')soundOk();await refreshTdCI();await loadAC();}
+    else{
+      const ciData = {member_id:m.id, gym_id:GYM_ID};
+      if(BRANCH_ID && GYM_BRANCHES.length>=2) ciData.branch_id = BRANCH_ID;
+      await sb.from('checkins').insert([ciData]);
+      document.getElementById('ci-msg').innerHTML=`<span style="color:#00895A;font-weight:600">${T().cok} — ${ft(new Date().toISOString())}</span>`;toast(T().cok);if(m.status!=='expired')soundOk();await refreshTdCI();await loadAC();}
   }catch(e){toast(T().err,'error')}finally{btn.disabled=false;selM=null;document.getElementById('ci-in').value='';}
 }
 async function refreshTdCI(){
@@ -4063,7 +4067,9 @@ async function processQRCheckin(scannedData){
       msgEl.innerHTML='<span style="color:var(--in)">ℹ️ تم تسجيل الحضور مسبقاً اليوم</span>';
       resEl.style.border='2px solid var(--in)';
     } else {
-      await sb.from('checkins').insert([{member_id:member.id, gym_id:GYM_ID, branch_id:(BRANCH_ID&&GYM_BRANCHES.length>=2)?BRANCH_ID:null}]);
+      const ciData2 = {member_id:member.id, gym_id:GYM_ID};
+      if(BRANCH_ID && GYM_BRANCHES.length>=2) ciData2.branch_id = BRANCH_ID;
+      await sb.from('checkins').insert([ciData2]);
       msgEl.innerHTML='<span style="color:var(--su)">✅ أهلاً ' + member.name.split(' ')[0] + '!<br>تم تسجيل الحضور الساعة ' + new Date().toLocaleTimeString('ar') + '</span>';
       resEl.style.border='2px solid var(--su)';
       soundOk();
