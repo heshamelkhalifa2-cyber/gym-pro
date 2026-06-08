@@ -1795,7 +1795,7 @@ async function loadOverviewDash(){
       const [mr,pr,cr] = await Promise.all([
         sb.from('members').select('id,status').eq('gym_id',GYM_ID).eq('branch_id',b.id),
         sb.from('payments').select('amount').eq('gym_id',GYM_ID).eq('branch_id',b.id),
-        sb.from('checkins').select('id').eq('gym_id',GYM_ID).eq('branch_id',b.id).eq('date',today)
+        sb.from('checkins').select('id').eq('gym_id',GYM_ID).eq('date',today)
       ]);
       const mems = mr.data||[];
       const rev = (pr.data||[]).reduce((s,p)=>s+Number(p.amount||0),0);
