@@ -2645,7 +2645,8 @@ async function loadDash(){
     let cq = sb.from('checkins').select('id,member_id,date,checkin_time,members(name,phone,photo_url)').eq('gym_id',GYM_ID||'').eq('date',t).order('created_at',{ascending:false});
     if(BRANCH_ID && GYM_BRANCHES.length >= 2){
       mq=mq.eq('branch_id',BRANCH_ID); pq=pq.eq('branch_id',BRANCH_ID);
-      eq=eq.eq('branch_id',BRANCH_ID); cq=cq.eq('branch_id',BRANCH_ID);
+      eq=eq.eq('branch_id',BRANCH_ID);
+      // branch_id not yet in checkins table — skip filter
     }
     const[mr,pr,er,cr]=await Promise.all([mq,pq,eq,cq]);
     const mems=mr.data||[],act=mems.filter(m=>m.status==='active').length,exp=mems.filter(m=>m.status==='expired').length;
@@ -2999,11 +3000,12 @@ async function loadReport(){
   const rc=document.getElementById('rep-content');rc.innerHTML='<div class="lc"><div class="spn"></div></div>';
   try{
     const bf = (q) => (BRANCH_ID && GYM_BRANCHES.length >= 2) ? q.eq('branch_id',BRANCH_ID) : q;
+    const bfNoCi = (q) => q; // checkins don't have branch_id yet
     const[pays,newM,actM,cis]=await Promise.all([
       bf(sb.from('payments').select('amount,notes,payment_date,members(name)').eq('gym_id',GYM_ID||'').gte('payment_date',start).lte('payment_date',end).order('payment_date',{ascending:false})),
       bf(sb.from('members').select('id,name,phone,subscription_type,subscription_start').eq('gym_id',GYM_ID||'').gte('subscription_start',start).lte('subscription_start',end)),
       bf(sb.from('members').select('id').eq('gym_id',GYM_ID||'').eq('status','active')),
-      bf(sb.from('checkins').select('id,date').eq('gym_id',GYM_ID||'').gte('date',start).lte('date',end))
+      bfNoCi(sb.from('checkins').select('id,date').eq('gym_id',GYM_ID||'').gte('date',start).lte('date',end))
     ]);
     const totalRev=(pays.data||[]).reduce((s,p)=>s+Number(p.amount||0),0),totalCis=(cis.data||[]).length;
     const uniqDays=[...new Set((cis.data||[]).map(c=>c.date))].length;
