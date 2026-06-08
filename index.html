@@ -1887,7 +1887,7 @@ const TX={
     waChooseMem:'اختر عضو', waTemplates:['رسالة مخصصة','تذكير بتجديد الاشتراك','إشعار انتهاء الاشتراك','ترحيب بعضو جديد','عرض خاص'],
     // Settings
     settTitle:'الإعدادات', settSub:'إعدادات الجيم والموظفين',
-    settTabs:['🏋️ معلومات الجيم','👥 الموظفون','💰 الأسعار','🔔 الإشعارات'],
+    settTabs:['🏋️ معلومات الجيم','👥 الموظفون','💰 الأسعار','🗺️ الفروع','🔔 الإشعارات'],
     settSave:'💾 حفظ', settLogoHint:'الحجم المثالي: 200×200 بكسل',
     settChangeLogo:'تغيير اللوجو', settAddStaff:'＋ إضافة موظف',
     settNoStaff:'لا يوجد موظفون بعد', settSavePrices:'💾 حفظ الأسعار',
@@ -2009,7 +2009,7 @@ const TX={
     waLog:'📋 Message Log', waAutoTitle:'⚡ Auto Reminders',
     waChooseMem:'Select member', waTemplates:['Custom message','Renewal reminder','Expiry notification','New member welcome','Special offer'],
     settTitle:'Settings', settSub:'Gym settings & staff management',
-    settTabs:['🏋️ Gym Info','👥 Staff','💰 Pricing','🔔 Notifications'],
+    settTabs:['🏋️ Gym Info','👥 Staff','💰 Pricing','🗺️ Branches','🔔 Notifications'],
     settSave:'💾 Save', settLogoHint:'Best size: 200×200 pixels',
     settChangeLogo:'Change Logo', settAddStaff:'＋ Add Staff',
     settNoStaff:'No staff members yet', settSavePrices:'💾 Save Prices',
@@ -2122,7 +2122,7 @@ const TX={
     waLog:'📋 Talaan ng Mensahe', waAutoTitle:'⚡ Auto Reminders',
     waChooseMem:'Pumili ng miyembro', waTemplates:['Custom na mensahe','Renewal reminder','Abiso ng pag-expire','Maligayang pagdating','Espesyal na alok'],
     settTitle:'Mga Setting', settSub:'Mga setting ng gym at staff',
-    settTabs:['🏋️ Info ng Gym','👥 Staff','💰 Presyo','🔔 Abiso'],
+    settTabs:['🏋️ Info ng Gym','👥 Staff','💰 Presyo','🗺️ Branches','🔔 Abiso'],
     settSave:'💾 I-save', settLogoHint:'Pinakamainam na sukat: 200×200 pixel',
     settChangeLogo:'Baguhin ang Logo', settAddStaff:'＋ Magdagdag ng Staff',
     settNoStaff:'Wala pang staff', settSavePrices:'💾 I-save ang Presyo',
@@ -2235,7 +2235,7 @@ const TX={
     waLog:'📋 संदेश लॉग', waAutoTitle:'⚡ स्वचालित अनुस्मारक',
     waChooseMem:'सदस्य चुनें', waTemplates:['कस्टम संदेश','नवीनीकरण अनुस्मारक','समाप्ति अधिसूचना','नए सदस्य का स्वागत','विशेष ऑफर'],
     settTitle:'सेटिंग्स', settSub:'जिम सेटिंग्स और स्टाफ प्रबंधन',
-    settTabs:['🏋️ जिम जानकारी','👥 स्टाफ','💰 मूल्य निर्धारण','🔔 सूचनाएं'],
+    settTabs:['🏋️ जिम जानकारी','👥 स्टाफ','💰 मूल्य निर्धारण','🗺️ Branches','🔔 सूचनाएं'],
     settSave:'💾 सहेजें', settLogoHint:'सर्वोत्तम आकार: 200×200 पिक्सेल',
     settChangeLogo:'लोगो बदलें', settAddStaff:'＋ स्टाफ जोड़ें',
     settNoStaff:'अभी कोई स्टाफ नहीं', settSavePrices:'💾 मूल्य सहेजें',
@@ -4647,7 +4647,7 @@ async function savePricing(){
 document.getElementById('settings-tabs')?.querySelectorAll('.tab').forEach(tab=>{
   tab.addEventListener('click',()=>{
     document.getElementById('settings-tabs').querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-    ['tab-st-gym','tab-st-staff','tab-st-pricing','tab-st-notif'].forEach(id=>{
+    ['tab-st-gym','tab-st-staff','tab-st-pricing','tab-st-branches','tab-st-notif'].forEach(id=>{
       const el=document.getElementById(id);if(el)el.classList.remove('active');
     });
     tab.classList.add('active');
