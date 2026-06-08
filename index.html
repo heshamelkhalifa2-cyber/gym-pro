@@ -7,6 +7,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Tajawal:wght@300;400;500;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
 /* ══════════════════════════════════════════════
@@ -885,7 +886,7 @@ body.rtl .trial-banner{left:auto;right:0}
           <div class="sb-urole">Admin</div>
         </div>
       </div>
-      <div class="ni" onclick="document.getElementById('qr-checkin-page').style.display='flex'"><span class="ni-ic">📲</span><span>كشك الحضور QR</span></div>
+      <div class="ni" onclick="document.getElementById('qr-checkin-page').style.display='flex';startKioskCamera()"><span class="ni-ic">📲</span><span>كشك الحضور QR</span></div>
       <div class="ni" data-page="settings"><span class="ni-ic">⚙️</span><span>الإعدادات</span></div>
       <div class="ni" onclick="openMo('about-mo')"><span class="ni-ic">ℹ️</span><span>حول التطبيق</span></div>
       <div class="ni" id="logout-btn"><span class="ni-ic">🚪</span><span id="n-out">تسجيل الخروج</span></div>
@@ -913,7 +914,7 @@ body.rtl .trial-banner{left:auto;right:0}
           <div class="branch-dd" id="branch-dd"></div>
         </div>
         <div class="hdr-clock"><span class="clk-dot"></span><span id="live-clock">--:--:--</span></div>
-        <button onclick="document.getElementById('qr-checkin-page').style.display='flex'" title="QR Check-in" style="width:36px;height:36px;border-radius:var(--rs);background:var(--pg);border:1.5px solid rgba(255,87,34,0.2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all .2s;flex-shrink:0">📲</button>
+        <button onclick="document.getElementById('qr-checkin-page').style.display='flex';startKioskCamera()" title="QR Check-in" style="width:36px;height:36px;border-radius:var(--rs);background:var(--pg);border:1.5px solid rgba(255,87,34,0.2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all .2s;flex-shrink:0">📲</button>
         <button id="theme-toggle" onclick="toggleTheme()" title="Toggle theme" style="width:36px;height:36px;border-radius:var(--rs);background:var(--bg);border:1.5px solid var(--br);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all .2s;flex-shrink:0">🌙</button>
         <div class="lang-sw">
           <button class="lang-btn" id="l-btn2b"><span id="lfb">🇸🇦</span><span id="lnb">AR</span><span>▾</span></button>
@@ -3717,20 +3718,46 @@ function toggleTheme(){
 
 <!-- QR SELF CHECKIN PAGE -->
 <div id="qr-checkin-page" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9999;flex-direction:column;align-items:center;justify-content:center;padding:2rem">
-  <div style="text-align:center;max-width:400px;width:100%">
-    <div style="width:60px;height:60px;background:linear-gradient(135deg,#FF5722,#7C3AED);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto 1rem">🏋️</div>
-    <h2 style="font-size:1.4rem;font-weight:900;margin-bottom:.5rem">GymPro</h2>
-    <p id="qrScanTitleEl" style="color:var(--t2);font-size:.875rem;margin-bottom:2rem">امسح الـ QR للدخول</p>
-    <div id="qr-scan-result" style="display:none;background:var(--bc);border:2px solid var(--su);border-radius:var(--r);padding:1.5rem;margin-bottom:1rem">
-      <div class="av av-lg" id="qr-res-av" style="margin:0 auto 1rem">?</div>
-      <div style="font-size:1.2rem;font-weight:900" id="qr-res-name">-</div>
-      <div style="color:var(--t2);font-size:.85rem;margin-top:.25rem" id="qr-res-msg">-</div>
+  <div style="text-align:center;max-width:420px;width:100%">
+    <div style="width:64px;height:64px;background:linear-gradient(135deg,#FF5722,#7C3AED);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto .75rem">🏋️</div>
+    <h2 style="font-size:1.4rem;font-weight:900;margin-bottom:.25rem" id="kiosk-gym-name">GymPro</h2>
+    <p style="color:var(--t2);font-size:.85rem;margin-bottom:1.25rem">امسح كارت العضو للتسجيل</p>
+
+    <!-- Camera scanner -->
+    <div id="qr-cam-wrap" style="position:relative;width:100%;max-width:320px;margin:0 auto 1rem;border-radius:16px;overflow:hidden;background:#000;aspect-ratio:1">
+      <video id="qr-video" style="width:100%;height:100%;object-fit:cover" playsinline></video>
+      <canvas id="qr-scan-canvas" style="display:none"></canvas>
+      <!-- Scanning frame overlay -->
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">
+        <div style="width:70%;height:70%;border:3px solid rgba(255,87,34,0.8);border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,0.35)">
+          <div style="position:absolute;top:0;left:0;width:24px;height:24px;border-top:4px solid #FF5722;border-left:4px solid #FF5722;border-radius:4px 0 0 0"></div>
+          <div style="position:absolute;top:0;right:0;width:24px;height:24px;border-top:4px solid #FF5722;border-right:4px solid #FF5722;border-radius:0 4px 0 0"></div>
+          <div style="position:absolute;bottom:0;left:0;width:24px;height:24px;border-bottom:4px solid #FF5722;border-left:4px solid #FF5722;border-radius:0 0 0 4px"></div>
+          <div style="position:absolute;bottom:0;right:0;width:24px;height:24px;border-bottom:4px solid #FF5722;border-right:4px solid #FF5722;border-radius:0 0 4px 0"></div>
+        </div>
+      </div>
+      <div id="qr-scan-line" style="position:absolute;top:15%;left:15%;right:15%;height:2px;background:linear-gradient(90deg,transparent,#FF5722,transparent);animation:scanLine 2s linear infinite"></div>
     </div>
-    <input type="text" id="qr-manual-input" placeholder="أو أدخل الـ Token يدوياً..." style="text-align:center;margin-bottom:.75rem" autocomplete="off"/>
-    <button onclick="processQRInput()" class="btn bp" style="width:100%;justify-content:center;padding:.8rem">✅ تسجيل دخول</button>
-    <button onclick="document.getElementById('qr-checkin-page').style.display='none'" class="btn bs2" style="width:100%;justify-content:center;margin-top:.5rem">رجوع</button>
+
+    <!-- Result -->
+    <div id="qr-scan-result" style="display:none;border-radius:var(--r);padding:1.25rem;margin-bottom:1rem;transition:all .3s">
+      <div class="av av-lg" id="qr-res-av" style="margin:0 auto .75rem;font-size:1.5rem;width:56px;height:56px">?</div>
+      <div style="font-size:1.3rem;font-weight:900" id="qr-res-name">-</div>
+      <div style="font-size:.875rem;margin-top:.35rem" id="qr-res-msg">-</div>
+    </div>
+
+    <!-- Camera status -->
+    <div id="qr-cam-status" style="font-size:.78rem;color:var(--tm);margin-bottom:.75rem">🔄 جاري تشغيل الكاميرا...</div>
+
+    <div style="display:flex;gap:.5rem">
+      <button onclick="stopKioskCamera();document.getElementById('qr-checkin-page').style.display='none'" class="btn bs2" style="flex:1;justify-content:center">✕ إغلاق</button>
+    </div>
   </div>
 </div>
+
+<style>
+@keyframes scanLine{0%{top:15%}50%{top:80%}100%{top:15%}}
+</style>
 
 
 <script>
@@ -3877,96 +3904,130 @@ async function unfreeze(id){
   }catch(e){toast(T().err,'error')}
 }
 
+
 // ══════════════════════════════════════════════
 // QR SELF CHECK-IN KIOSK
 // ══════════════════════════════════════════════
-async function generateMemberQRToken(memberId){
-  // Generate unique token for member
-  const token = 'GP-' + memberId.split('-')[0].toUpperCase() + '-' + Date.now().toString(36).toUpperCase();
-  try{
-    // Upsert token
-    await sb.from('qr_tokens').upsert([{member_id:memberId, token}],{onConflict:'member_id'});
-    return token;
-  }catch(e){
-    // If table does not exist yet, just use member ID
-    return 'GP-' + memberId.split('-')[0].toUpperCase();
-  }
-}
 
-// Patch openQR to generate self-checkin QR
+// Patch openQR — QR contains member_id directly, no token table needed
 const _origOpenQR = openQR;
 openQR = async function(id){
   const m = allM.find(x=>x.id===id)||{name:'?',phone:'?'};
-  const token = await generateMemberQRToken(id);
   document.getElementById('qr-name').textContent = m.name;
   document.getElementById('qr-phone').textContent = m.phone;
   document.getElementById('qr-title').textContent = 'QR — ' + m.name;
-  // QR contains the check-in URL
-  const checkinUrl = window.location.origin + '?checkin=' + token;
-  QRCode.toCanvas(document.getElementById('qr-canvas'), checkinUrl,
+  // Simple: QR = GYMPRO-CHECKIN:<member_id>
+  QRCode.toCanvas(document.getElementById('qr-canvas'), 'GYMPRO-CHECKIN:' + id,
     {width:220,margin:2,color:{dark:'#1A1B2E',light:'#ffffff'}},()=>{});
   openMo('qr-mo');
 };
 
-async function processQRInput(){
-  const input = document.getElementById('qr-manual-input').value.trim();
-  if(!input)return;
-  // Extract token from URL or use directly
-  let token = input;
-  if(input.includes('checkin=')) token = new URL(input).searchParams.get('checkin');
-
+// Process scanned QR data — member_id directly, no token table
+async function processQRCheckin(scannedData){
   const resEl = document.getElementById('qr-scan-result');
-  const avEl = document.getElementById('qr-res-av');
-  const nameEl = document.getElementById('qr-res-name');
+  const avEl  = document.getElementById('qr-res-av');
+  const nameEl= document.getElementById('qr-res-name');
   const msgEl = document.getElementById('qr-res-msg');
 
-  try{
-    // Find member by token
-    const{data:tokenData} = await sb.from('qr_tokens').select('*,members(*)').eq('token',token).single();
-    const member = tokenData?.members;
-    if(!member){nameEl.textContent='❌ عضو غير موجود';msgEl.textContent='Token غير صحيح';resEl.style.display='block';resEl.style.borderColor='var(--da)';return;}
+  let memberId = scannedData;
+  if(scannedData.startsWith('GYMPRO-CHECKIN:')) memberId = scannedData.replace('GYMPRO-CHECKIN:','').trim();
+  else if(scannedData.includes('checkin=')){ try{ memberId = new URL(scannedData).searchParams.get('checkin'); }catch(e){} }
 
+  resEl.style.display='block';
+  resEl.style.background='var(--bc)';
+  resEl.style.border='2px solid var(--br)';
+  nameEl.textContent='...'; msgEl.textContent=''; avEl.textContent='?';
+
+  try{
+    const{data:member} = await sb.from('members').select('*').eq('id', memberId).single();
+    if(!member){
+      nameEl.textContent='❌ عضو غير موجود';
+      msgEl.innerHTML='<span style="color:var(--da)">QR غير معروف</span>';
+      resEl.style.border='2px solid var(--da)';
+      soundWarn(); return;
+    }
     avEl.textContent = ini(member.name);
     nameEl.textContent = member.name;
-    resEl.style.display='block';
-
-    if(member.status==='expired'||member.is_frozen){
-      msgEl.innerHTML = member.is_frozen?'<span style="color:#0277BD">🧊 الاشتراك مجمّد</span>':'<span style="color:var(--da)">❌ الاشتراك منتهٍ</span>';
-      resEl.style.borderColor = member.is_frozen ? '#0277BD' : 'var(--da)';
-      soundWarn();return;
+    if(member.is_frozen){
+      msgEl.innerHTML='<span style="color:#0277BD">🧊 الاشتراك مجمّد</span>';
+      resEl.style.border='2px solid #0277BD'; soundWarn(); return;
     }
-
-    // Check-in
+    if(member.status==='expired'){
+      msgEl.innerHTML='<span style="color:var(--da)">❌ الاشتراك منتهٍ</span>';
+      resEl.style.border='2px solid var(--da)'; soundWarn(); return;
+    }
     const{data:ex} = await sb.from('checkins').select('id').eq('member_id',member.id).eq('date',td2());
     if(ex&&ex.length){
-      msgEl.innerHTML = '<span style="color:var(--in)">ℹ️ تم تسجيل الحضور مسبقاً اليوم</span>';
-      resEl.style.borderColor = 'var(--in)';
-    }else{
-      await sb.from('checkins').insert([{member_id:member.id}]);
-      msgEl.innerHTML = '<span style="color:var(--su)">✅ تم تسجيل الحضور — ' + new Date().toLocaleTimeString('ar') + '</span>';
-      resEl.style.borderColor = 'var(--su)';
+      msgEl.innerHTML='<span style="color:var(--in)">ℹ️ تم تسجيل الحضور مسبقاً اليوم</span>';
+      resEl.style.border='2px solid var(--in)';
+    } else {
+      await sb.from('checkins').insert([{member_id:member.id, gym_id:GYM_ID, branch_id:(BRANCH_ID&&GYM_BRANCHES.length>=2)?BRANCH_ID:null}]);
+      msgEl.innerHTML='<span style="color:var(--su)">✅ أهلاً ' + member.name.split(' ')[0] + '!<br>تم تسجيل الحضور الساعة ' + new Date().toLocaleTimeString('ar') + '</span>';
+      resEl.style.border='2px solid var(--su)';
       soundOk();
     }
-    document.getElementById('qr-manual-input').value='';
-    setTimeout(()=>{resEl.style.display='none';},3000);
-  }catch(e){nameEl.textContent='❌ خطأ';msgEl.textContent=e.message;resEl.style.display='block';}
+    setTimeout(()=>{ resEl.style.display='none'; }, 3500);
+  }catch(e){
+    nameEl.textContent='❌ خطأ'; msgEl.textContent=e.message;
+    resEl.style.border='2px solid var(--da)';
+  }
 }
 
-// Auto check-in from URL (when member scans QR)
-// Only runs AFTER app is loaded and user is authenticated
+// ── CAMERA SCANNER ──
+let _kioskStream = null;
+let _kioskScanInterval = null;
+
+async function startKioskCamera(){
+  const statusEl = document.getElementById('qr-cam-status');
+  const video = document.getElementById('qr-video');
+  const gymNameEl = document.getElementById('kiosk-gym-name');
+  if(gymNameEl && GYM_INFO) gymNameEl.textContent = GYM_INFO.name || 'GymPro';
+  try{
+    _kioskStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});
+    video.srcObject = _kioskStream;
+    await video.play();
+    if(statusEl) statusEl.textContent = '📷 الكاميرا شغالة — وجّه كارت العضو للكاميرا';
+    _kioskScanInterval = setInterval(scanKioskFrame, 300);
+  }catch(e){
+    if(statusEl) statusEl.innerHTML = '⚠️ تعذّر تشغيل الكاميرا<br><small>' + (e.message||'') + '</small>';
+  }
+}
+
+function scanKioskFrame(){
+  const video = document.getElementById('qr-video');
+  const canvas = document.getElementById('qr-scan-canvas');
+  if(!video||!canvas||video.readyState!==4) return;
+  canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video,0,0);
+  const img = ctx.getImageData(0,0,canvas.width,canvas.height);
+  if(typeof jsQR === 'undefined') return;
+  const code = jsQR(img.data, img.width, img.height, {inversionAttempts:'dontInvert'});
+  if(code && code.data){
+    clearInterval(_kioskScanInterval);
+    processQRCheckin(code.data);
+    setTimeout(()=>{ _kioskScanInterval = setInterval(scanKioskFrame,300); }, 4500);
+  }
+}
+
+function stopKioskCamera(){
+  clearInterval(_kioskScanInterval); _kioskScanInterval = null;
+  if(_kioskStream){ _kioskStream.getTracks().forEach(t=>t.stop()); _kioskStream=null; }
+  const video = document.getElementById('qr-video');
+  if(video) video.srcObject = null;
+}
+
 function checkQRFromURL(){
   const params = new URLSearchParams(window.location.search);
   const token = params.get('checkin');
   if(token){
-    const inp = document.getElementById('qr-manual-input');
     const page = document.getElementById('qr-checkin-page');
-    if(inp) inp.value = token;
-    if(page) page.style.display = 'flex';
-    setTimeout(processQRInput, 800);
-    // Clean URL
+    if(page){ page.style.display='flex'; startKioskCamera(); }
+    setTimeout(()=>processQRCheckin(token), 800);
     window.history.replaceState({},'',window.location.pathname);
   }
 }
+
 
 // ══════════════════════════════════════════════
 // RETENTION / CAMPAIGNS - in WhatsApp page
