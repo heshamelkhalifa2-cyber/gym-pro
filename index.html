@@ -2785,10 +2785,12 @@ document.querySelectorAll('.tab').forEach(tab=>{tab.addEventListener('click',()=
 
 // QR
 function openQR(id){
+  window._currentQRMemberId = id;
   const m=allM.find(x=>x.id===id)||{name:'?',phone:'?'};
-  document.getElementById('qr-name').textContent=m.name;document.getElementById('qr-phone').textContent=m.phone;
+  document.getElementById('qr-name').textContent=m.name;
+  document.getElementById('qr-phone').textContent=m.phone;
   document.getElementById('qr-title').textContent='QR — '+m.name;
-  QRCode.toCanvas(document.getElementById('qr-canvas'),`GYMPRO:${id}:${m.phone}`,{width:220,margin:2,color:{dark:'#1A1B2E',light:'#ffffff'}},()=>{});
+  QRCode.toCanvas(document.getElementById('qr-canvas'),'GYMPRO-CHECKIN:'+id,{width:220,margin:2,color:{dark:'#1A1B2E',light:'#ffffff'}},()=>{});
   openMo('qr-mo');
 }
 function downloadQR(){const c=document.getElementById('qr-canvas'),l=document.createElement('a');l.download=`qr-${document.getElementById('qr-name').textContent}.png`;l.href=c.toDataURL();l.click();}
@@ -4016,20 +4018,6 @@ async function unfreeze(id){
 // ══════════════════════════════════════════════
 // QR SELF CHECK-IN KIOSK
 // ══════════════════════════════════════════════
-
-// Patch openQR — QR contains member_id directly, no token table needed
-const _origOpenQR = openQR;
-openQR = async function(id){
-  window._currentQRMemberId = id;
-  const m = allM.find(x=>x.id===id)||{name:'?',phone:'?'};
-  document.getElementById('qr-name').textContent = m.name;
-  document.getElementById('qr-phone').textContent = m.phone;
-  document.getElementById('qr-title').textContent = 'QR — ' + m.name;
-  // Simple: QR = GYMPRO-CHECKIN:<member_id>
-  QRCode.toCanvas(document.getElementById('qr-canvas'), 'GYMPRO-CHECKIN:' + id,
-    {width:220,margin:2,color:{dark:'#1A1B2E',light:'#ffffff'}},()=>{});
-  openMo('qr-mo');
-};
 
 // Process scanned QR data — member_id directly, no token table
 async function processQRCheckin(scannedData){
