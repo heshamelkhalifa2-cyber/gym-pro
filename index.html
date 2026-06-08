@@ -1227,6 +1227,7 @@ body.rtl .trial-banner{left:auto;right:0}
           <div class="tab active" data-tab="st-gym">🏋️ معلومات الجيم</div>
           <div class="tab" data-tab="st-staff">👥 الموظفون</div>
           <div class="tab" data-tab="st-pricing">💰 الأسعار</div>
+          <div class="tab" data-tab="st-branches">🗺️ الفروع</div>
           <div class="tab" data-tab="st-notif">🔔 الإشعارات</div>
         </div>
 
@@ -1291,6 +1292,20 @@ body.rtl .trial-banner{left:auto;right:0}
           </div>
         </div>
 
+        <!-- Branches Tab -->
+        <div id="tab-st-branches" class="tab-content">
+          <div class="card">
+            <div class="ch">
+              <h3 class="ct">🗺️ فروع الجيم</h3>
+              <button class="btn bp btn-sm" onclick="openAddBranch()">＋ إضافة فرع</button>
+            </div>
+            <div style="background:var(--inl);border:1px solid rgba(33,150,243,0.2);border-radius:var(--rs);padding:.875rem;margin-bottom:1.25rem;font-size:.83rem;color:var(--in)">
+              ℹ️ أضف عناوين وأرقام هواتف فروع جيمك — تظهر للأعضاء في الإيصالات والتذكيرات
+            </div>
+            <div id="branches-list"><div class="lc"><div class="spn"></div></div></div>
+          </div>
+        </div>
+
         <!-- Notifications Tab -->
         <div id="tab-st-notif" class="tab-content">
           <div class="card">
@@ -1319,6 +1334,26 @@ body.rtl .trial-banner{left:auto;right:0}
 </div>
 
 <!-- ══════ MODALS ══════ -->
+
+<!-- Branch Modal -->
+<div class="mo" id="branch-mo">
+  <div class="md">
+    <div class="mh"><h3 class="mt">🗺️ <span id="branch-mo-title">إضافة فرع</span></h3><button class="xbtn" data-close="branch-mo">✕</button></div>
+    <div class="mc2">
+      <input type="hidden" id="branch-id"/>
+      <div class="fg">
+        <div class="f2"><label>اسم الفرع <span class="req">*</span></label><input type="text" id="branch-name" placeholder="مثال: الفرع الرئيسي، فرع السالمية"/></div>
+        <div class="f2"><label>رقم الهاتف <span class="req">*</span></label><input type="tel" id="branch-phone" placeholder="+96550000000"/></div>
+        <div class="f2 full"><label>العنوان <span class="req">*</span></label><input type="text" id="branch-address" placeholder="المنطقة، الشارع، المبنى"/></div>
+        <div class="f2 full"><label>ملاحظات</label><textarea id="branch-notes" placeholder="ساعات العمل أو أي تفاصيل إضافية..." rows="2"></textarea></div>
+      </div>
+    </div>
+    <div class="mft">
+      <button class="btn bs2" data-close="branch-mo">إلغاء</button>
+      <button class="btn bp" onclick="saveBranch()">💾 حفظ الفرع</button>
+    </div>
+  </div>
+</div>
 
 <!-- Member -->
 <div class="mo" id="m-mo">
@@ -4097,6 +4132,7 @@ async function loadSettings(){
   // Load staff and pricing
   loadStaff();
   loadPricingForm();
+  loadBranches();
 }
 
 function previewStLogo(input){
@@ -4138,6 +4174,93 @@ async function saveGymInfo(){
     applyGymBranding(GYM_INFO);
     toast('تم حفظ معلومات الجيم ✅');
   }catch(e){toast('خطأ: '+e.message,'error')}
+}
+
+// ── BRANCHES ──
+async function loadBranches(){
+  const list = document.getElementById('branches-list');
+  if(!list) return;
+  try{
+    const {data,error} = await sb.from('gym_branches').select('*').eq('gym_id',GYM_ID).order('created_at');
+    const branches = data||[];
+    if(!branches.length){
+      list.innerHTML = `<div class="es"><div class="ei">🗺️</div><div class="et">لا يوجد فروع بعد</div><div class="es2">اضغط "إضافة فرع" لإضافة أول فرع</div></div>`;
+      return;
+    }
+    list.innerHTML = branches.map(b=>`
+      <div style="display:flex;align-items:flex-start;gap:1rem;padding:1rem;border:1px solid var(--br);border-radius:var(--rs);margin-bottom:.75rem;background:var(--bg)">
+        <div style="width:44px;height:44px;background:linear-gradient(135deg,var(--p),var(--s));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0">🗺️</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:800;font-size:.95rem;margin-bottom:.25rem">${b.name}</div>
+          <div style="color:var(--t2);font-size:.82rem;display:flex;align-items:center;gap:.4rem;margin-bottom:.2rem">📍 ${b.address}</div>
+          <div style="color:var(--t2);font-size:.82rem;display:flex;align-items:center;gap:.4rem">📞 ${b.phone}</div>
+          ${b.notes?`<div style="color:var(--tm);font-size:.78rem;margin-top:.3rem;font-style:italic">${b.notes}</div>`:''}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:.4rem;flex-shrink:0">
+          <button class="btn bs2 btn-sm" onclick="openEditBranch(${JSON.stringify(b).replace(/"/g,'&quot;')})">✏️ تعديل</button>
+          <button class="btn btn-sm" style="background:rgba(244,67,54,0.1);color:#f44336;border:1px solid rgba(244,67,54,0.2)" onclick="deleteBranch('${b.id}')">🗑️ حذف</button>
+        </div>
+      </div>
+    `).join('');
+  }catch(e){
+    list.innerHTML = `<div class="es"><div class="ei">⚠️</div><div class="et">خطأ في تحميل الفروع</div></div>`;
+  }
+}
+
+function openAddBranch(){
+  document.getElementById('branch-id').value = '';
+  document.getElementById('branch-name').value = '';
+  document.getElementById('branch-phone').value = '';
+  document.getElementById('branch-address').value = '';
+  document.getElementById('branch-notes').value = '';
+  document.getElementById('branch-mo-title').textContent = 'إضافة فرع';
+  openMo('branch-mo');
+}
+
+function openEditBranch(b){
+  document.getElementById('branch-id').value = b.id||'';
+  document.getElementById('branch-name').value = b.name||'';
+  document.getElementById('branch-phone').value = b.phone||'';
+  document.getElementById('branch-address').value = b.address||'';
+  document.getElementById('branch-notes').value = b.notes||'';
+  document.getElementById('branch-mo-title').textContent = 'تعديل الفرع';
+  openMo('branch-mo');
+}
+
+async function saveBranch(){
+  const name = document.getElementById('branch-name').value.trim();
+  const phone = document.getElementById('branch-phone').value.trim();
+  const address = document.getElementById('branch-address').value.trim();
+  if(!name){toast('اسم الفرع مطلوب','error');return;}
+  if(!phone){toast('رقم الهاتف مطلوب','error');return;}
+  if(!address){toast('العنوان مطلوب','error');return;}
+  try{
+    const id = document.getElementById('branch-id').value;
+    const payload = {
+      gym_id: GYM_ID,
+      name,
+      phone,
+      address,
+      notes: document.getElementById('branch-notes').value.trim()||null
+    };
+    if(id){
+      await sb.from('gym_branches').update(payload).eq('id',id);
+    } else {
+      await sb.from('gym_branches').insert([payload]);
+    }
+    closeMo('branch-mo');
+    toast(id?'تم تحديث الفرع ✅':'تم إضافة الفرع ✅');
+    loadBranches();
+  }catch(e){toast('خطأ: '+e.message,'error');}
+}
+
+async function deleteBranch(id){
+  if(!confirm('هل تريد حذف هذا الفرع؟')) return;
+  try{
+    await sb.from('gym_branches').delete().eq('id',id);
+    toast('تم حذف الفرع');
+    loadBranches();
+  }catch(e){toast('خطأ: '+e.message,'error');}
 }
 
 async function saveNotifSettings(){
