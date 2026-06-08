@@ -5092,22 +5092,40 @@ async function activateCode(){
   const code = document.getElementById('activation-code').value.trim().toUpperCase();
   if(!code){ toast('أدخل كود التفعيل','error'); return; }
 
-  // Code format: PLAN-MONTHS-RANDOMKEY e.g. PRO-1-ABC123
-  // Admin generates these manually
-  const parts = code.split('-');
-  if(parts.length < 3){ toast('كود غير صحيح','error'); return; }
-
-  const planKey = parts[0].toLowerCase();
-  const months = parseInt(parts[1]);
-  const plan = PLANS[planKey];
-
-  if(!plan){ toast('خطة غير صحيحة في الكود','error'); return; }
-
   try{
+    // Verify code exists in database and not used
+    const{data:codeData, error} = await sb
+      .from('activation_codes')
+      .select('*')
+      .eq('code', code)
+      .single();
+
+    if(error || !codeData){
+      toast('❌ كود غير صحيح أو غير موجود','error'); return;
+    }
+    if(codeData.used_at){
+      toast('❌ هذا الكود تم استخدامه مسبقاً','error'); return;
+    }
+    if(codeData.expires_at && new Date(codeData.expires_at) < new Date()){
+      toast('❌ هذا الكود منتهي الصلاحية','error'); return;
+    }
+
+    const planKey = codeData.plan;
+    const months = codeData.months;
+    const plan = PLANS[planKey];
+    if(!plan){ toast('خطة غير صحيحة','error'); return; }
+
     const now = new Date();
     const billingEnd = new Date(now);
     billingEnd.setMonth(billingEnd.getMonth() + months);
 
+    // Mark code as used
+    await sb.from('activation_codes').update({
+      used_at: now.toISOString(),
+      used_by_gym: GYM_ID
+    }).eq('code', code);
+
+    // Activate subscription
     await sb.from('gym_subscriptions').upsert([{
       gym_id: GYM_ID,
       plan: planKey,
