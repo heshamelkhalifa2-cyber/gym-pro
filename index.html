@@ -203,6 +203,33 @@ body.ltr .sb{left:0;right:auto;border-right:1px solid var(--br)}
 body.rtl .mc{margin-right:var(--sw);margin-left:0}
 body.ltr .mc{margin-left:var(--sw);margin-right:0}
 .hdr{height:var(--hh);background:var(--bc);border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;padding:0 1rem;position:sticky;top:0;z-index:200;box-shadow:var(--sh1);width:100%;box-sizing:border-box}
+/* Branch Switcher */
+.branch-sw{position:relative;display:flex;align-items:center}
+.branch-btn{display:flex;align-items:center;gap:.45rem;padding:.38rem .75rem;background:var(--pg);border:1.5px solid rgba(255,87,34,0.25);border-radius:var(--rs);cursor:pointer;font-size:.78rem;font-weight:700;color:var(--t1);transition:all .2s;white-space:nowrap;max-width:180px}
+.branch-btn:hover{background:var(--p);color:white;border-color:var(--p)}
+.branch-btn .br-ic{font-size:.9rem;flex-shrink:0}
+.branch-btn .br-nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.branch-dd{position:absolute;top:calc(100% + 6px);left:0;min-width:220px;background:var(--bc);border:1px solid var(--br);border-radius:var(--r);box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:9999;overflow:hidden;display:none}
+body.rtl .branch-dd{left:auto;right:0}
+.branch-dd.open{display:block}
+.branch-dd-item{display:flex;align-items:center;gap:.65rem;padding:.65rem 1rem;cursor:pointer;font-size:.83rem;font-weight:600;transition:background .15s;border-bottom:1px solid var(--br)}
+.branch-dd-item:last-child{border-bottom:none}
+.branch-dd-item:hover{background:var(--pg)}
+.branch-dd-item.active{color:var(--p)}
+.branch-dd-item .bdi-dot{width:8px;height:8px;border-radius:50%;background:var(--br);flex-shrink:0}
+.branch-dd-item.active .bdi-dot{background:var(--p)}
+/* Overview dashboard badge */
+.ov-badge{display:inline-flex;align-items:center;gap:.35rem;padding:.2rem .6rem;background:linear-gradient(135deg,var(--p),var(--s));color:white;border-radius:999px;font-size:.68rem;font-weight:800}
+/* Branch overview cards */
+.br-ov-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;margin-bottom:1.25rem}
+.br-ov-card{background:var(--bc);border:1px solid var(--br);border-radius:var(--r);padding:1rem;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.br-ov-card:hover{border-color:var(--p);box-shadow:0 4px 16px rgba(255,87,34,.12);transform:translateY(-2px)}
+.br-ov-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--p),var(--s))}
+.br-ov-card .boc-name{font-weight:800;font-size:.95rem;margin-bottom:.5rem}
+.br-ov-card .boc-stats{display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
+.br-ov-card .boc-stat{background:var(--bg);border-radius:var(--rs);padding:.4rem .6rem;text-align:center}
+.br-ov-card .boc-stat-val{font-size:1.1rem;font-weight:900;color:var(--p)}
+.br-ov-card .boc-stat-lbl{font-size:.65rem;color:var(--tm);margin-top:.1rem}
 .hdr-l{display:flex;align-items:center;gap:.5rem;min-width:0;overflow:hidden}
 .pg-title{font-size:1rem;font-weight:800;color:var(--t1);letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px}
 .hdr-r{display:flex;align-items:center;gap:.4rem;flex-shrink:0}
@@ -876,6 +903,15 @@ body.rtl .trial-banner{left:auto;right:0}
         </div>
       </div>
       <div class="hdr-r">
+        <!-- Branch Switcher -->
+        <div class="branch-sw" id="branch-sw" style="display:none">
+          <button class="branch-btn" onclick="toggleBranchDd()">
+            <span class="br-ic">🏢</span>
+            <span class="br-nm" id="branch-btn-name">الفرع الرئيسي</span>
+            <span>▾</span>
+          </button>
+          <div class="branch-dd" id="branch-dd"></div>
+        </div>
         <div class="hdr-clock"><span class="clk-dot"></span><span id="live-clock">--:--:--</span></div>
         <button onclick="document.getElementById('qr-checkin-page').style.display='flex'" title="QR Check-in" style="width:36px;height:36px;border-radius:var(--rs);background:var(--pg);border:1.5px solid rgba(255,87,34,0.2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all .2s;flex-shrink:0">📲</button>
         <button id="theme-toggle" onclick="toggleTheme()" title="Toggle theme" style="width:36px;height:36px;border-radius:var(--rs);background:var(--bg);border:1.5px solid var(--br);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all .2s;flex-shrink:0">🌙</button>
@@ -967,8 +1003,25 @@ body.rtl .trial-banner{left:auto;right:0}
             <h2 id="dash-t">لوحة التحكم</h2>
             <p id="dash-sub">مرحباً! إليك ملخص اليوم</p>
           </div>
-          <button class="btn bp" onclick="loadDash()">🔄 تحديث</button>
+          <div style="display:flex;gap:.5rem;align-items:center">
+            <button class="btn bs2 btn-sm" id="ov-toggle-btn" onclick="toggleOverview()" style="display:none">🌐 عرض كل الفروع</button>
+            <button class="btn bp" onclick="loadDash()">🔄 تحديث</button>
+          </div>
         </div>
+        <!-- Overview (all branches) -->
+        <div id="dash-overview" style="display:none">
+          <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1rem">
+            <span class="ov-badge">🌐 نظرة عامة — كل الفروع</span>
+            <button class="btn bs2 btn-sm" onclick="toggleOverview()">← العودة للفرع</button>
+          </div>
+          <div class="br-ov-grid" id="branches-overview-grid"></div>
+          <div class="card">
+            <div class="ch"><h3 class="ct">📊 مقارنة الفروع</h3></div>
+            <div class="cw"><canvas id="c-branches-compare"></canvas></div>
+          </div>
+        </div>
+        <!-- Single branch dashboard -->
+        <div id="dash-single">
         <div class="sg">
           <div class="sc v-orange"><div class="sc-ic">👥</div><div class="sc-val" id="s-tot">0</div><div class="sc-lbl" id="s-tot-l">إجمالي الأعضاء</div></div>
           <div class="sc v-purple"><div class="sc-ic">✅</div><div class="sc-val" id="s-act">0</div><div class="sc-lbl" id="s-act-l">الأعضاء النشطون</div></div>
@@ -983,6 +1036,7 @@ body.rtl .trial-banner{left:auto;right:0}
         <div class="dg">
           <div class="card"><div class="ch"><h3 class="ct">⏰ <span id="ch-ex">تنتهي خلال 10 أيام</span></h3><span class="badge bgw" id="exp-cnt">0</span></div><div id="exp-list"><div class="lc"><div class="spn"></div></div></div></div>
           <div class="card"><div class="ch"><h3 class="ct">🏃 <span id="ch-ci">آخر تسجيلات الحضور</span></h3><span class="badge bgi" id="ci-bdg">0</span></div><div id="rec-ci"><div class="lc"><div class="spn"></div></div></div></div>
+        </div>
         </div>
       </div>
 
@@ -1383,6 +1437,7 @@ body.rtl .trial-banner{left:auto;right:0}
         </div>
         <div class="f2"><label>تاريخ التسجيل</label><input type="date" id="m-reg"/></div>
         <div class="f2"><label>تاريخ البدء الفعلي <span class="req">*</span></label><input type="date" id="m-st"/></div>
+        <div class="f2" id="m-branch-wrap" style="display:none"><label>🏢 الفرع</label><select id="m-branch"></select></div>
         <div class="f2" style="grid-column:1/-1"><label style="color:var(--in)">💡 يمكنك تسجيل الاشتراك اليوم وتحديد تاريخ البدء في المستقبل (مسبقاً)</label></div>
         <div class="f2"><label>تاريخ الانتهاء (تلقائي)</label><input type="date" id="m-en" readonly style="opacity:.5"/></div>
         <div class="f2"><label>⚖️ الوزن (كجم)</label><input type="number" id="m-wt" placeholder="70.5" min="0" step="0.1"/></div>
@@ -1566,6 +1621,11 @@ window._gymProSb=sb;
 // ── MULTI-TENANT ──
 let GYM_ID = null;
 let GYM_INFO = null;
+// ── MULTI-BRANCH ──
+let BRANCH_ID = null;       // null = كل الفروع (overview)
+let BRANCH_INFO = null;     // بيانات الفرع الحالي
+let GYM_BRANCHES = [];      // كل فروع الجيم
+let IS_OVERVIEW = false;    // وضع عرض كل الفروع
 
 async function loadGymContext(userId){
   try{
@@ -1575,6 +1635,8 @@ async function loadGymContext(userId){
       GYM_ID = gu.gym_id;
       GYM_INFO = gu.gyms;
       applyGymBranding(GYM_INFO);
+      // Load branches
+      await loadGymBranches();
       return true;
     }
   }catch(e){
@@ -1582,6 +1644,146 @@ async function loadGymContext(userId){
     console.log('No gym found for user');
   }
   return false;
+}
+
+// ── BRANCH FUNCTIONS ──
+async function loadGymBranches(){
+  try{
+    const{data} = await sb.from('gym_branches').select('*').eq('gym_id',GYM_ID).order('created_at');
+    GYM_BRANCHES = data||[];
+    // Set default branch (first one, or null if none)
+    if(GYM_BRANCHES.length > 0){
+      BRANCH_ID = GYM_BRANCHES[0].id;
+      BRANCH_INFO = GYM_BRANCHES[0];
+    }
+    renderBranchSwitcher();
+  }catch(e){ GYM_BRANCHES = []; }
+}
+
+function renderBranchSwitcher(){
+  const sw = document.getElementById('branch-sw');
+  const dd = document.getElementById('branch-dd');
+  const btnName = document.getElementById('branch-btn-name');
+  const ovBtn = document.getElementById('ov-toggle-btn');
+  if(!sw||!dd) return;
+  // Only show if 2+ branches
+  if(GYM_BRANCHES.length < 2){ sw.style.display='none'; if(ovBtn)ovBtn.style.display='none'; return; }
+  sw.style.display = 'flex';
+  if(ovBtn) ovBtn.style.display = 'flex';
+  // Update button name
+  if(btnName) btnName.textContent = IS_OVERVIEW ? 'كل الفروع' : (BRANCH_INFO?.name||'الفرع الرئيسي');
+  // Build dropdown
+  dd.innerHTML = `
+    <div class="branch-dd-item ${IS_OVERVIEW?'active':''}" onclick="switchBranch(null)">
+      <div class="bdi-dot"></div>
+      <span>🌐 كل الفروع (نظرة عامة)</span>
+    </div>
+    ${GYM_BRANCHES.map(b=>`
+      <div class="branch-dd-item ${BRANCH_ID===b.id&&!IS_OVERVIEW?'active':''}" onclick="switchBranch('${b.id}')">
+        <div class="bdi-dot"></div>
+        <span>🏢 ${b.name}</span>
+        <span style="font-size:.7rem;color:var(--tm);margin-inline-start:auto">${b.phone}</span>
+      </div>
+    `).join('')}
+  `;
+}
+
+function toggleBranchDd(){
+  const dd = document.getElementById('branch-dd');
+  if(dd) dd.classList.toggle('open');
+  // Close on outside click
+  setTimeout(()=>{
+    document.addEventListener('click', function handler(e){
+      if(!e.target.closest('.branch-sw')){ dd&&dd.classList.remove('open'); document.removeEventListener('click',handler); }
+    });
+  },10);
+}
+
+async function switchBranch(branchId){
+  const dd = document.getElementById('branch-dd');
+  if(dd) dd.classList.remove('open');
+  if(branchId === null){
+    IS_OVERVIEW = true;
+    BRANCH_ID = null;
+    BRANCH_INFO = null;
+  } else {
+    IS_OVERVIEW = false;
+    BRANCH_ID = branchId;
+    BRANCH_INFO = GYM_BRANCHES.find(b=>b.id===branchId)||null;
+  }
+  renderBranchSwitcher();
+  // Reload current page data
+  const activePage = document.querySelector('.pg2.active');
+  if(activePage){
+    const pid = activePage.id.replace('pg-','');
+    if(pid==='dashboard') loadDash();
+    else if(pid==='members') loadMems();
+    else if(pid==='payments') loadPays();
+    else if(pid==='report') loadReport();
+    else if(pid==='checkin') refreshTdCI();
+  }
+  toast(IS_OVERVIEW ? '🌐 عرض كل الفروع' : `🏢 ${BRANCH_INFO?.name}`);
+}
+
+function toggleOverview(){
+  if(IS_OVERVIEW){ switchBranch(GYM_BRANCHES[0]?.id||null); }
+  else { switchBranch(null); }
+}
+
+// Get branch filter for queries — returns eq filter or empty
+function branchFilter(query){
+  if(IS_OVERVIEW || !BRANCH_ID || GYM_BRANCHES.length < 2) return query;
+  return query.eq('branch_id', BRANCH_ID);
+}
+
+// Overview dashboard
+async function loadOverviewDash(){
+  const grid = document.getElementById('branches-overview-grid');
+  if(!grid) return;
+  grid.innerHTML = `<div class="lc"><div class="spn"></div></div>`;
+  try{
+    const today = new Date().toISOString().split('T')[0];
+    const cardsData = await Promise.all(GYM_BRANCHES.map(async b=>{
+      const [mr,pr,cr] = await Promise.all([
+        sb.from('members').select('id,status').eq('gym_id',GYM_ID).eq('branch_id',b.id),
+        sb.from('payments').select('amount').eq('gym_id',GYM_ID).eq('branch_id',b.id),
+        sb.from('checkins').select('id').eq('gym_id',GYM_ID).eq('branch_id',b.id).eq('date',today)
+      ]);
+      const mems = mr.data||[];
+      const rev = (pr.data||[]).reduce((s,p)=>s+Number(p.amount||0),0);
+      const active = mems.filter(m=>m.status==='active').length;
+      return { branch:b, total:mems.length, active, rev, checkins:(cr.data||[]).length };
+    }));
+    grid.innerHTML = cardsData.map(d=>`
+      <div class="br-ov-card" onclick="switchBranch('${d.branch.id}')">
+        <div class="boc-name">🏢 ${d.branch.name}</div>
+        <div style="font-size:.72rem;color:var(--tm);margin-bottom:.6rem">📍 ${d.branch.address||''}</div>
+        <div class="boc-stats">
+          <div class="boc-stat"><div class="boc-stat-val">${d.total}</div><div class="boc-stat-lbl">إجمالي الأعضاء</div></div>
+          <div class="boc-stat"><div class="boc-stat-val" style="color:#00897B">${d.active}</div><div class="boc-stat-lbl">نشطون</div></div>
+          <div class="boc-stat"><div class="boc-stat-val" style="color:#7C3AED">${d.checkins}</div><div class="boc-stat-lbl">حضور اليوم</div></div>
+          <div class="boc-stat"><div class="boc-stat-val" style="font-size:.85rem">${d.rev.toFixed(3)}</div><div class="boc-stat-lbl">الإيرادات KWD</div></div>
+        </div>
+        <div style="margin-top:.6rem;font-size:.7rem;color:var(--p);font-weight:700;text-align:center">اضغط للدخول ←</div>
+      </div>
+    `).join('');
+    // Comparison chart
+    const ctx = document.getElementById('c-branches-compare');
+    if(ctx){
+      if(window._brChart) window._brChart.destroy();
+      window._brChart = new Chart(ctx,{
+        type:'bar',
+        data:{
+          labels: cardsData.map(d=>d.branch.name),
+          datasets:[
+            {label:'الأعضاء النشطون', data:cardsData.map(d=>d.active), backgroundColor:'rgba(255,87,34,0.7)', borderRadius:6},
+            {label:'حضور اليوم', data:cardsData.map(d=>d.checkins), backgroundColor:'rgba(124,58,237,0.7)', borderRadius:6}
+          ]
+        },
+        options:{responsive:true,plugins:{legend:{position:'top'}},scales:{y:{beginAtZero:true}}}
+      });
+    }
+  }catch(e){ grid.innerHTML=`<div class="es"><div class="ei">⚠️</div><div class="et">خطأ في التحميل</div></div>`; }
 }
 
 function applyGymBranding(gym){
@@ -2375,14 +2577,29 @@ function nav(page){
 
 // Dashboard
 async function loadDash(){
+  // Show/hide overview vs single
+  const ovDiv = document.getElementById('dash-overview');
+  const snDiv = document.getElementById('dash-single');
+  if(IS_OVERVIEW && GYM_BRANCHES.length >= 2){
+    if(ovDiv) ovDiv.style.display='block';
+    if(snDiv) snDiv.style.display='none';
+    loadOverviewDash();
+    return;
+  }
+  if(ovDiv) ovDiv.style.display='none';
+  if(snDiv) snDiv.style.display='block';
   try{
     const t=td2(),in10=new Date();in10.setDate(in10.getDate()+10);
-    const[mr,pr,er,cr]=await Promise.all([
-      sb.from('members').select('id,status,subscription_type').eq('gym_id',GYM_ID||''),
-      sb.from('payments').select('amount').eq('gym_id',GYM_ID||''),
-      sb.from('members').select('id,name,phone,subscription_end,photo_url').eq('gym_id',GYM_ID||'').eq('status','active').gte('subscription_end',t).lte('subscription_end',in10.toISOString().split('T')[0]),
-      sb.from('checkins').select('id,member_id,date,checkin_time,members(name,phone,photo_url)').eq('gym_id',GYM_ID||'').eq('date',t).order('created_at',{ascending:false})
-    ]);
+    // Build queries with branch filter
+    let mq = sb.from('members').select('id,status,subscription_type').eq('gym_id',GYM_ID||'');
+    let pq = sb.from('payments').select('amount').eq('gym_id',GYM_ID||'');
+    let eq = sb.from('members').select('id,name,phone,subscription_end,photo_url').eq('gym_id',GYM_ID||'').eq('status','active').gte('subscription_end',t).lte('subscription_end',in10.toISOString().split('T')[0]);
+    let cq = sb.from('checkins').select('id,member_id,date,checkin_time,members(name,phone,photo_url)').eq('gym_id',GYM_ID||'').eq('date',t).order('created_at',{ascending:false});
+    if(BRANCH_ID && GYM_BRANCHES.length >= 2){
+      mq=mq.eq('branch_id',BRANCH_ID); pq=pq.eq('branch_id',BRANCH_ID);
+      eq=eq.eq('branch_id',BRANCH_ID); cq=cq.eq('branch_id',BRANCH_ID);
+    }
+    const[mr,pr,er,cr]=await Promise.all([mq,pq,eq,cq]);
     const mems=mr.data||[],act=mems.filter(m=>m.status==='active').length,exp=mems.filter(m=>m.status==='expired').length;
     document.getElementById('s-tot').textContent=mems.length;document.getElementById('s-act').textContent=act;
     document.getElementById('s-exp').textContent=exp;document.getElementById('s-rev').textContent=fc((pr.data||[]).reduce((s,p)=>s+Number(p.amount||0),0));
@@ -2415,6 +2632,13 @@ function openAddM(){
   document.getElementById('m-en').value=ce(td2(),1);document.getElementById('m-wt').value='';
   document.getElementById('m-fm').value='0';document.getElementById('m-pm').value='0';
   document.getElementById('photo-preview').style.display='none';document.getElementById('photo-placeholder').style.display='block';
+  // Branch selector
+  const brWrap = document.getElementById('m-branch-wrap');
+  const brSel = document.getElementById('m-branch');
+  if(GYM_BRANCHES.length >= 2 && brWrap && brSel){
+    brWrap.style.display='block';
+    brSel.innerHTML = GYM_BRANCHES.map(b=>`<option value="${b.id}" ${b.id===BRANCH_ID?'selected':''}>${b.name}</option>`).join('');
+  } else if(brWrap){ brWrap.style.display='none'; }
   document.getElementById('m-mo-t').textContent=T().addtit;openMo('m-mo');
 }
 function editM(id){
@@ -2441,7 +2665,8 @@ async function saveM(){
     const data={name,phone,email:document.getElementById('m-em').value.trim(),subscription_type:type,subscription_start:start,subscription_end:finalEnd,
       notes:document.getElementById('m-nt').value.trim(),weight:document.getElementById('m-wt').value?parseFloat(document.getElementById('m-wt').value):null,
       free_months:freeM,pause_months:parseInt(document.getElementById('m-pm').value||0),photo_url:photoBase64||null,
-      gym_id:GYM_ID};
+      gym_id:GYM_ID,
+      branch_id:(GYM_BRANCHES.length>=2)?(document.getElementById('m-branch')?.value||BRANCH_ID||null):null};
     if(id){const{error}=await sb.from('members').update(data).eq('id',id);if(error)throw error;}
     else{const{error}=await sb.from('members').insert([data]);if(error)throw error;}
     toast(T().saved);closeMo('m-mo');loadMems();photoBase64='';
@@ -2599,7 +2824,7 @@ async function doCI(){
   try{
     const{data:ex}=await sb.from('checkins').select('id').eq('member_id',m.id).eq('date',td2());
     if(ex&&ex.length){document.getElementById('ci-msg').innerHTML=`<span style="color:var(--in);font-weight:600">${T().calr}</span>`;toast(T().calr,'info');}
-    else{await sb.from('checkins').insert([{member_id:m.id,gym_id:GYM_ID}]);document.getElementById('ci-msg').innerHTML=`<span style="color:#00895A;font-weight:600">${T().cok} — ${ft(new Date().toISOString())}</span>`;toast(T().cok);if(m.status!=='expired')soundOk();await refreshTdCI();await loadAC();}
+    else{await sb.from('checkins').insert([{member_id:m.id,gym_id:GYM_ID,branch_id:(BRANCH_ID&&GYM_BRANCHES.length>=2)?BRANCH_ID:null}]);document.getElementById('ci-msg').innerHTML=`<span style="color:#00895A;font-weight:600">${T().cok} — ${ft(new Date().toISOString())}</span>`;toast(T().cok);if(m.status!=='expired')soundOk();await refreshTdCI();await loadAC();}
   }catch(e){toast(T().err,'error')}finally{btn.disabled=false;selM=null;document.getElementById('ci-in').value='';}
 }
 async function refreshTdCI(){
@@ -2614,7 +2839,9 @@ async function loadPays(){
   const srch=document.getElementById('p-srch').value.toLowerCase();
   const tbody=document.getElementById('p-tbody');tbody.innerHTML='<tr><td colspan="5"><div class="lc"><div class="spn"></div></div></td></tr>';
   try{
-    const{data,error}=await sb.from('payments').select('*,members(name,phone)').eq('gym_id',GYM_ID||'').order('payment_date',{ascending:false});if(error)throw error;
+    let pq = sb.from('payments').select('*,members(name,phone)').eq('gym_id',GYM_ID||'').order('payment_date',{ascending:false});
+    if(BRANCH_ID && GYM_BRANCHES.length >= 2) pq = pq.eq('branch_id',BRANCH_ID);
+    const{data,error}=await pq;if(error)throw error;
     let pays=data||[];if(srch)pays=pays.filter(p=>(p.members?.name||'').toLowerCase().includes(srch)||(p.notes||'').toLowerCase().includes(srch));
     document.getElementById('p-total').textContent=fc(pays.reduce((s,p)=>s+Number(p.amount||0),0));
     tbody.innerHTML=pays.length?pays.map(p=>`<tr>
@@ -2635,7 +2862,7 @@ async function saveP(){
   if(!mid||!amt||!dt){toast(T().req,'error');return}
   const btn=document.getElementById('p-save');btn.disabled=true;
   try{
-    const{error}=await sb.from('payments').insert([{member_id:mid,amount:parseFloat(amt),payment_date:dt,notes:document.getElementById('p-nt').value.trim(),gym_id:GYM_ID}]);
+    const{error}=await sb.from('payments').insert([{member_id:mid,amount:parseFloat(amt),payment_date:dt,notes:document.getElementById('p-nt').value.trim(),gym_id:GYM_ID,branch_id:(BRANCH_ID&&GYM_BRANCHES.length>=2)?BRANCH_ID:null}]);
     if(error)throw error;toast(T().payed);closeMo('p-mo');loadPays();
     const{data}=await sb.from('payments').select('*,members(name,phone)').eq('member_id',mid).order('created_at',{ascending:false}).limit(1);
     if(data&&data[0])showReceipt(data[0].id,data[0].members?.name,data[0].members?.phone);
@@ -2651,11 +2878,12 @@ async function loadReport(){
   const endDate=new Date(year,mon,0),end=`${year}-${mon}-${String(endDate.getDate()).padStart(2,'0')}`;
   const rc=document.getElementById('rep-content');rc.innerHTML='<div class="lc"><div class="spn"></div></div>';
   try{
+    const bf = (q) => (BRANCH_ID && GYM_BRANCHES.length >= 2) ? q.eq('branch_id',BRANCH_ID) : q;
     const[pays,newM,actM,cis]=await Promise.all([
-      sb.from('payments').select('amount,notes,payment_date,members(name)').eq('gym_id',GYM_ID||'').gte('payment_date',start).lte('payment_date',end).order('payment_date',{ascending:false}),
-      sb.from('members').select('id,name,phone,subscription_type,subscription_start').eq('gym_id',GYM_ID||'').gte('subscription_start',start).lte('subscription_start',end),
-      sb.from('members').select('id').eq('gym_id',GYM_ID||'').eq('status','active'),
-      sb.from('checkins').select('id,date').eq('gym_id',GYM_ID||'').gte('date',start).lte('date',end)
+      bf(sb.from('payments').select('amount,notes,payment_date,members(name)').eq('gym_id',GYM_ID||'').gte('payment_date',start).lte('payment_date',end).order('payment_date',{ascending:false})),
+      bf(sb.from('members').select('id,name,phone,subscription_type,subscription_start').eq('gym_id',GYM_ID||'').gte('subscription_start',start).lte('subscription_start',end)),
+      bf(sb.from('members').select('id').eq('gym_id',GYM_ID||'').eq('status','active')),
+      bf(sb.from('checkins').select('id,date').eq('gym_id',GYM_ID||'').gte('date',start).lte('date',end))
     ]);
     const totalRev=(pays.data||[]).reduce((s,p)=>s+Number(p.amount||0),0),totalCis=(cis.data||[]).length;
     const uniqDays=[...new Set((cis.data||[]).map(c=>c.date))].length;
@@ -3530,6 +3758,7 @@ async function loadMems(){
   try{
     let q = sb.from('members').select('*').order('created_at',{ascending:false});
     if(GYM_ID) q = q.eq('gym_id', GYM_ID);
+    if(BRANCH_ID && GYM_BRANCHES.length >= 2) q = q.eq('branch_id', BRANCH_ID);
 
     // Category filter
     if(currentCat !== 'all' && currentCat !== 'frozen') q = q.eq('category', currentCat);
