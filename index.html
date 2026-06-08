@@ -575,7 +575,10 @@ body.dark .bg-ring{opacity:.08}
 
 
 /* ── BILLING / TRIAL ── */
-.trial-banner{position:fixed;bottom:0;left:0;right:0;z-index:8000;padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;font-size:.875rem;font-weight:600;gap:1rem;animation:slideUp .4s ease}
+.trial-banner{position:fixed;bottom:56px;left:0;width:var(--sw,268px);z-index:8000;padding:.42rem .7rem;display:flex;align-items:center;justify-content:space-between;font-size:.7rem;font-weight:600;gap:.5rem;animation:slideUp .4s ease;border-radius:0;transition:width .3s}
+body.rtl .trial-banner{left:auto;right:0}
+.sb.collapsed~* .trial-banner,.trial-banner.slim{width:64px;overflow:hidden}
+.sb.collapsed ~ .trial-banner .trial-text,.sb.collapsed ~ .trial-banner .trial-btn{display:none}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .trial-banner.warn{background:linear-gradient(135deg,#FF5722,#E64A19);color:white}
 .trial-banner.expired{background:linear-gradient(135deg,#C62828,#B71C1C);color:white}
@@ -3375,6 +3378,13 @@ function toggleSidebar(){
     mc.style.marginLeft = margin;
     mc.style.marginRight = '0';
   }
+  // Resize trial banner with sidebar
+  const tb = document.querySelector('.trial-banner');
+  if(tb){
+    tb.style.width = isCollapsed ? '64px' : 'var(--sw,268px)';
+    tb.querySelector('.trial-text') && (tb.querySelector('.trial-text').style.display = isCollapsed ? 'none' : '');
+    tb.querySelector('.trial-btn') && (tb.querySelector('.trial-btn').style.display = isCollapsed ? 'none' : '');
+  }
 }
 
 // Apply saved sidebar state
@@ -4413,7 +4423,7 @@ async function checkSubscription(){
       const billingEnd = new Date(GYM_SUB.billing_end);
       const daysToRenew = Math.ceil((billingEnd - now) / 864e5);
       if(daysToRenew <= 7){
-        showTrialBanner('warn', `⚠️ اشتراكك ينتهي خلال ${daysToRenew} أيام`, 'تجديد الاشتراك');
+        showTrialBanner('warn', daysToRenew);
       }
       return; // All good
     }
@@ -4424,9 +4434,9 @@ async function checkSubscription(){
         showPaywall('expired');
         return;
       } else if(daysLeft <= 5){
-        showTrialBanner('warn', `⚠️ تجربتك المجانية تنتهي خلال ${daysLeft} أيام`, 'اشترك الآن');
+        showTrialBanner('warn', daysLeft);
       } else {
-        showTrialBanner('active', `🎉 تجربة مجانية — ${daysLeft} يوم متبقي من أصل 15`, 'عرض الخطط');
+        showTrialBanner('active', daysLeft);
       }
       return;
     }
@@ -4438,25 +4448,32 @@ async function checkSubscription(){
   }catch(e){ console.warn('Subscription check error:', e); }
 }
 
-function showTrialBanner(type, msg, btnText){
+function showTrialBanner(type, daysLeft){
   // Remove existing
   const existing = document.querySelector('.trial-banner');
   if(existing) existing.remove();
 
+  // Multilingual text
+  const lang = document.documentElement.lang || 'ar';
+  const texts = {
+    ar:  { active: `🎁 تجربة مجانية — ${daysLeft} يوم`, warn: `⚠️ تنتهي خلال ${daysLeft} أيام`, btn: 'اشترك' },
+    en:  { active: `🎁 Free Trial — ${daysLeft} days`, warn: `⚠️ Expires in ${daysLeft} days`, btn: 'Subscribe' },
+    tl:  { active: `🎁 Libreng Trial — ${daysLeft} araw`, warn: `⚠️ Mag-eexpire sa ${daysLeft} araw`, btn: 'I-subscribe' },
+    hi:  { active: `🎁 निःशुल्क ट्रायल — ${daysLeft} दिन`, warn: `⚠️ ${daysLeft} दिन बचे हैं`, btn: 'सदस्यता' },
+  };
+  const t = texts[lang] || texts['en'];
+  const msg = type === 'warn' ? t.warn : t.active;
+  const btnText = t.btn;
+
   const banner = document.createElement('div');
   banner.className = `trial-banner ${type}`;
   banner.innerHTML = `
-    <div style="display:flex;align-items:center;gap:.75rem">
-      <span style="font-size:1.2rem">${type==='warn'?'⚡':'🎁'}</span>
-      <span>${msg}</span>
-    </div>
-    <button onclick="showPaywall('plans')" style="background:rgba(255,255,255,0.2);border:1.5px solid rgba(255,255,255,0.4);border-radius:8px;color:white;padding:.4rem 1rem;cursor:pointer;font-size:.82rem;font-weight:700;font-family:var(--font);white-space:nowrap;flex-shrink:0">
-      ${btnText} →
+    <span class="trial-icon" style="font-size:.85rem;flex-shrink:0">${type==='warn'?'⚠️':'🎁'}</span>
+    <span class="trial-text" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.7rem">${msg}</span>
+    <button class="trial-btn" onclick="showPaywall('plans')" style="background:rgba(255,255,255,0.25);border:1px solid rgba(255,255,255,0.4);border-radius:6px;color:white;padding:.2rem .45rem;cursor:pointer;font-size:.65rem;font-weight:700;font-family:var(--font);white-space:nowrap;flex-shrink:0">
+      ${btnText}
     </button>
   `;
-  // Add margin to main content so banner does not overlap
-  const mc = document.querySelector('.mc');
-  if(mc) mc.style.paddingBottom = '60px';
   document.body.appendChild(banner);
 }
 
