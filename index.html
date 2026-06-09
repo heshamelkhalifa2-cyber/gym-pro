@@ -5801,31 +5801,47 @@ function checkAdminPass(){
 
 let lastGeneratedCode = '';
 
-function adminGenerateCode(){
+async function adminGenerateCode(){
   const plan = document.getElementById('admin-plan').value;
   const months = document.getElementById('admin-months').value;
   const gymName = document.getElementById('admin-gym-name').value.trim();
+
+  const btn = document.querySelector('#admin-content button[onclick="adminGenerateCode()"]');
+  if(btn){ btn.disabled=true; btn.textContent='⏳ جاري التوليد...'; }
 
   // Generate unique code
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let random = '';
   for(let i=0;i<8;i++) random += chars[Math.floor(Math.random()*chars.length)];
-  const code = `${plan.toUpperCase()}-${months}-${random}`;
+  const code = `${plan.toUpperCase()}-${months}M-${random}`;
   lastGeneratedCode = code;
 
   const planInfo = PLANS[plan];
-  const totalPrice = planInfo.price * parseInt(months);
+  const totalPrice = planInfo ? planInfo.price * parseInt(months) : 0;
 
-  document.getElementById('generated-code').textContent = code;
-  document.getElementById('generated-code-info').textContent =
-    `${planInfo.nameAr} | ${months} شهر | ${totalPrice} KWD${gymName ? ' | ' + gymName : ''}`;
-  document.getElementById('generated-code-wrap').style.display = 'block';
+  try{
+    // ✅ حفظ الكود في قاعدة البيانات
+    const{error} = await sb.from('activation_codes').insert([{
+      code,
+      plan,
+      months: parseInt(months),
+      notes: gymName || null
+    }]);
+    if(error) throw error;
 
-  // Save code to Supabase for tracking
-  sb.from('gym_subscriptions').select('count').then(()=>{
-    // Just log it - optional tracking
-    console.log('Code generated:', code, 'for', gymName);
-  });
+    document.getElementById('generated-code').textContent = code;
+    document.getElementById('generated-code-info').textContent =
+      `${planInfo?.nameAr||plan} | ${months} شهر | ${totalPrice} KWD${gymName ? ' | ' + gymName : ''}`;
+    document.getElementById('generated-code-wrap').style.display = 'block';
+    toast('✅ تم توليد الكود وحفظه');
+  }catch(e){
+    toast('خطأ في حفظ الكود: '+e.message,'error');
+    // Show code anyway even if save failed
+    document.getElementById('generated-code').textContent = code;
+    document.getElementById('generated-code-wrap').style.display = 'block';
+  }finally{
+    if(btn){ btn.disabled=false; btn.textContent='⚡ توليد الكود'; }
+  }
 }
 
 function copyCode(){
