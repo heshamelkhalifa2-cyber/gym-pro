@@ -4931,27 +4931,13 @@ async function doRegister(){
 let GYM_SUB = null;
 
 const PLANS = {
-  starter: {
-    name: 'Starter', nameAr: 'ستارتر',
-    price: 15, priceYear: 150,
-    maxMembers: 100,
-    color: '#00897B',
-    features: ['✅ إدارة الأعضاء (100)', '✅ تسجيل الحضور', '✅ المدفوعات', '✅ QR Check-in', '❌ واتساب تلقائي', '❌ جدول الحصص', '❌ تقارير متقدمة']
-  },
   pro: {
-    name: 'Pro', nameAr: 'برو',
+    name: 'GymPro', nameAr: 'GymPro',
     price: 25, priceYear: 250,
-    maxMembers: 500,
+    maxMembers: 99999,
     color: '#FF5722',
     popular: true,
-    features: ['✅ إدارة الأعضاء (500)', '✅ تسجيل الحضور', '✅ المدفوعات', '✅ QR Check-in', '✅ واتساب تلقائي', '✅ جدول الحصص', '✅ تقارير كاملة']
-  },
-  business: {
-    name: 'Business', nameAr: 'بزنس',
-    price: 40, priceYear: 400,
-    maxMembers: 99999,
-    color: '#7C3AED',
-    features: ['✅ أعضاء غير محدودين', '✅ كل مميزات Pro', '✅ موظفين غير محدودين', '✅ تخصيص كامل', '✅ تقارير متقدمة', '✅ دعم أولوية', '✅ API Access']
+    features: ['✅ أعضاء غير محدودين', '✅ إدارة الأعضاء الكاملة', '✅ تسجيل الحضور بـ QR', '✅ المدفوعات والإيصالات', '✅ واتساب تلقائي', '✅ فروع متعددة', '✅ تقارير كاملة', '✅ دعم فني']
   }
 };
 
@@ -5055,23 +5041,23 @@ function showPaywall(mode){
       </div>
 
       <!-- Plans -->
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;margin-bottom:1.5rem">
+      <div style="display:grid;grid-template-columns:1fr;gap:.75rem;margin-bottom:1.5rem;max-width:320px;margin-inline:auto">
         ${Object.entries(PLANS).map(([key, plan])=>`
-          <div class="plan-card ${plan.popular?'popular':''}" onclick="selectPlan('${key}')" id="plan-${key}">
-            <div class="plan-name">${plan.nameAr}</div>
-            <div class="plan-price">${plan.price}</div>
-            <div class="plan-period">KWD / شهر</div>
-            <div style="font-size:.65rem;color:var(--tm);margin-top:.2rem">${plan.priceYear} KWD / سنة</div>
-            <div class="plan-features">${plan.features.join('<br/>')}</div>
+          <div class="plan-card popular" id="plan-${key}" style="text-align:center;padding:2rem">
+            <div style="font-size:2rem;margin-bottom:.5rem">🏋️</div>
+            <div style="font-size:1.2rem;font-weight:900;margin-bottom:.5rem">${plan.nameAr}</div>
+            <div style="font-size:2.5rem;font-weight:900;color:var(--p);line-height:1">${plan.price}</div>
+            <div style="font-size:.85rem;color:var(--tm);margin-bottom:1rem">KWD / شهر</div>
+            <div style="text-align:right;font-size:.78rem;color:var(--t2);line-height:2">${plan.features.join('<br/>')}</div>
           </div>
         `).join('')}
       </div>
 
       <!-- Selected plan action -->
-      <div id="billing-action" style="display:none;background:var(--pg);border:1.5px solid rgba(255,87,34,0.2);border-radius:var(--r);padding:1.25rem;margin-bottom:1rem">
-        <div style="font-weight:700;margin-bottom:.5rem" id="selected-plan-name">—</div>
+      <div style="background:var(--pg);border:1.5px solid rgba(255,87,34,0.2);border-radius:var(--r);padding:1.25rem;margin-bottom:1rem">
+        <div style="font-weight:700;margin-bottom:.5rem">خطة GymPro — 25 KWD / شهر</div>
         <div style="font-size:.82rem;color:var(--t2);margin-bottom:1rem">للاشتراك تواصل معنا على واتساب وسيتم تفعيل حسابك خلال ساعات</div>
-        <a id="wa-billing-btn" href="#" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.85rem;background:linear-gradient(135deg,#25D366,#128C7E);color:white;border-radius:var(--rs);font-weight:700;font-size:.95rem;text-decoration:none">
+        <a href="https://wa.me/96550000000?text=${encodeURIComponent('مرحباً، أريد الاشتراك في GymPro — الخطة الاحترافية 25 KWD/شهر')}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.85rem;background:linear-gradient(135deg,#25D366,#128C7E);color:white;border-radius:var(--rs);font-weight:700;font-size:.95rem;text-decoration:none">
           📲 تواصل على واتساب للاشتراك
         </a>
         <div style="font-size:.72rem;color:var(--tm);margin-top:.5rem;text-align:center">سيتم تفعيل حسابك فور تأكيد الدفع</div>
