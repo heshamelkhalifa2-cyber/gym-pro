@@ -1368,13 +1368,14 @@ body.rtl .trial-banner{left:auto;right:0}
         <!-- Pricing Tab -->
         <div id="tab-st-pricing" class="tab-content">
           <div class="card">
-            <div class="ch"><h3 class="ct">💰 أسعار الاشتراكات</h3><button class="btn bp btn-sm" onclick="savePricing()">💾 حفظ الأسعار</button></div>
+            <div class="ch">
+              <h3 class="ct">💰 قائمة الخدمات والأسعار</h3>
+              <button class="btn bp btn-sm" onclick="openAddProduct()">＋ إضافة خدمة / منتج</button>
+            </div>
             <div style="background:var(--inl);border:1px solid rgba(33,150,243,0.2);border-radius:var(--rs);padding:.875rem;margin-bottom:1.25rem;font-size:.83rem;color:var(--in)">
-              ℹ️ حدد سعر كل نوع اشتراك — اتركه فارغاً لإخفائه
+              ℹ️ أضف كل خدماتك ومنتجاتك بأسعارها — تظهر تلقائياً في مودال الحصة الفردية وإضافة العضو
             </div>
-            <div class="fg" id="pricing-grid">
-              <div class="lc"><div class="spn"></div></div>
-            </div>
+            <div id="products-list"><div class="lc"><div class="spn"></div></div></div>
           </div>
         </div>
 
@@ -1424,18 +1425,43 @@ body.rtl .trial-banner{left:auto;right:0}
 <!-- Session Modal -->
 <div class="mo" id="session-mo">
   <div class="md md-sm">
-    <div class="mh"><h3 class="mt">🎯 تسجيل حصة فردية</h3><button class="xbtn" data-close="session-mo">✕</button></div>
+    <div class="mh"><h3 class="mt">🎯 تسجيل حصة / خدمة</h3><button class="xbtn" data-close="session-mo">✕</button></div>
     <div class="mc2">
       <div class="fg">
+        <!-- نوع الزائر -->
         <div class="f2 full">
-          <label>العضو <span class="req">*</span></label>
+          <label>نوع الزائر</label>
+          <div style="display:flex;gap:.5rem">
+            <button id="sess-btn-member" onclick="setSessType('member')" class="btn bp btn-sm" style="flex:1;justify-content:center">👤 عضو مسجل</button>
+            <button id="sess-btn-walkin" onclick="setSessType('walkin')" class="btn bs2 btn-sm" style="flex:1;justify-content:center">🚶 زائر جديد</button>
+          </div>
+        </div>
+        <!-- عضو مسجل -->
+        <div class="f2 full" id="sess-member-wrap">
+          <label>ابحث عن العضو</label>
           <input type="text" id="sess-search" placeholder="ابحث بالاسم أو الهاتف..." autocomplete="off"/>
           <div id="sess-ac" style="display:none;background:var(--bc);border:1px solid var(--br);border-radius:var(--rs);max-height:160px;overflow-y:auto;margin-top:4px"></div>
           <input type="hidden" id="sess-mid"/>
           <div id="sess-member-info" style="display:none;margin-top:.5rem;padding:.5rem .75rem;background:var(--pg);border-radius:var(--rs);font-size:.82rem;font-weight:700"></div>
         </div>
+        <!-- زائر جديد -->
+        <div class="f2" id="sess-walkin-wrap" style="display:none">
+          <label>الاسم <span class="req">*</span></label>
+          <input type="text" id="sess-walkin-name" placeholder="اسم الزائر"/>
+        </div>
+        <div class="f2" id="sess-walkin-phone-wrap" style="display:none">
+          <label>رقم الهاتف</label>
+          <input type="tel" id="sess-walkin-phone" placeholder="+96550000000"/>
+        </div>
+        <!-- الخدمة -->
+        <div class="f2 full">
+          <label>الخدمة / المنتج</label>
+          <select id="sess-service" onchange="onSessServiceChange()">
+            <option value="">-- اختر خدمة (اختياري) --</option>
+          </select>
+        </div>
         <div class="f2">
-          <label>المبلغ (KWD)</label>
+          <label>المبلغ (KWD) <span class="req">*</span></label>
           <input type="number" id="sess-amt" placeholder="0.000" step="0.001" min="0"/>
           <div style="font-size:.7rem;color:var(--tm);margin-top:.2rem" id="sess-hint"></div>
         </div>
@@ -1452,7 +1478,7 @@ body.rtl .trial-banner{left:auto;right:0}
           <label>التاريخ</label>
           <input type="date" id="sess-date"/>
         </div>
-        <div class="f2">
+        <div class="f2 full">
           <label>ملاحظات</label>
           <input type="text" id="sess-notes" placeholder="اختياري"/>
         </div>
@@ -1460,7 +1486,53 @@ body.rtl .trial-banner{left:auto;right:0}
     </div>
     <div class="mft">
       <button class="btn bs2" data-close="session-mo">إلغاء</button>
-      <button class="btn bp" onclick="saveSession()">💾 تسجيل الحصة</button>
+      <button class="btn bp" onclick="saveSession()">💾 تسجيل وإصدار فاتورة</button>
+    </div>
+  </div>
+</div>
+
+<!-- Product / Service Modal -->
+<div class="mo" id="product-mo">
+  <div class="md md-sm">
+    <div class="mh"><h3 class="mt">💰 <span id="product-mo-title">إضافة خدمة / منتج</span></h3><button class="xbtn" data-close="product-mo">✕</button></div>
+    <div class="mc2">
+      <input type="hidden" id="product-id"/>
+      <div class="fg">
+        <div class="f2 full"><label>اسم الخدمة / المنتج <span class="req">*</span></label><input type="text" id="product-name" placeholder="مثال: حصة فردية، شهر كامل، بروتين..."/></div>
+        <div class="f2">
+          <label>النوع</label>
+          <select id="product-type">
+            <option value="session">🎯 حصة فردية</option>
+            <option value="subscription">📅 اشتراك</option>
+            <option value="product">📦 منتج</option>
+            <option value="offer">🎁 عرض</option>
+            <option value="other">📝 أخرى</option>
+          </select>
+        </div>
+        <div class="f2">
+          <label>السعر (KWD) <span class="req">*</span></label>
+          <input type="number" id="product-price" placeholder="0.000" step="0.001" min="0"/>
+        </div>
+        <div class="f2">
+          <label>المدة (شهور) — للاشتراكات</label>
+          <input type="number" id="product-months" placeholder="مثال: 1، 3، 6، 12" min="0" step="1"/>
+          <div style="font-size:.7rem;color:var(--tm);margin-top:.2rem">اتركه فارغاً للخدمات غير الاشتراكية</div>
+        </div>
+        <div class="f2 full">
+          <label>وصف (اختياري)</label>
+          <input type="text" id="product-desc" placeholder="وصف مختصر..."/>
+        </div>
+        <div class="f2 full">
+          <div style="display:flex;align-items:center;gap:.5rem">
+            <input type="checkbox" id="product-active" checked style="width:16px;height:16px;accent-color:var(--p)"/>
+            <label for="product-active" style="cursor:pointer;text-transform:none;font-size:.875rem;color:var(--t1);font-weight:500">نشط — يظهر في القوائم</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mft">
+      <button class="btn bs2" data-close="product-mo">إلغاء</button>
+      <button class="btn bp" onclick="saveProduct()">💾 حفظ</button>
     </div>
   </div>
 </div>
@@ -1786,7 +1858,7 @@ async function loadGymContext(userId){
       applyGymBranding(GYM_INFO);
       // Load branches and pricing
       await loadGymBranches();
-      await loadGymPricing();
+      await loadGymProducts();
       return true;
     }
   }catch(e){
@@ -1810,17 +1882,69 @@ async function loadGymBranches(){
   }catch(e){ GYM_BRANCHES = []; }
 }
 
-// ── SESSION (حصة فردية) ──
+// ── SESSION (حصة فردية / خدمة) ──
+let _sessType = 'member'; // 'member' or 'walkin'
+let GYM_PRODUCTS = []; // قائمة المنتجات/الخدمات
+
+function setSessType(type){
+  _sessType = type;
+  const memberWrap = document.getElementById('sess-member-wrap');
+  const walkinName = document.getElementById('sess-walkin-wrap');
+  const walkinPhone = document.getElementById('sess-walkin-phone-wrap');
+  const btnMember = document.getElementById('sess-btn-member');
+  const btnWalkin = document.getElementById('sess-btn-walkin');
+  if(type === 'member'){
+    memberWrap.style.display = 'block';
+    walkinName.style.display = 'none';
+    walkinPhone.style.display = 'none';
+    btnMember.className = 'btn bp btn-sm'; btnMember.style.flex='1';btnMember.style.justifyContent='center';
+    btnWalkin.className = 'btn bs2 btn-sm'; btnWalkin.style.flex='1';btnWalkin.style.justifyContent='center';
+  } else {
+    memberWrap.style.display = 'none';
+    walkinName.style.display = 'flex';
+    walkinPhone.style.display = 'flex';
+    btnWalkin.className = 'btn bp btn-sm'; btnWalkin.style.flex='1';btnWalkin.style.justifyContent='center';
+    btnMember.className = 'btn bs2 btn-sm'; btnMember.style.flex='1';btnMember.style.justifyContent='center';
+  }
+}
+
+function onSessServiceChange(){
+  const sel = document.getElementById('sess-service');
+  const val = sel.value;
+  if(!val) return;
+  const prod = GYM_PRODUCTS.find(p=>p.id===val);
+  if(prod){
+    document.getElementById('sess-amt').value = prod.price.toFixed(3);
+    document.getElementById('sess-hint').textContent = `${prod.name} — ${prod.price.toFixed(3)} KWD`;
+  }
+}
+
 function openSession(){
+  _sessType = 'member';
   document.getElementById('sess-search').value='';
   document.getElementById('sess-mid').value='';
   document.getElementById('sess-member-info').style.display='none';
   document.getElementById('sess-ac').style.display='none';
+  document.getElementById('sess-walkin-name') && (document.getElementById('sess-walkin-name').value='');
+  document.getElementById('sess-walkin-phone') && (document.getElementById('sess-walkin-phone').value='');
   document.getElementById('sess-date').value=td2();
   document.getElementById('sess-notes').value='';
-  const price = GYM_PRICING[0]||0;
-  document.getElementById('sess-amt').value = price>0?price.toFixed(3):'';
-  document.getElementById('sess-hint').textContent = price>0?`سعر الحصة: ${price.toFixed(3)} KWD`:'لم يتم تحديد سعر للحصة الفردية';
+  document.getElementById('sess-amt').value='';
+  document.getElementById('sess-hint').textContent='';
+  // Load products into select
+  const sel = document.getElementById('sess-service');
+  sel.innerHTML = '<option value="">-- اختر خدمة (اختياري) --</option>' +
+    GYM_PRODUCTS.filter(p=>p.is_active!==false).map(p=>
+      `<option value="${p.id}">${p.name} — ${p.price.toFixed(3)} KWD</option>`
+    ).join('');
+  // Default to session price if exists
+  const sessionProd = GYM_PRODUCTS.find(p=>p.type==='session');
+  if(sessionProd){
+    sel.value = sessionProd.id;
+    document.getElementById('sess-amt').value = sessionProd.price.toFixed(3);
+    document.getElementById('sess-hint').textContent = `${sessionProd.name} — ${sessionProd.price.toFixed(3)} KWD`;
+  }
+  setSessType('member');
   openMo('session-mo');
   // Bind autocomplete
   const inp = document.getElementById('sess-search');
@@ -1832,7 +1956,7 @@ function openSession(){
     if(!data||!data.length){ ac.style.display='none'; return; }
     ac.style.display='block';
     ac.innerHTML = data.map(m=>`
-      <div style="padding:.5rem .75rem;cursor:pointer;font-size:.85rem;border-bottom:1px solid var(--br)" 
+      <div style="padding:.5rem .75rem;cursor:pointer;font-size:.85rem;border-bottom:1px solid var(--br)"
         onmousedown="selectSessionMember('${m.id}','${m.name}','${m.phone}')">
         <span style="font-weight:700">${m.name}</span> <span style="color:var(--tm)">${m.phone}</span>
       </div>`).join('');
@@ -1849,52 +1973,192 @@ function selectSessionMember(id,name,phone){
 }
 
 async function saveSession(){
-  const mid = document.getElementById('sess-mid').value;
   const amt = parseFloat(document.getElementById('sess-amt').value||0);
   const dt = document.getElementById('sess-date').value;
-  if(!mid){ toast('اختر العضو أولاً','error'); return; }
   if(!amt||amt<=0){ toast('أدخل المبلغ','error'); return; }
   const methodLabels={cash:'كاش',knet:'كنت',transfer:'تحويل',other:'أخرى'};
   const method = document.getElementById('sess-method').value;
   const notes = document.getElementById('sess-notes').value.trim();
+  const sel = document.getElementById('sess-service');
+  const serviceName = sel.options[sel.selectedIndex]?.text || 'حصة فردية';
+
   try{
-    // Register checkin
-    const{data:ex}=await sb.from('checkins').select('id').eq('member_id',mid).eq('date',dt);
-    if(!ex||!ex.length){
-      await sb.from('checkins').insert([{member_id:mid,gym_id:GYM_ID,date:dt,checkin_time:new Date().toISOString()}]);
+    if(_sessType === 'member'){
+      // عضو مسجل
+      const mid = document.getElementById('sess-mid').value;
+      if(!mid){ toast('اختر العضو أولاً','error'); return; }
+      // Register checkin
+      const{data:ex}=await sb.from('checkins').select('id').eq('member_id',mid).eq('date',dt);
+      if(!ex||!ex.length){
+        await sb.from('checkins').insert([{member_id:mid,gym_id:GYM_ID,date:dt,checkin_time:new Date().toISOString()}]);
+      }
+      // Register payment
+      await sb.from('payments').insert([{
+        member_id:mid, amount:amt, payment_date:dt,
+        notes:`${serviceName} — ${methodLabels[method]||method}${notes?' — '+notes:''}`,
+        gym_id:GYM_ID,
+        branch_id:(BRANCH_ID&&GYM_BRANCHES.length>=2)?BRANCH_ID:null
+      }]);
+      const{data:pays}=await sb.from('payments').select('*,members(name,phone)').eq('member_id',mid).order('payment_date',{ascending:false}).limit(1);
+      closeMo('session-mo');
+      toast(`✅ تم تسجيل الحصة (${amt.toFixed(3)} KWD)`);
+      if(pays&&pays[0]) showReceipt(pays[0].id, pays[0].members?.name, pays[0].members?.phone);
+
+    } else {
+      // زائر جديد
+      const walkinName = document.getElementById('sess-walkin-name').value.trim() || 'زائر';
+      const walkinPhone = document.getElementById('sess-walkin-phone').value.trim() || '-';
+      // Register in walk-in log (payments table with no member_id)
+      await sb.from('payments').insert([{
+        member_id: null,
+        amount: amt,
+        payment_date: dt,
+        notes: `${serviceName} — ${walkinName} — ${walkinPhone} — ${methodLabels[method]||method}${notes?' — '+notes:''}`,
+        gym_id: GYM_ID,
+        branch_id:(BRANCH_ID&&GYM_BRANCHES.length>=2)?BRANCH_ID:null
+      }]);
+      closeMo('session-mo');
+      toast(`✅ تم تسجيل الخدمة لـ ${walkinName} (${amt.toFixed(3)} KWD)`);
+      // Show manual receipt
+      showWalkInReceipt(walkinName, walkinPhone, amt, serviceName, method, dt);
     }
-    // Register payment
-    await sb.from('payments').insert([{
-      member_id:mid, amount:amt, payment_date:dt,
-      notes:`حصة فردية — ${methodLabels[method]||method}${notes?' — '+notes:''}`,
-      gym_id:GYM_ID,
-      branch_id:(BRANCH_ID&&GYM_BRANCHES.length>=2)?BRANCH_ID:null
-    }]);
-    // Show receipt
-    const{data:pays}=await sb.from('payments').select('*,members(name,phone)').eq('member_id',mid).order('payment_date',{ascending:false}).limit(1);
-    closeMo('session-mo');
-    toast(`🎯 تم تسجيل الحصة والدفعة (${amt.toFixed(3)} KWD) ✅`);
-    if(pays&&pays[0]) showReceipt(pays[0].id, pays[0].members?.name, pays[0].members?.phone);
     soundOk();
   }catch(e){ toast('خطأ: '+e.message,'error'); }
 }
 
-async function loadGymPricing(){
-  try{
-    const{data} = await sb.from('gym_pricing').select('*').eq('gym_id',GYM_ID);
-    GYM_PRICING = {};
-    (data||[]).forEach(p=>{ GYM_PRICING[p.months] = p.price; });
-  }catch(e){ GYM_PRICING = {}; }
+function showWalkInReceipt(name, phone, amount, service, method, date){
+  const methodLabels={cash:'كاش',knet:'كنت',transfer:'تحويل',other:'أخرى'};
+  const receiptId = 'WLK-' + Date.now().toString(36).toUpperCase();
+  document.getElementById('rc-date').textContent = new Date(date).toLocaleDateString('ar') + ' • ' + new Date().toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('rc-id').textContent = receiptId;
+  document.getElementById('rc-rows').innerHTML = `
+    <div class="receipt-row"><span>👤 الاسم</span><strong>${name}</strong></div>
+    <div class="receipt-row"><span>📱 الهاتف</span><span>${phone}</span></div>
+    <div class="receipt-row"><span>📅 التاريخ</span><span>${new Date(date).toLocaleDateString('ar')}</span></div>
+    <div class="receipt-row"><span>📝 الخدمة</span><span>${service}</span></div>
+    <div class="receipt-row"><span>💳 طريقة الدفع</span><span>${methodLabels[method]||method}</span></div>
+    <div class="receipt-row total"><span>💰 المبلغ المدفوع</span><strong>${amount.toFixed(3)} KWD</strong></div>
+  `;
+  openMo('rec-mo');
 }
+
+// ── PRODUCTS / SERVICES ──
+async function loadGymProducts(){
+  try{
+    const{data} = await sb.from('gym_products').select('*').eq('gym_id',GYM_ID).order('created_at');
+    GYM_PRODUCTS = data||[];
+    // Also update GYM_PRICING for backward compat
+    GYM_PRICING = {};
+    GYM_PRODUCTS.forEach(p=>{ if(p.months) GYM_PRICING[p.months] = p.price; });
+  }catch(e){ GYM_PRODUCTS = []; }
+}
+
+async function loadProductsList(){
+  const list = document.getElementById('products-list');
+  if(!list) return;
+  await loadGymProducts();
+  if(!GYM_PRODUCTS.length){
+    list.innerHTML = `<div class="es"><div class="ei">💰</div><div class="et">لا توجد خدمات بعد</div><div style="font-size:.82rem;color:var(--tm);margin-top:.5rem">اضغط "إضافة خدمة / منتج" للبدء</div></div>`;
+    return;
+  }
+  const typeColors={session:'#FF5722',subscription:'#7C3AED',product:'#00897B',offer:'#E91E63',other:'#9E9E9E'};
+  const typeIcons={session:'🎯',subscription:'📅',product:'📦',offer:'🎁',other:'📝'};
+  const typeNames={session:'حصة فردية',subscription:'اشتراك',product:'منتج',offer:'عرض',other:'أخرى'};
+  list.innerHTML = GYM_PRODUCTS.map(p=>`
+    <div style="display:flex;align-items:center;gap:.875rem;padding:.875rem;background:var(--bg);border:1px solid var(--br);border-radius:var(--rs);margin-bottom:.5rem;${p.is_active===false?'opacity:.5':''}">
+      <div style="width:40px;height:40px;border-radius:10px;background:${typeColors[p.type]||'#9E9E9E'}18;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">${typeIcons[p.type]||'📝'}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:800;font-size:.9rem">${p.name}</div>
+        <div style="display:flex;gap:.4rem;align-items:center;margin-top:.2rem;flex-wrap:wrap">
+          <span style="font-family:var(--mono);font-weight:700;color:#00897B;font-size:.85rem">${p.price.toFixed(3)} KWD</span>
+          <span style="padding:.1rem .4rem;border-radius:999px;font-size:.65rem;font-weight:700;background:${typeColors[p.type]||'#9E9E9E'}18;color:${typeColors[p.type]||'#666'}">${typeNames[p.type]||p.type}</span>
+          ${p.months?`<span class="badge bgi" style="font-size:.65rem">${p.months} شهر</span>`:''}
+          ${p.is_active===false?'<span class="badge bgd" style="font-size:.62rem">مخفي</span>':''}
+        </div>
+        ${p.description?`<div style="font-size:.75rem;color:var(--tm);margin-top:.2rem">${p.description}</div>`:''}
+      </div>
+      <div style="display:flex;gap:.35rem;flex-shrink:0">
+        <button class="btn bs2 btn-sm" onclick="openEditProduct('${p.id}')">✏️</button>
+        <button class="btn bd btn-sm" onclick="deleteProduct('${p.id}')">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openAddProduct(){
+  document.getElementById('product-id').value='';
+  document.getElementById('product-name').value='';
+  document.getElementById('product-price').value='';
+  document.getElementById('product-months').value='';
+  document.getElementById('product-desc').value='';
+  document.getElementById('product-type').value='session';
+  document.getElementById('product-active').checked=true;
+  document.getElementById('product-mo-title').textContent='إضافة خدمة / منتج';
+  openMo('product-mo');
+}
+
+function openEditProduct(id){
+  const p = GYM_PRODUCTS.find(x=>x.id===id); if(!p)return;
+  document.getElementById('product-id').value=p.id;
+  document.getElementById('product-name').value=p.name;
+  document.getElementById('product-price').value=p.price;
+  document.getElementById('product-months').value=p.months||'';
+  document.getElementById('product-desc').value=p.description||'';
+  document.getElementById('product-type').value=p.type||'session';
+  document.getElementById('product-active').checked=p.is_active!==false;
+  document.getElementById('product-mo-title').textContent='تعديل الخدمة';
+  openMo('product-mo');
+}
+
+async function saveProduct(){
+  const name = document.getElementById('product-name').value.trim();
+  const price = parseFloat(document.getElementById('product-price').value||0);
+  if(!name){ toast('اسم الخدمة مطلوب','error'); return; }
+  if(!price||price<=0){ toast('السعر مطلوب','error'); return; }
+  const id = document.getElementById('product-id').value;
+  const payload = {
+    gym_id: GYM_ID,
+    name,
+    price,
+    type: document.getElementById('product-type').value,
+    months: document.getElementById('product-months').value ? parseInt(document.getElementById('product-months').value) : null,
+    description: document.getElementById('product-desc').value.trim()||null,
+    is_active: document.getElementById('product-active').checked
+  };
+  try{
+    if(id){ await sb.from('gym_products').update(payload).eq('id',id); }
+    else { await sb.from('gym_products').insert([payload]); }
+    toast(id?'تم تحديث الخدمة ✅':'تم إضافة الخدمة ✅');
+    closeMo('product-mo');
+    loadProductsList();
+    await loadGymProducts();
+  }catch(e){ toast('خطأ: '+e.message,'error'); }
+}
+
+async function deleteProduct(id){
+  if(!confirm('هل تريد حذف هذه الخدمة؟')) return;
+  await sb.from('gym_products').delete().eq('id',id);
+  toast('تم الحذف');
+  loadProductsList();
+  await loadGymProducts();
+}
+
+async function loadGymPricing(){
+  // Load from gym_products table
+  await loadGymProducts();
+}
+
+
 
 function updatePaymentHint(){
   const ty = parseInt(document.getElementById('m-ty')?.value||1);
-  const price = GYM_PRICING[ty];
+  // Find product matching subscription months
+  const prod = GYM_PRODUCTS.find(p=>p.months===ty);
   const hint = document.getElementById('m-pay-hint');
   const amtEl = document.getElementById('m-pay-amt');
-  if(price && price > 0){
-    if(amtEl && !amtEl._userEdited) amtEl.value = price.toFixed(3);
-    if(hint) hint.textContent = `السعر المحدد: ${price.toFixed(3)} KWD`;
+  if(prod && prod.price > 0){
+    if(amtEl && !amtEl._userEdited) amtEl.value = prod.price.toFixed(3);
+    if(hint) hint.textContent = `السعر المحدد: ${prod.price.toFixed(3)} KWD — ${prod.name}`;
   } else {
     if(hint) hint.textContent = 'لم يتم تحديد سعر لهذا النوع في الإعدادات';
   }
@@ -4775,7 +5039,7 @@ async function loadSettings(){
   }catch(e){}
   // Load staff and pricing
   loadStaff();
-  loadPricingForm();
+  loadProductsList();
   loadBranches();
 }
 
