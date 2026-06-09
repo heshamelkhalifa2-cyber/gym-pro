@@ -5265,7 +5265,7 @@ async function loadSettings(){
   }
   // Load gym settings
   try{
-    const{data} = await sb.from('gym_settings').select('*').eq('gym_id',GYM_ID).single();
+    const{data} = await sb.from('gym_settings').select('*').eq('gym_id',GYM_ID).maybeSingle();
     gymSettings = data;
     if(data){
       const si = id => document.getElementById(id);
