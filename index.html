@@ -2961,7 +2961,7 @@ function showAlerts(m){
 }
 async function doCI(){
   if(!selM){const q=document.getElementById('ci-in').value.trim();if(!q){toast(T().req,'error');return}
-    const{data}=await sb.from('members').select('*').or(`name.ilike.%${q}%,phone.ilike.%${q}%`);
+    const{data}=await sb.from('members').select('*').eq('gym_id',GYM_ID||'').or(`name.ilike.%${q}%,phone.ilike.%${q}%`);
     if(!data||!data.length){document.getElementById('ci-res').classList.add('vis');document.getElementById('ci-av').textContent='?';document.getElementById('ci-nm').textContent=T().cnf;document.getElementById('ci-ph2').textContent='';document.getElementById('ci-msg').innerHTML=`<span style="color:var(--da)">${T().cnf}</span>`;return;}
     selM=data[0];}
   const m=selM;const btn=document.getElementById('ci-btn');btn.disabled=true;
@@ -3014,7 +3014,7 @@ async function saveP(){
   try{
     const{error}=await sb.from('payments').insert([{member_id:mid,amount:parseFloat(amt),payment_date:dt,notes:document.getElementById('p-nt').value.trim(),gym_id:GYM_ID,branch_id:(BRANCH_ID&&GYM_BRANCHES.length>=2)?BRANCH_ID:null}]);
     if(error)throw error;toast(T().payed);closeMo('p-mo');loadPays();
-    const{data}=await sb.from('payments').select('*,members(name,phone)').eq('member_id',mid).order('created_at',{ascending:false}).limit(1);
+    const{data}=await sb.from('payments').select('*,members(name,phone)').eq('member_id',mid).order('payment_date',{ascending:false}).limit(1);
     if(data&&data[0])showReceipt(data[0].id,data[0].members?.name,data[0].members?.phone);
   }catch(e){toast(T().err,'error')}finally{btn.disabled=false}
 }
