@@ -1167,18 +1167,54 @@ body.rtl .trial-banner{left:auto;right:0}
 
       <!-- REPORT -->
       <div id="pg-report" class="pg2">
-        <div class="pg-hdr"><div class="pg-hdr-left"><h2 id="rep-t">التقرير الشهري</h2><p>تحليل الأداء والإيرادات</p></div></div>
+        <div class="pg-hdr"><div class="pg-hdr-left"><h2 id="rep-t">التقارير</h2><p>تحليل شامل للأداء والإيرادات</p></div></div>
+
+        <!-- Filters Card -->
         <div class="card" style="margin-bottom:1.25rem">
-          <div class="ch">
-            <h3 class="ct">📅 اختر الشهر</h3>
-            <div style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap">
-              <input type="month" id="rep-month" style="width:auto;min-width:160px"/>
-              <button class="btn bp" id="rep-load-btn">📊 عرض التقرير</button>
-              <button class="btn bs2" onclick="printReport()">🖨️ طباعة</button>
+          <div class="fg" style="grid-template-columns:1fr 1fr 1fr;gap:.75rem;align-items:end">
+            <div class="f2">
+              <label>نوع الفترة</label>
+              <select id="rep-period-type" onchange="onRepPeriodChange()">
+                <option value="month">شهر محدد</option>
+                <option value="range">من / إلى</option>
+                <option value="year">سنة كاملة</option>
+              </select>
+            </div>
+            <div class="f2" id="rep-month-wrap">
+              <label>الشهر</label>
+              <input type="month" id="rep-month" style="width:100%"/>
+            </div>
+            <div class="f2" id="rep-year-wrap" style="display:none">
+              <label>السنة</label>
+              <input type="number" id="rep-year" placeholder="2025" min="2020" max="2030" style="width:100%"/>
+            </div>
+            <div class="f2" id="rep-from-wrap" style="display:none">
+              <label>من تاريخ</label>
+              <input type="date" id="rep-from"/>
+            </div>
+            <div class="f2" id="rep-to-wrap" style="display:none">
+              <label>إلى تاريخ</label>
+              <input type="date" id="rep-to"/>
+            </div>
+            <div class="f2" style="display:flex;gap:.5rem;align-items:flex-end">
+              <button class="btn bp" id="rep-load-btn" style="flex:1;justify-content:center">📊 عرض</button>
+              <button class="btn bs2" onclick="printReport()" title="طباعة">🖨️</button>
+              <button class="btn bs2" onclick="exportReportCSV()" title="تصدير CSV">📥</button>
+              <button class="btn bs2" onclick="exportReportPDF()" title="تصدير PDF">📄</button>
             </div>
           </div>
         </div>
-        <div id="rep-content"><div class="es"><div class="ei">📅</div><div class="et">اختر شهراً لعرض التقرير</div></div></div>
+
+        <!-- Report Tabs -->
+        <div class="tabs" id="rep-tabs" style="display:none">
+          <div class="tab active" data-reptab="summary">📊 ملخص</div>
+          <div class="tab" data-reptab="revenue">💰 الإيرادات</div>
+          <div class="tab" data-reptab="members">👥 الأعضاء</div>
+          <div class="tab" data-reptab="checkins">✅ الحضور</div>
+          <div class="tab" data-reptab="subscriptions">📋 الاشتراكات</div>
+        </div>
+
+        <div id="rep-content"><div class="es"><div class="ei">📅</div><div class="et">اختر فترة زمنية لعرض التقرير</div></div></div>
       </div>
 
       <!-- MEASUREMENTS -->
@@ -3485,35 +3521,237 @@ async function delP(id){const ok=await confirm_(T().cdel);if(!ok)return;try{cons
 
 // Report
 function initReport(){const now=new Date();document.getElementById('rep-month').value=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;}
+// ── REPORT PERIOD CHANGE ──
+function onRepPeriodChange(){
+  const type = document.getElementById('rep-period-type').value;
+  document.getElementById('rep-month-wrap').style.display = type==='month'?'block':'none';
+  document.getElementById('rep-year-wrap').style.display = type==='year'?'block':'none';
+  document.getElementById('rep-from-wrap').style.display = type==='range'?'block':'none';
+  document.getElementById('rep-to-wrap').style.display = type==='range'?'block':'none';
+}
+
+function getRepDateRange(){
+  const type = document.getElementById('rep-period-type').value;
+  let start, end;
+  if(type==='month'){
+    const month = document.getElementById('rep-month').value;
+    if(!month) return null;
+    const[year,mon] = month.split('-');
+    start = `${year}-${mon}-01`;
+    const endDate = new Date(year, mon, 0);
+    end = `${year}-${mon}-${String(endDate.getDate()).padStart(2,'0')}`;
+  } else if(type==='year'){
+    const year = document.getElementById('rep-year').value;
+    if(!year) return null;
+    start = `${year}-01-01`; end = `${year}-12-31`;
+  } else {
+    start = document.getElementById('rep-from').value;
+    end = document.getElementById('rep-to').value;
+    if(!start||!end) return null;
+  }
+  return {start, end};
+}
+
+let _repData = {};
+let _repTab = 'summary';
+
 async function loadReport(){
-  const month=document.getElementById('rep-month').value;if(!month)return;
-  const[year,mon]=month.split('-'),start=`${year}-${mon}-01`;
-  const endDate=new Date(year,mon,0),end=`${year}-${mon}-${String(endDate.getDate()).padStart(2,'0')}`;
-  const rc=document.getElementById('rep-content');rc.innerHTML='<div class="lc"><div class="spn"></div></div>';
+  const range = getRepDateRange();
+  if(!range){ toast('اختر فترة زمنية','error'); return; }
+  const{start, end} = range;
+  const rc = document.getElementById('rep-content');
+  rc.innerHTML = '<div class="lc"><div class="spn"></div></div>';
   try{
     const bf = (q) => (BRANCH_ID && GYM_BRANCHES.length >= 2) ? q.eq('branch_id',BRANCH_ID) : q;
-    const bfNoCi = (q) => q; // checkins don't have branch_id yet
-    const[pays,newM,actM,cis]=await Promise.all([
-      bf(sb.from('payments').select('amount,notes,payment_date,members(name)').eq('gym_id',GYM_ID||'').gte('payment_date',start).lte('payment_date',end).order('payment_date',{ascending:false})),
-      bf(sb.from('members').select('id,name,phone,subscription_type,subscription_start').eq('gym_id',GYM_ID||'').gte('subscription_start',start).lte('subscription_start',end)),
-      bf(sb.from('members').select('id').eq('gym_id',GYM_ID||'').eq('status','active')),
-      bfNoCi(sb.from('checkins').select('id,date').eq('gym_id',GYM_ID||'').gte('date',start).lte('date',end))
+    const[pays, newM, allMR, expM, cis, subTypes] = await Promise.all([
+      bf(sb.from('payments').select('*,members(name,phone)').eq('gym_id',GYM_ID||'').gte('payment_date',start).lte('payment_date',end).order('payment_date',{ascending:false})),
+      bf(sb.from('members').select('*').eq('gym_id',GYM_ID||'').gte('subscription_start',start).lte('subscription_start',end).order('subscription_start',{ascending:false})),
+      bf(sb.from('members').select('id,name,phone,status,subscription_type,subscription_end,subscription_start,is_frozen').eq('gym_id',GYM_ID||'')),
+      bf(sb.from('members').select('id,name,phone,subscription_end').eq('gym_id',GYM_ID||'').eq('status','expired').gte('subscription_end',start).lte('subscription_end',end)),
+      sb.from('checkins').select('*,members(name,phone)').eq('gym_id',GYM_ID||'').gte('date',start).lte('date',end).order('date',{ascending:false}),
+      bf(sb.from('members').select('subscription_type').eq('gym_id',GYM_ID||'').eq('status','active'))
     ]);
-    const totalRev=(pays.data||[]).reduce((s,p)=>s+Number(p.amount||0),0),totalCis=(cis.data||[]).length;
-    const uniqDays=[...new Set((cis.data||[]).map(c=>c.date))].length;
-    rc.innerHTML=`<div class="report-grid">
-      <div class="report-stat"><div class="report-val">${fc(totalRev)}</div><div class="report-lbl">💰 إجمالي الإيرادات</div></div>
-      <div class="report-stat"><div class="report-val">${(newM.data||[]).length}</div><div class="report-lbl">👥 أعضاء جدد</div></div>
-      <div class="report-stat"><div class="report-val">${totalCis}</div><div class="report-lbl">✅ إجمالي الحضور</div></div>
-      <div class="report-stat"><div class="report-val">${uniqDays}</div><div class="report-lbl">📅 أيام مفتوحة</div></div>
-      <div class="report-stat"><div class="report-val">${uniqDays>0?(totalCis/uniqDays).toFixed(1):0}</div><div class="report-lbl">📊 متوسط الحضور/يوم</div></div>
-      <div class="report-stat"><div class="report-val">${(actM.data||[]).length}</div><div class="report-lbl">✅ الأعضاء النشطون</div></div>
-    </div>
-    ${(newM.data||[]).length?`<div class="card" style="margin-bottom:1rem"><div class="ch"><h3 class="ct">👥 الأعضاء الجدد (${(newM.data||[]).length})</h3></div>${(newM.data||[]).map(m=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:.65rem 0;border-bottom:1px solid var(--br)">${mkAv(m.name,null)}<div style="flex:1;margin-inline-start:.75rem"><div style="font-weight:700">${m.name}</div><div style="font-size:.78rem;color:var(--tm);font-family:var(--mono)">${m.phone}</div></div><span class="badge bgi">${subLbl(m.subscription_type)}</span></div>`).join('')}</div>`:''}
-    ${(pays.data||[]).length?`<div class="card"><div class="ch"><h3 class="ct">💰 المدفوعات</h3><span class="mono" style="color:#00895A;font-weight:800">${fc(totalRev)}</span></div>${(pays.data||[]).map(p=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:.6rem 0;border-bottom:1px solid var(--br)"><div><div style="font-weight:700">${p.members?.name||'?'}</div><div style="font-size:.78rem;color:var(--tm)">${fd(p.payment_date)}${p.notes?' • '+p.notes:''}</div></div><span class="mono" style="color:#00895A;font-weight:700">${fc(p.amount)}</span></div>`).join('')}</div>`:''}`;
-  }catch(e){toast(T().err,'error')}
+    _repData = {
+      pays:pays.data||[], newM:newM.data||[], allM:allMR.data||[],
+      expM:expM.data||[], cis:cis.data||[], subTypes:subTypes.data||[], start, end
+    };
+    document.getElementById('rep-tabs').style.display = 'flex';
+    document.querySelectorAll('[data-reptab]').forEach(t=>{
+      t.onclick = ()=>{
+        document.querySelectorAll('[data-reptab]').forEach(x=>x.classList.remove('active'));
+        t.classList.add('active'); _repTab = t.dataset.reptab; renderRepTab();
+      };
+    });
+    document.querySelectorAll('[data-reptab]').forEach(t=>t.classList.toggle('active',t.dataset.reptab==='summary'));
+    _repTab = 'summary';
+    renderRepTab();
+  }catch(e){toast(T().err,'error');console.error(e);}
 }
-function printReport(){window.print();}
+
+function renderRepTab(){
+  const rc = document.getElementById('rep-content');
+  if(!_repData.pays){return;}
+  const{pays,newM,allM,expM,cis,subTypes,start,end} = _repData;
+  const totalRev = pays.reduce((s,p)=>s+Number(p.amount||0),0);
+  const totalCis = cis.length;
+  const uniqDays = [...new Set(cis.map(c=>c.date))].length;
+  const actM = allM.filter(m=>m.status==='active'&&!m.is_frozen);
+
+  if(_repTab==='summary'){
+    const subCount = {};
+    subTypes.forEach(m=>{ const k=m.subscription_type||1; subCount[k]=(subCount[k]||0)+1; });
+    rc.innerHTML = `
+      <div class="report-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="report-stat"><div class="report-val">${fc(totalRev)}</div><div class="report-lbl">💰 إجمالي الإيرادات</div></div>
+        <div class="report-stat"><div class="report-val">${newM.length}</div><div class="report-lbl">👥 أعضاء جدد</div></div>
+        <div class="report-stat"><div class="report-val">${actM.length}</div><div class="report-lbl">✅ أعضاء نشطون</div></div>
+        <div class="report-stat"><div class="report-val">${totalCis}</div><div class="report-lbl">🏃 إجمالي الحضور</div></div>
+        <div class="report-stat"><div class="report-val">${uniqDays}</div><div class="report-lbl">📅 أيام مفتوحة</div></div>
+        <div class="report-stat"><div class="report-val">${uniqDays>0?(totalCis/uniqDays).toFixed(1):0}</div><div class="report-lbl">📊 متوسط حضور/يوم</div></div>
+        <div class="report-stat"><div class="report-val">${expM.length}</div><div class="report-lbl">❌ اشتراكات انتهت</div></div>
+        <div class="report-stat"><div class="report-val">${pays.length}</div><div class="report-lbl">💳 عدد الدفعات</div></div>
+        <div class="report-stat"><div class="report-val">${pays.length>0?fc(totalRev/pays.length):fc(0)}</div><div class="report-lbl">💡 متوسط الدفعة</div></div>
+      </div>
+      ${Object.keys(subCount).length?`<div class="card" style="margin-top:1rem"><div class="ch"><h3 class="ct">📋 توزيع الاشتراكات النشطة</h3></div>
+        ${Object.entries(subCount).sort((a,b)=>+b[1]-+a[1]).map(([k,v])=>`
+          <div style="display:flex;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid var(--br)">
+            <span>${subLbl(k)}</span><span style="font-weight:700">${v} عضو</span>
+          </div>`).join('')}
+      </div>`:''}`;
+
+  } else if(_repTab==='revenue'){
+    const grouped = {};
+    pays.forEach(p=>{ grouped[p.payment_date]=(grouped[p.payment_date]||[]).concat(p); });
+    rc.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:1rem 1.25rem;background:linear-gradient(135deg,#FF5722,#7C3AED);border-radius:var(--r);margin-bottom:1rem">
+        <span style="color:rgba(255,255,255,0.8);font-weight:700">إجمالي الإيرادات (${pays.length} دفعة)</span>
+        <span class="mono" style="color:white;font-size:1.4rem;font-weight:900">${fc(totalRev)}</span>
+      </div>
+      <div class="card">
+        ${Object.entries(grouped).sort((a,b)=>b[0].localeCompare(a[0])).map(([date,ps])=>{
+          const dt = ps.reduce((s,p)=>s+Number(p.amount||0),0);
+          return `<div style="margin-bottom:.75rem">
+            <div style="display:flex;justify-content:space-between;padding:.5rem .75rem;background:var(--bg);border-radius:var(--rs);margin-bottom:.25rem">
+              <span style="font-weight:700">📅 ${fd(date)}</span>
+              <span class="mono" style="color:#00897B;font-weight:800">${fc(dt)}</span>
+            </div>
+            ${ps.map(p=>`<div style="display:flex;justify-content:space-between;padding:.4rem .75rem;border-bottom:1px solid var(--br)">
+              <div><div style="font-size:.85rem;font-weight:600">${p.members?.name||'زائر'}</div><div style="font-size:.7rem;color:var(--tm)">${p.notes||'-'}</div></div>
+              <span class="mono" style="color:#00897B;font-weight:700">${fc(p.amount)}</span>
+            </div>`).join('')}
+          </div>`;
+        }).join('') || `<div class="es"><div class="ei">💰</div><div class="et">لا توجد مدفوعات</div></div>`}
+      </div>`;
+
+  } else if(_repTab==='members'){
+    const subFlt = document.getElementById('rep-sub-filter')?.value||'';
+    let filtered = newM;
+    if(subFlt) filtered = filtered.filter(m=>m.subscription_type==subFlt);
+    rc.innerHTML = `
+      <div style="display:flex;gap:.5rem;margin-bottom:1rem;align-items:center;flex-wrap:wrap">
+        <span style="font-size:.82rem;color:var(--t2);font-weight:700">فلتر نوع الاشتراك:</span>
+        <select id="rep-sub-filter" onchange="renderRepTab()" style="width:auto">
+          <option value="">الكل</option>
+          ${[1,2,3,6,12].map(m=>`<option value="${m}" ${subFlt==m?'selected':''}>${subLbl(m)}</option>`).join('')}
+        </select>
+        <span class="badge bgi">${filtered.length} عضو</span>
+      </div>
+      <div class="card">
+        ${filtered.length ? filtered.map(m=>`
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem 0;border-bottom:1px solid var(--br)">
+            <div style="display:flex;align-items:center;gap:.75rem">${mkAv(m.name,m.photo_url)}
+              <div><div style="font-weight:700">${m.name}</div><div style="font-size:.75rem;color:var(--tm);font-family:var(--mono)">${m.phone}</div></div>
+            </div>
+            <div style="text-align:end">
+              <span class="badge bgi">${subLbl(m.subscription_type)}</span>
+              <div style="font-size:.7rem;color:var(--tm);margin-top:.2rem">بدأ: ${fd(m.subscription_start)}</div>
+              <div style="font-size:.7rem;color:var(--tm)">ينتهي: ${fd(m.subscription_end)}</div>
+            </div>
+          </div>`).join('') : `<div class="es"><div class="ei">👥</div><div class="et">لا يوجد أعضاء جدد</div></div>`}
+      </div>
+      ${expM.length?`<div class="card" style="margin-top:1rem"><div class="ch"><h3 class="ct">❌ اشتراكات انتهت</h3><span class="badge bgd">${expM.length}</span></div>
+        ${expM.map(m=>`<div style="display:flex;justify-content:space-between;padding:.6rem 0;border-bottom:1px solid var(--br)">
+          <span style="font-weight:700">${m.name}</span><span style="color:var(--da);font-size:.85rem">${fd(m.subscription_end)}</span>
+        </div>`).join('')}</div>`:''}`;
+
+  } else if(_repTab==='checkins'){
+    const byDate = {};
+    cis.forEach(c=>{ byDate[c.date]=(byDate[c.date]||[]).concat(c); });
+    const peak = Object.entries(byDate).sort((a,b)=>b[1].length-a[1].length)[0];
+    rc.innerHTML = `
+      <div class="report-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:1rem">
+        <div class="report-stat"><div class="report-val">${totalCis}</div><div class="report-lbl">🏃 إجمالي الحضور</div></div>
+        <div class="report-stat"><div class="report-val">${uniqDays}</div><div class="report-lbl">📅 أيام مفتوحة</div></div>
+        <div class="report-stat"><div class="report-val">${peak?peak[1].length:0}</div><div class="report-lbl">🏆 أعلى يوم ${peak?'('+fd(peak[0])+')':''}</div></div>
+      </div>
+      <div class="card">
+        ${Object.entries(byDate).sort((a,b)=>b[0].localeCompare(a[0])).map(([date,cs])=>`
+          <div style="margin-bottom:.5rem">
+            <div style="display:flex;justify-content:space-between;padding:.5rem .75rem;background:var(--bg);border-radius:var(--rs)">
+              <span style="font-weight:700">📅 ${fd(date)}</span><span class="badge bgi">${cs.length} حضور</span>
+            </div>
+            ${cs.map(c=>`<div style="display:flex;justify-content:space-between;padding:.4rem .75rem;border-bottom:1px solid var(--br)">
+              <span style="font-size:.85rem">${c.members?.name||'?'}</span>
+              <span class="mono" style="font-size:.75rem;color:var(--t2)">${ft(c.checkin_time)}</span>
+            </div>`).join('')}
+          </div>`).join('') || `<div class="es"><div class="ei">🏃</div><div class="et">لا يوجد حضور</div></div>`}
+      </div>`;
+
+  } else if(_repTab==='subscriptions'){
+    const subCount = {};
+    allM.forEach(m=>{ const k=m.subscription_type||1; subCount[k]=(subCount[k]||0)+1; });
+    const active=allM.filter(m=>m.status==='active'&&!m.is_frozen).length;
+    const expired=allM.filter(m=>m.status==='expired').length;
+    const frozen=allM.filter(m=>m.is_frozen).length;
+    rc.innerHTML = `
+      <div class="report-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:1rem">
+        <div class="report-stat"><div class="report-val">${allM.length}</div><div class="report-lbl">👥 إجمالي</div></div>
+        <div class="report-stat"><div class="report-val" style="-webkit-text-fill-color:#00897B">${active}</div><div class="report-lbl">✅ نشطون</div></div>
+        <div class="report-stat"><div class="report-val" style="-webkit-text-fill-color:#C62828">${expired}</div><div class="report-lbl">❌ منتهي</div></div>
+      </div>
+      <div class="card">
+        <div class="ch"><h3 class="ct">📊 توزيع أنواع الاشتراكات</h3></div>
+        ${Object.entries(subCount).sort((a,b)=>+b[1]-+a[1]).map(([k,v])=>{
+          const pct=Math.round(v/allM.length*100)||0;
+          return `<div style="margin-bottom:.875rem">
+            <div style="display:flex;justify-content:space-between;margin-bottom:.3rem">
+              <span style="font-weight:700">${subLbl(k)}</span>
+              <span style="font-weight:700;color:var(--p)">${v} عضو (${pct}%)</span>
+            </div>
+            <div style="background:var(--bg);border-radius:999px;height:8px;overflow:hidden">
+              <div style="height:100%;background:linear-gradient(90deg,var(--p),var(--s));width:${pct}%;border-radius:999px"></div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`;
+  }
+}
+
+function printReport(){ window.print(); }
+
+async function exportReportCSV(){
+  if(!_repData.pays){ toast('عرض التقرير أولاً','error'); return; }
+  const{pays,newM,cis,start,end} = _repData;
+  let csv = `تقرير GymPro من ${start} إلى ${end}\n\n`;
+  csv += 'المدفوعات\n العضو,الهاتف,المبلغ,التاريخ,ملاحظات\n';
+  pays.forEach(p=>{ csv+=`"${p.members?.name||'زائر'}","${p.members?.phone||'-'}",${p.amount},"${p.payment_date}","${p.notes||''}"\n`; });
+  csv += '\nالأعضاء الجدد\nالاسم,الهاتف,نوع الاشتراك,تاريخ البدء,تاريخ الانتهاء\n';
+  newM.forEach(m=>{ csv+=`"${m.name}","${m.phone}","${subLbl(m.subscription_type)}","${m.subscription_start}","${m.subscription_end}"\n`; });
+  csv += '\nتفاصيل الحضور\nالعضو,الهاتف,التاريخ,الوقت\n';
+  cis.forEach(c=>{ csv+=`"${c.members?.name||'?'}","${c.members?.phone||''}","${c.date}","${ft(c.checkin_time)}"\n`; });
+  const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download=`gympro-report-${start}-${end}.csv`; a.click();
+  URL.revokeObjectURL(url);
+  toast('✅ تم تصدير التقرير CSV');
+}
+
+async function exportReportPDF(){
+  if(!_repData.pays){ toast('عرض التقرير أولاً','error'); return; }
+  window.print();
+  toast('ℹ️ اختر "حفظ كـ PDF" في نافذة الطباعة');
+}
 
 // Measurements
 let msAcMs=[];
