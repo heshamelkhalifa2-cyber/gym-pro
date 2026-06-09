@@ -440,6 +440,35 @@ textarea{resize:vertical;min-height:75px}
 .qr-wrap canvas{border-radius:var(--rs);background:white;padding:.75rem;box-shadow:var(--sh1)}
 
 /* Receipt */
+/* ── ONBOARDING ── */
+.ob-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:99999;display:flex;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(4px)}
+.ob-card{background:var(--bc);border-radius:var(--r);max-width:520px;width:100%;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.3);animation:obIn .4s cubic-bezier(.34,1.56,.64,1)}
+@keyframes obIn{from{opacity:0;transform:translateY(24px) scale(.96)}to{opacity:1;transform:none}}
+.ob-header{background:linear-gradient(135deg,var(--p),#7C3AED);padding:2rem;text-align:center;position:relative}
+.ob-icon{font-size:3rem;margin-bottom:.75rem}
+.ob-title{color:white;font-size:1.3rem;font-weight:900;margin-bottom:.35rem}
+.ob-sub{color:rgba(255,255,255,0.8);font-size:.85rem}
+.ob-steps{display:flex;justify-content:center;gap:.4rem;margin-top:1rem}
+.ob-step-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.35);transition:all .3s}
+.ob-step-dot.active{background:white;width:20px;border-radius:4px}
+.ob-body{padding:1.5rem}
+.ob-feature{display:flex;align-items:flex-start;gap:1rem;padding:.75rem;border-radius:var(--rs);margin-bottom:.5rem;background:var(--bg);border:1px solid var(--br)}
+.ob-feature-ic{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+.ob-feature-title{font-weight:800;font-size:.9rem;margin-bottom:.2rem}
+.ob-feature-desc{font-size:.78rem;color:var(--t2);line-height:1.5}
+.ob-footer{padding:1rem 1.5rem;border-top:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;gap:.75rem}
+.ob-progress{font-size:.75rem;color:var(--tm);font-weight:600}
+/* Tooltip tour */
+.tt-overlay{position:fixed;inset:0;z-index:88888;pointer-events:none}
+.tt-highlight{position:fixed;border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,.55);z-index:88889;pointer-events:none;transition:all .4s cubic-bezier(.4,0,.2,1)}
+.tt-bubble{position:fixed;background:var(--bc);border:1px solid var(--br);border-radius:var(--r);padding:1rem 1.25rem;max-width:280px;box-shadow:0 8px 32px rgba(0,0,0,.2);z-index:88890;animation:obIn .3s ease}
+.tt-bubble::before{content:'';position:absolute;width:12px;height:12px;background:var(--bc);border:1px solid var(--br);transform:rotate(45deg)}
+.tt-bubble-title{font-weight:800;font-size:.9rem;margin-bottom:.35rem;color:var(--p)}
+.tt-bubble-desc{font-size:.8rem;color:var(--t2);line-height:1.5;margin-bottom:.75rem}
+.tt-bubble-footer{display:flex;align-items:center;justify-content:space-between}
+.tt-bubble-skip{font-size:.72rem;color:var(--tm);cursor:pointer;text-decoration:underline}
+.tt-bubble-count{font-size:.72rem;color:var(--tm)}
+
 @media print{body *{visibility:hidden}#receipt-content,#receipt-content *{visibility:visible}#receipt-content{position:fixed;left:0;top:0;width:100%;background:white;color:black;padding:2rem}.no-print{display:none!important}#member-card-print,#member-card-print *{visibility:visible}#member-card-print{position:fixed;left:0;top:0;width:100%;display:flex;align-items:center;justify-content:center;background:white}}
 .receipt{background:white;color:#1a1a1a;border-radius:var(--r);padding:2rem;max-width:380px;margin:0 auto}
 .receipt-logo{text-align:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px dashed #e5e7eb}
@@ -3094,6 +3123,8 @@ async function showApp(email){
 
   document.getElementById('u-em').textContent = GYM_INFO?.name || email || 'admin';
   nav('dashboard');loadAC();
+  // Show onboarding for new users
+  setTimeout(showOnboarding, 800);
   setTimeout(checkQRFromURL, 1000);
   // Check subscription status
   setTimeout(checkSubscription, 1500);
@@ -5365,6 +5396,208 @@ async function loadAdminGyms(){
   }
 }
 </script>
+
+  }
+}
+</script>
+
+<script>
+// ══════════════════════════════════════════════
+// ONBOARDING SYSTEM
+// ══════════════════════════════════════════════
+const OB_STEPS = [
+  {
+    icon:'🎉', title:'أهلاً بك في GymPro!', sub:'خلي ندلك على أهم المميزات في دقيقتين',
+    features:[
+      {ic:'👥', bg:'rgba(255,87,34,0.12)', color:'#FF5722', title:'إدارة الأعضاء', desc:'أضف وتابع كل أعضاء جيمك — الاشتراكات، الحضور، والمدفوعات في مكان واحد'},
+      {ic:'📱', bg:'rgba(124,58,237,0.12)', color:'#7C3AED', title:'تسجيل الحضور بـ QR', desc:'كل عضو عنده QR خاص — يمسحه ويتسجل تلقائي بدون أي تدخل منك'},
+      {ic:'💰', bg:'rgba(0,137,123,0.12)', color:'#00897B', title:'تتبع المدفوعات', desc:'سجّل كل دفعة واشوف تقارير الإيرادات يومياً وشهرياً'},
+    ]
+  },
+  {
+    icon:'👥', title:'إضافة أعضاء', sub:'إزاي تضيف عضو جديد بسرعة',
+    features:[
+      {ic:'➕', bg:'rgba(255,87,34,0.12)', color:'#FF5722', title:'من صفحة الأعضاء', desc:'اضغط "إضافة عضو" واملأ الاسم والهاتف ونوع الاشتراك — خلاص!'},
+      {ic:'📅', bg:'rgba(124,58,237,0.12)', color:'#7C3AED', title:'أنواع الاشتراكات', desc:'شهري، ربع سنوي، سنوي — والسيستم يحسب تاريخ الانتهاء تلقائي'},
+      {ic:'🔔', bg:'rgba(0,137,123,0.12)', color:'#00897B', title:'تنبيهات الانتهاء', desc:'لوحة التحكم تظهرلك الأعضاء اللي اشتراكهم هينتهي خلال 10 أيام'},
+    ]
+  },
+  {
+    icon:'📱', title:'كشك الحضور QR', sub:'الطريقة الأسهل لتسجيل الحضور',
+    features:[
+      {ic:'🖨️', bg:'rgba(255,87,34,0.12)', color:'#FF5722', title:'اطبع كارت لكل عضو', desc:'من بروفايل العضو اضغط QR ← طباعة كارت — كارت أنيق بالاسم والـ QR'},
+      {ic:'📲', bg:'rgba(124,58,237,0.12)', color:'#7C3AED', title:'تابلت على المكتب', desc:'افتح "كشك الحضور QR" على تابلت المكتب — العضو يقرّب كارته والسيستم يسجله'},
+      {ic:'💬', bg:'rgba(37,211,102,0.12)', color:'#25D366', title:'ابعت QR على واتساب', desc:'من بروفايل العضو اضغط QR ← إرسال واتساب — العضو يحفظ الصورة على موبايله'},
+    ]
+  },
+  {
+    icon:'💰', title:'المدفوعات والتقارير', sub:'تتبع إيرادات جيمك بسهولة',
+    features:[
+      {ic:'💳', bg:'rgba(255,87,34,0.12)', color:'#FF5722', title:'تسجيل الدفعات', desc:'من صفحة المدفوعات أو من بروفايل العضو مباشرة — سجّل أي دفعة بثواني'},
+      {ic:'📊', bg:'rgba(124,58,237,0.12)', color:'#7C3AED', title:'تقارير شهرية', desc:'شوف إجمالي الإيرادات والأعضاء الجدد لأي فترة زمنية'},
+      {ic:'🧾', bg:'rgba(0,137,123,0.12)', color:'#00897B', title:'إيصالات تلقائية', desc:'كل دفعة بتولد إيصال جاهز للطباعة أو المشاركة'},
+    ]
+  },
+  {
+    icon:'🚀', title:'جاهز تبدأ!', sub:'جيمك جاهز — ابدأ بإضافة أول عضو',
+    features:[
+      {ic:'⚙️', bg:'rgba(255,87,34,0.12)', color:'#FF5722', title:'الإعدادات', desc:'غيّر اسم الجيم، الشعار، الألوان، وأسعار الاشتراكات من صفحة الإعدادات'},
+      {ic:'🏢', bg:'rgba(124,58,237,0.12)', color:'#7C3AED', title:'فروع متعددة', desc:'لو عندك أكتر من فرع أضفهم من الإعدادات ← الفروع وإدارة كل فرع لوحده'},
+      {ic:'💪', bg:'rgba(0,137,123,0.12)', color:'#00897B', title:'ابدأ دلوقتي!', desc:'كل حاجة جاهزة — اضغط "ابدأ" وأضف أول عضو في جيمك'},
+    ]
+  }
+];
+
+let _obStep = 0;
+
+function showOnboarding(){
+  if(localStorage.getItem('ob_done')) return;
+  _obStep = 0;
+  renderObStep();
+  document.getElementById('ob-overlay').style.display = 'flex';
+}
+
+function renderObStep(){
+  const s = OB_STEPS[_obStep];
+  const total = OB_STEPS.length;
+  document.getElementById('ob-icon').textContent = s.icon;
+  document.getElementById('ob-title').textContent = s.title;
+  document.getElementById('ob-sub').textContent = s.sub;
+  document.getElementById('ob-progress').textContent = `${_obStep+1} / ${total}`;
+  // Dots
+  document.getElementById('ob-dots').innerHTML = OB_STEPS.map((_,i)=>
+    `<div class="ob-step-dot ${i===_obStep?'active':''}"></div>`
+  ).join('');
+  // Features
+  document.getElementById('ob-body').innerHTML = s.features.map(f=>`
+    <div class="ob-feature">
+      <div class="ob-feature-ic" style="background:${f.bg};color:${f.color}">${f.ic}</div>
+      <div>
+        <div class="ob-feature-title">${f.title}</div>
+        <div class="ob-feature-desc">${f.desc}</div>
+      </div>
+    </div>
+  `).join('');
+  // Next button
+  const btn = document.getElementById('ob-next');
+  btn.textContent = _obStep === total-1 ? '🚀 ابدأ!' : 'التالي ←';
+}
+
+function obNext(){
+  if(_obStep < OB_STEPS.length-1){
+    _obStep++;
+    const card = document.getElementById('ob-card');
+    card.style.animation = 'none';
+    card.offsetHeight;
+    card.style.animation = 'obIn .3s ease';
+    renderObStep();
+  } else {
+    skipOnboarding();
+    setTimeout(startTour, 500);
+  }
+}
+
+function skipOnboarding(){
+  localStorage.setItem('ob_done','1');
+  document.getElementById('ob-overlay').style.display = 'none';
+}
+
+// ── TOOLTIP TOUR ──
+const TT_STEPS = [
+  {selector:'[data-page="dashboard"]', title:'لوحة التحكم', desc:'هنا تشوف ملخص يومي — الأعضاء والإيرادات والحضور', pos:'right'},
+  {selector:'[data-page="members"]', title:'الأعضاء', desc:'اضغط هنا لإدارة كل أعضاء جيمك وإضافة أعضاء جدد', pos:'right'},
+  {selector:'[data-page="checkin"]', title:'تسجيل الحضور', desc:'سجّل حضور الأعضاء يدوياً أو عن طريق البحث', pos:'right'},
+  {selector:'[data-page="payments"]', title:'المدفوعات', desc:'تابع كل الدفعات وسجّل اشتراكات جديدة', pos:'right'},
+  {selector:'[data-page="report"]', title:'التقارير', desc:'شوف تقارير الإيرادات والأعضاء لأي فترة', pos:'right'},
+  {selector:'[data-page="settings"]', title:'الإعدادات', desc:'غيّر معلومات الجيم، الموظفين، الأسعار، والفروع', pos:'right'},
+  {selector:'#logout-btn', title:'انتهت الجولة! 🎉', desc:'دلوقتي جاهز تبدأ — ابدأ بإضافة أول عضو في جيمك 💪', pos:'right'},
+];
+
+let _ttStep = 0;
+
+function startTour(){
+  if(localStorage.getItem('tt_done')) return;
+  _ttStep = 0;
+  document.getElementById('tt-overlay').style.display = 'block';
+  renderTTStep();
+}
+
+function renderTTStep(){
+  const s = TT_STEPS[_ttStep];
+  const el = document.querySelector(s.selector);
+  if(!el){ ttNext(); return; }
+  const rect = el.getBoundingClientRect();
+  const pad = 6;
+  const hl = document.getElementById('tt-highlight');
+  hl.style.top = (rect.top-pad)+'px';
+  hl.style.left = (rect.left-pad)+'px';
+  hl.style.width = (rect.width+pad*2)+'px';
+  hl.style.height = (rect.height+pad*2)+'px';
+
+  const bubble = document.getElementById('tt-bubble');
+  document.getElementById('tt-title').textContent = s.title;
+  document.getElementById('tt-desc').textContent = s.desc;
+  document.getElementById('tt-count').textContent = `${_ttStep+1} / ${TT_STEPS.length}`;
+
+  // Position bubble
+  const bTop = rect.bottom + 12;
+  const bLeft = Math.min(rect.left, window.innerWidth - 300);
+  bubble.style.top = bTop + 'px';
+  bubble.style.left = Math.max(8, bLeft) + 'px';
+
+  // Last step button
+  const btn = bubble.querySelector('.btn');
+  btn.textContent = _ttStep === TT_STEPS.length-1 ? '🚀 ابدأ!' : 'التالي';
+}
+
+function ttNext(){
+  if(_ttStep < TT_STEPS.length-1){
+    _ttStep++;
+    renderTTStep();
+  } else {
+    skipTour();
+  }
+}
+
+function skipTour(){
+  localStorage.setItem('tt_done','1');
+  document.getElementById('tt-overlay').style.display = 'none';
+}
+</script>
+
+<!-- ══ ONBOARDING ══ -->
+<div class="ob-overlay" id="ob-overlay" style="display:none">
+  <div class="ob-card" id="ob-card">
+    <div class="ob-header" id="ob-header">
+      <div class="ob-icon" id="ob-icon">🎉</div>
+      <div class="ob-title" id="ob-title">أهلاً بك في GymPro!</div>
+      <div class="ob-sub" id="ob-sub">نظام إدارة الجيم الاحترافي</div>
+      <div class="ob-steps" id="ob-dots"></div>
+    </div>
+    <div class="ob-body" id="ob-body"></div>
+    <div class="ob-footer">
+      <span class="ob-progress" id="ob-progress">1 / 5</span>
+      <div style="display:flex;gap:.5rem">
+        <button class="btn bs2 btn-sm" id="ob-skip" onclick="skipOnboarding()">تخطي</button>
+        <button class="btn bp btn-sm" id="ob-next" onclick="obNext()">التالي ←</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tooltip tour -->
+<div id="tt-overlay" style="display:none">
+  <div class="tt-highlight" id="tt-highlight"></div>
+  <div class="tt-bubble" id="tt-bubble">
+    <div class="tt-bubble-title" id="tt-title"></div>
+    <div class="tt-bubble-desc" id="tt-desc"></div>
+    <div class="tt-bubble-footer">
+      <span class="tt-bubble-skip" onclick="skipTour()">تخطي الجولة</span>
+      <span class="tt-bubble-count" id="tt-count"></span>
+      <button class="btn bp btn-sm" onclick="ttNext()">التالي</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
