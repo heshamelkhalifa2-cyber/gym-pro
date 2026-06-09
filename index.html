@@ -1121,7 +1121,9 @@ body.rtl .trial-banner{left:auto;right:0}
 
       <!-- CHECKIN -->
       <div id="pg-checkin" class="pg2">
-        <div class="pg-hdr"><div class="pg-hdr-left"><h2 id="ci-title">تسجيل الحضور</h2><p>تسجيل دخول الأعضاء</p></div></div>
+        <div class="pg-hdr"><div class="pg-hdr-left"><h2 id="ci-title">تسجيل الحضور</h2><p>تسجيل دخول الأعضاء</p></div>
+          <button class="btn bp btn-sm" onclick="openSession()">🎯 حصة فردية</button>
+        </div>
         <div class="ci-grid">
           <div class="card">
             <h3 class="ct" id="ci-ttl" style="margin-bottom:1.25rem">🔍 البحث عن عضو</h3>
@@ -1419,6 +1421,50 @@ body.rtl .trial-banner{left:auto;right:0}
 
 <!-- ══════ MODALS ══════ -->
 
+<!-- Session Modal -->
+<div class="mo" id="session-mo">
+  <div class="md md-sm">
+    <div class="mh"><h3 class="mt">🎯 تسجيل حصة فردية</h3><button class="xbtn" data-close="session-mo">✕</button></div>
+    <div class="mc2">
+      <div class="fg">
+        <div class="f2 full">
+          <label>العضو <span class="req">*</span></label>
+          <input type="text" id="sess-search" placeholder="ابحث بالاسم أو الهاتف..." autocomplete="off"/>
+          <div id="sess-ac" style="display:none;background:var(--bc);border:1px solid var(--br);border-radius:var(--rs);max-height:160px;overflow-y:auto;margin-top:4px"></div>
+          <input type="hidden" id="sess-mid"/>
+          <div id="sess-member-info" style="display:none;margin-top:.5rem;padding:.5rem .75rem;background:var(--pg);border-radius:var(--rs);font-size:.82rem;font-weight:700"></div>
+        </div>
+        <div class="f2">
+          <label>المبلغ (KWD)</label>
+          <input type="number" id="sess-amt" placeholder="0.000" step="0.001" min="0"/>
+          <div style="font-size:.7rem;color:var(--tm);margin-top:.2rem" id="sess-hint"></div>
+        </div>
+        <div class="f2">
+          <label>طريقة الدفع</label>
+          <select id="sess-method">
+            <option value="cash">💵 كاش</option>
+            <option value="knet">💳 كنت</option>
+            <option value="transfer">🏦 تحويل</option>
+            <option value="other">📝 أخرى</option>
+          </select>
+        </div>
+        <div class="f2">
+          <label>التاريخ</label>
+          <input type="date" id="sess-date"/>
+        </div>
+        <div class="f2">
+          <label>ملاحظات</label>
+          <input type="text" id="sess-notes" placeholder="اختياري"/>
+        </div>
+      </div>
+    </div>
+    <div class="mft">
+      <button class="btn bs2" data-close="session-mo">إلغاء</button>
+      <button class="btn bp" onclick="saveSession()">💾 تسجيل الحصة</button>
+    </div>
+  </div>
+</div>
+
 <!-- Branch Modal -->
 <div class="mo" id="branch-mo">
   <div class="md">
@@ -1474,6 +1520,31 @@ body.rtl .trial-banner{left:auto;right:0}
         <div class="f2"><label>🎁 شهور الهدية</label><input type="number" id="m-fm" value="0" min="0"/></div>
         <div class="f2"><label>⏸️ شهور الإيقاف</label><input type="number" id="m-pm" value="0" min="0"/></div>
         <div class="f2 full"><label>ملاحظات</label><textarea id="m-nt" placeholder="ملاحظات..."></textarea></div>
+        <!-- Payment Section -->
+        <div class="f2 full" style="grid-column:1/-1">
+          <div style="border-top:2px dashed var(--br);margin:.5rem 0 1rem"></div>
+          <div style="font-weight:800;font-size:.95rem;margin-bottom:.75rem;color:var(--p)">💳 تسجيل الدفعة</div>
+          <div class="fg" style="grid-template-columns:1fr 1fr;gap:.75rem">
+            <div class="f2">
+              <label>المبلغ (KWD)</label>
+              <input type="number" id="m-pay-amt" placeholder="0.000" step="0.001" min="0" style="background:var(--pg);border-color:rgba(255,87,34,0.3)"/>
+              <div style="font-size:.7rem;color:var(--tm);margin-top:.25rem" id="m-pay-hint">سيتم حساب السعر تلقائياً</div>
+            </div>
+            <div class="f2">
+              <label>طريقة الدفع</label>
+              <select id="m-pay-method">
+                <option value="cash">💵 كاش</option>
+                <option value="knet">💳 كنت</option>
+                <option value="transfer">🏦 تحويل بنكي</option>
+                <option value="other">📝 أخرى</option>
+              </select>
+            </div>
+          </div>
+          <div style="font-size:.75rem;color:var(--tm);margin-top:.35rem">
+            <input type="checkbox" id="m-pay-skip" style="margin-left:.35rem"/>
+            <label for="m-pay-skip" style="cursor:pointer">تخطي تسجيل الدفعة الآن</label>
+          </div>
+        </div>
       </div>
     </div>
     <div class="mft"><button class="btn bs2" data-close="m-mo" id="m-can">إلغاء</button><button class="btn bp" id="m-save">💾 حفظ العضو</button></div>
@@ -1698,6 +1769,7 @@ window._gymProSb=sb;
 // ── MULTI-TENANT ──
 let GYM_ID = null;
 let GYM_INFO = null;
+let GYM_PRICING = {};  // { months: price } — محمّل من gym_pricing
 // ── MULTI-BRANCH ──
 let BRANCH_ID = null;       // null = كل الفروع (overview)
 let BRANCH_INFO = null;     // بيانات الفرع الحالي
@@ -1712,8 +1784,9 @@ async function loadGymContext(userId){
       GYM_ID = gu.gym_id;
       GYM_INFO = gu.gyms;
       applyGymBranding(GYM_INFO);
-      // Load branches
+      // Load branches and pricing
       await loadGymBranches();
+      await loadGymPricing();
       return true;
     }
   }catch(e){
@@ -1735,6 +1808,96 @@ async function loadGymBranches(){
     }
     renderBranchSwitcher();
   }catch(e){ GYM_BRANCHES = []; }
+}
+
+// ── SESSION (حصة فردية) ──
+function openSession(){
+  document.getElementById('sess-search').value='';
+  document.getElementById('sess-mid').value='';
+  document.getElementById('sess-member-info').style.display='none';
+  document.getElementById('sess-ac').style.display='none';
+  document.getElementById('sess-date').value=td2();
+  document.getElementById('sess-notes').value='';
+  const price = GYM_PRICING[0]||0;
+  document.getElementById('sess-amt').value = price>0?price.toFixed(3):'';
+  document.getElementById('sess-hint').textContent = price>0?`سعر الحصة: ${price.toFixed(3)} KWD`:'لم يتم تحديد سعر للحصة الفردية';
+  openMo('session-mo');
+  // Bind autocomplete
+  const inp = document.getElementById('sess-search');
+  inp.oninput = async function(){
+    const q = this.value.trim();
+    if(q.length < 2){ document.getElementById('sess-ac').style.display='none'; return; }
+    const{data} = await sb.from('members').select('id,name,phone').eq('gym_id',GYM_ID||'').or(`name.ilike.%${q}%,phone.ilike.%${q}%`).limit(6);
+    const ac = document.getElementById('sess-ac');
+    if(!data||!data.length){ ac.style.display='none'; return; }
+    ac.style.display='block';
+    ac.innerHTML = data.map(m=>`
+      <div style="padding:.5rem .75rem;cursor:pointer;font-size:.85rem;border-bottom:1px solid var(--br)" 
+        onmousedown="selectSessionMember('${m.id}','${m.name}','${m.phone}')">
+        <span style="font-weight:700">${m.name}</span> <span style="color:var(--tm)">${m.phone}</span>
+      </div>`).join('');
+  };
+}
+
+function selectSessionMember(id,name,phone){
+  document.getElementById('sess-mid').value=id;
+  document.getElementById('sess-search').value=name;
+  document.getElementById('sess-ac').style.display='none';
+  const info = document.getElementById('sess-member-info');
+  info.style.display='block';
+  info.innerHTML=`👤 ${name} — ${phone}`;
+}
+
+async function saveSession(){
+  const mid = document.getElementById('sess-mid').value;
+  const amt = parseFloat(document.getElementById('sess-amt').value||0);
+  const dt = document.getElementById('sess-date').value;
+  if(!mid){ toast('اختر العضو أولاً','error'); return; }
+  if(!amt||amt<=0){ toast('أدخل المبلغ','error'); return; }
+  const methodLabels={cash:'كاش',knet:'كنت',transfer:'تحويل',other:'أخرى'};
+  const method = document.getElementById('sess-method').value;
+  const notes = document.getElementById('sess-notes').value.trim();
+  try{
+    // Register checkin
+    const{data:ex}=await sb.from('checkins').select('id').eq('member_id',mid).eq('date',dt);
+    if(!ex||!ex.length){
+      await sb.from('checkins').insert([{member_id:mid,gym_id:GYM_ID,date:dt,checkin_time:new Date().toISOString()}]);
+    }
+    // Register payment
+    await sb.from('payments').insert([{
+      member_id:mid, amount:amt, payment_date:dt,
+      notes:`حصة فردية — ${methodLabels[method]||method}${notes?' — '+notes:''}`,
+      gym_id:GYM_ID,
+      branch_id:(BRANCH_ID&&GYM_BRANCHES.length>=2)?BRANCH_ID:null
+    }]);
+    // Show receipt
+    const{data:pays}=await sb.from('payments').select('*,members(name,phone)').eq('member_id',mid).order('payment_date',{ascending:false}).limit(1);
+    closeMo('session-mo');
+    toast(`🎯 تم تسجيل الحصة والدفعة (${amt.toFixed(3)} KWD) ✅`);
+    if(pays&&pays[0]) showReceipt(pays[0].id, pays[0].members?.name, pays[0].members?.phone);
+    soundOk();
+  }catch(e){ toast('خطأ: '+e.message,'error'); }
+}
+
+async function loadGymPricing(){
+  try{
+    const{data} = await sb.from('gym_pricing').select('*').eq('gym_id',GYM_ID);
+    GYM_PRICING = {};
+    (data||[]).forEach(p=>{ GYM_PRICING[p.months] = p.price; });
+  }catch(e){ GYM_PRICING = {}; }
+}
+
+function updatePaymentHint(){
+  const ty = parseInt(document.getElementById('m-ty')?.value||1);
+  const price = GYM_PRICING[ty];
+  const hint = document.getElementById('m-pay-hint');
+  const amtEl = document.getElementById('m-pay-amt');
+  if(price && price > 0){
+    if(amtEl && !amtEl._userEdited) amtEl.value = price.toFixed(3);
+    if(hint) hint.textContent = `السعر المحدد: ${price.toFixed(3)} KWD`;
+  } else {
+    if(hint) hint.textContent = 'لم يتم تحديد سعر لهذا النوع في الإعدادات';
+  }
 }
 
 function renderBranchSwitcher(){
@@ -2717,7 +2880,17 @@ function openAddM(){
     brWrap.style.display='block';
     brSel.innerHTML = GYM_BRANCHES.map(b=>`<option value="${b.id}" ${b.id===BRANCH_ID?'selected':''}>${b.name}</option>`).join('');
   } else if(brWrap){ brWrap.style.display='none'; }
-  document.getElementById('m-mo-t').textContent=T().addtit;openMo('m-mo');
+  document.getElementById('m-mo-t').textContent=T().addtit;
+  // Reset payment section
+  const payAmt = document.getElementById('m-pay-amt');
+  if(payAmt){ payAmt.value=''; payAmt._userEdited=false; }
+  document.getElementById('m-pay-skip') && (document.getElementById('m-pay-skip').checked=false);
+  document.getElementById('m-pay-method') && (document.getElementById('m-pay-method').value='cash');
+  // Bind subscription type change
+  const tyEl = document.getElementById('m-ty');
+  if(tyEl){ tyEl.onchange = updatePaymentHint; }
+  updatePaymentHint();
+  openMo('m-mo');
 }
 function editM(id){
   const m=allM.find(x=>x.id===id);if(!m)return;photoBase64=m.photo_url||'';
@@ -2740,14 +2913,40 @@ async function saveM(){
   let finalEnd=end;if(freeM>0){const d=new Date(end);d.setMonth(d.getMonth()+freeM);finalEnd=d.toISOString().split('T')[0]}
   const btn=document.getElementById('m-save');btn.disabled=true;
   try{
-    const data={name,phone,email:document.getElementById('m-em').value.trim(),subscription_type:type,subscription_start:start,subscription_end:finalEnd,
+    const mData={name,phone,email:document.getElementById('m-em').value.trim(),subscription_type:type,subscription_start:start,subscription_end:finalEnd,
       notes:document.getElementById('m-nt').value.trim(),weight:document.getElementById('m-wt').value?parseFloat(document.getElementById('m-wt').value):null,
       free_months:freeM,pause_months:parseInt(document.getElementById('m-pm').value||0),photo_url:photoBase64||null,
       gym_id:GYM_ID,
       branch_id:(GYM_BRANCHES.length>=2)?(document.getElementById('m-branch')?.value||BRANCH_ID||null):null};
-    if(id){const{error}=await sb.from('members').update(data).eq('id',id);if(error)throw error;}
-    else{const{error}=await sb.from('members').insert([data]);if(error)throw error;}
-    toast(T().saved);closeMo('m-mo');loadMems();photoBase64='';
+    let memberId = id;
+    if(id){
+      const{error}=await sb.from('members').update(mData).eq('id',id);
+      if(error)throw error;
+    } else {
+      const{data:newM,error}=await sb.from('members').insert([mData]).select().single();
+      if(error)throw error;
+      memberId = newM.id;
+      // Record payment if not skipped
+      const skipPay = document.getElementById('m-pay-skip')?.checked;
+      const payAmt = parseFloat(document.getElementById('m-pay-amt')?.value||0);
+      if(!skipPay && payAmt > 0){
+        const payMethod = document.getElementById('m-pay-method')?.value||'cash';
+        const payMethodLabels = {cash:'كاش',knet:'كنت',transfer:'تحويل',other:'أخرى'};
+        await sb.from('payments').insert([{
+          member_id:memberId,
+          amount:payAmt,
+          payment_date:start||td2(),
+          notes:`اشتراك ${subLbl(type)} — ${payMethodLabels[payMethod]||payMethod}`,
+          gym_id:GYM_ID,
+          branch_id:(GYM_BRANCHES.length>=2)?(document.getElementById('m-branch')?.value||BRANCH_ID||null):null
+        }]);
+        toast(`✅ تم تسجيل العضو والدفعة (${payAmt.toFixed(3)} KWD)`);
+      } else {
+        toast(T().saved);
+      }
+    }
+    if(id) toast(T().saved);
+    closeMo('m-mo');loadMems();photoBase64='';
   }catch(e){toast(T().err+': '+(e.message||''),'error')}finally{btn.disabled=false}
 }
 async function delM(id){const ok=await confirm_(T().cdel);if(!ok)return;try{const{error}=await sb.from('members').delete().eq('id',id);if(error)throw error;toast(T().deleted);loadMems();}catch(e){toast(T().err,'error')}}
@@ -4838,13 +5037,19 @@ async function loadPricingForm(){
         <input type="number" id="price-${m}" placeholder="0.000" step="0.001" min="0"
           value="${prices[m]?prices[m].price:''}"/>
       </div>
-    `).join('');
+    `).join('') + `
+      <div class="f2">
+        <label>🎯 حصة فردية (KWD)</label>
+        <input type="number" id="price-session" placeholder="0.000" step="0.001" min="0"
+          value="${prices[0]?prices[0].price:''}"/>
+      </div>
+    `;
   }catch(e){grid.innerHTML='<div class="et">خطأ في تحميل الأسعار</div>'}
 }
 
 async function savePricing(){
   try{
-    // Delete existing prices for this gym
+    // Delete existing prices for this gym (including session price)
     await sb.from('gym_pricing').delete().eq('gym_id',GYM_ID);
     // Insert new ones
     const inserts = [];
@@ -4854,7 +5059,13 @@ async function savePricing(){
         inserts.push({gym_id:GYM_ID, months:m, price:parseFloat(val), label:SUB_LABELS[m-1]});
       }
     });
+    // Session price (months=0)
+    const sessionVal = document.getElementById('price-session')?.value;
+    if(sessionVal && parseFloat(sessionVal)>0){
+      inserts.push({gym_id:GYM_ID, months:0, price:parseFloat(sessionVal), label:'حصة فردية'});
+    }
     if(inserts.length) await sb.from('gym_pricing').insert(inserts);
+    await loadGymPricing();
     toast('تم حفظ الأسعار ✅');
   }catch(e){toast('خطأ: '+e.message,'error')}
 }
