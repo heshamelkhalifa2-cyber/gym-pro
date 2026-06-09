@@ -3165,16 +3165,16 @@ async function logout(){await sb.auth.signOut();document.getElementById('app').s
   document.querySelectorAll('.lo').forEach(el=>el.addEventListener('click',()=>{document.querySelectorAll('.lang-dd').forEach(d=>d.classList.remove('open'));applyLang(el.dataset.lang);if(document.getElementById('app').style.display!=='none'){const p=document.querySelector('.ni.active[data-page]')?.dataset?.page||'dashboard';nav(p);}}));
   document.addEventListener('click',()=>document.querySelectorAll('.lang-dd').forEach(d=>d.classList.remove('open')));
   document.getElementById('add-m-btn')?.addEventListener('click',openAddM);
-  document.getElementById('m-save')?.addEventListener('click',saveM);
-  document.getElementById('m-srch')?.addEventListener('input',loadMems);
-  document.getElementById('ci-btn')?.addEventListener('click',doCI);
+  document.getElementById('m-save')?.addEventListener('click',()=>saveM());
+  document.getElementById('m-srch')?.addEventListener('input',()=>loadMems());
+  document.getElementById('ci-btn')?.addEventListener('click',()=>doCI());
   document.getElementById('ci-in')?.addEventListener('keydown',e=>{if(e.key==='Enter'){document.getElementById('ac-ls').style.display='none';doCI()}});
-  document.getElementById('add-p-btn')?.addEventListener('click',openAddP);document.getElementById('p-save')?.addEventListener('click',saveP);
-  document.getElementById('p-srch')?.addEventListener('input',loadPays);
-  document.getElementById('renew-save')?.addEventListener('click',saveRenew);
-  document.getElementById('rep-load-btn')?.addEventListener('click',loadReport);
+  document.getElementById('add-p-btn')?.addEventListener('click',openAddP);document.getElementById('p-save')?.addEventListener('click',()=>saveP());
+  document.getElementById('p-srch')?.addEventListener('input',()=>loadPays());
+  document.getElementById('renew-save')?.addEventListener('click',()=>saveRenew());
+  document.getElementById('rep-load-btn')?.addEventListener('click',()=>loadReport());
   document.getElementById('add-ms-btn')?.addEventListener('click',()=>{document.getElementById('ms-mid').value='';document.getElementById('ms-dt').value=td2();openMo('ms-mo')});
-  document.getElementById('ms-save')?.addEventListener('click',saveMs);
+  document.getElementById('ms-save')?.addEventListener('click',()=>saveMs());
   // Event delegation for ALL modals - handles dynamically added ones too
   document.addEventListener('click', function(e){
     // Handle data-close buttons
@@ -3188,6 +3188,20 @@ async function logout(){await sb.auth.signOut();document.getElementById('app').s
       e.target.classList.remove('active');
     }
   });
+
+  // Direct close handlers as backup
+  function bindCloseButtons(){
+    document.querySelectorAll('[data-close]').forEach(btn=>{
+      btn.onclick = function(e){
+        e.stopPropagation();
+        closeMo(this.dataset.close);
+      };
+    });
+  }
+  bindCloseButtons();
+  // Re-bind after any dynamic content
+  const _obs = new MutationObserver(bindCloseButtons);
+  _obs.observe(document.body, {childList:true, subtree:true});
 })();
 </script>
 
