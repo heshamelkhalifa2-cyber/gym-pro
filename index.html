@@ -917,6 +917,8 @@ body.rtl .trial-banner{left:auto;right:0}
       <div class="nav-section" style="margin-top:1.25rem">التقارير</div>
       <div class="ni" data-page="report" data-label="التقرير الشهري"><span class="ni-ic">📈</span><span id="n-rep">التقرير الشهري</span></div>
       <div class="ni" data-page="measurements" data-label="القياسات"><span class="ni-ic">📏</span><span id="n-meas">القياسات</span></div>
+      <div class="nav-section" style="margin-top:1.25rem">ذكاء اصطناعي</div>
+      <div class="ni" data-page="aicoach" data-label="AI Coach"><span class="ni-ic">🤖</span><span>AI Coach</span></div>
     </nav>
     <div class="sb-ft">
       <div style="padding:.5rem .875rem;margin-bottom:.5rem;font-size:.65rem;color:var(--tm);text-align:center;line-height:1.6;border-bottom:1px solid var(--br);margin-bottom:.75rem">
@@ -1427,6 +1429,65 @@ body.rtl .trial-banner{left:auto;right:0}
         </div>
       </div>
 
+      <!-- AI COACH -->
+      <div id="pg-aicoach" class="pg2">
+        <div class="pg-hdr">
+          <div class="pg-hdr-left">
+            <h2>🤖 AI Coach</h2>
+            <p>مدربك الذكي — اسأل عن التمارين، التغذية، والخطط الرياضية</p>
+          </div>
+          <button class="btn bs2 btn-sm" onclick="clearAIChat()">🗑️ مسح المحادثة</button>
+        </div>
+
+        <!-- Quick prompts -->
+        <div id="ai-quick-prompts" style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem">
+          <button class="btn bs2 btn-sm" onclick="sendQuickPrompt('خطة تمارين للمبتدئين 3 أيام في الأسبوع')">🏋️ خطة مبتدئين</button>
+          <button class="btn bs2 btn-sm" onclick="sendQuickPrompt('أفضل تمارين لحرق الدهون')">🔥 حرق الدهون</button>
+          <button class="btn bs2 btn-sm" onclick="sendQuickPrompt('خطة غذائية لبناء العضل')">🥗 تغذية عضلات</button>
+          <button class="btn bs2 btn-sm" onclick="sendQuickPrompt('كيف أزيد اللياقة البدنية؟')">💪 زيادة اللياقة</button>
+          <button class="btn bs2 btn-sm" onclick="sendQuickPrompt('تمارين البطن للمبتدئين')">🎯 تمارين بطن</button>
+        </div>
+
+        <!-- Chat messages -->
+        <div class="card" style="padding:0;overflow:hidden">
+          <div id="ai-messages" style="min-height:400px;max-height:500px;overflow-y:auto;padding:1.25rem;display:flex;flex-direction:column;gap:1rem">
+            <!-- Welcome message -->
+            <div style="display:flex;align-items:flex-start;gap:.75rem">
+              <div style="width:36px;height:36px;background:linear-gradient(135deg,#3B82F6,#60A5FA);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0">🤖</div>
+              <div style="background:var(--bg);border:1px solid var(--br);border-radius:12px;border-top-right-radius:4px;padding:.875rem 1rem;max-width:80%;font-size:.875rem;line-height:1.7">
+                مرحباً! أنا AI Coach الخاص بك 💪<br/>يمكنني مساعدتك في:<br/>
+                🏋️ خطط التمارين المخصصة<br/>
+                🥗 النصائح الغذائية<br/>
+                📊 تتبع التقدم الرياضي<br/>
+                ❓ أي سؤال عن الرياضة واللياقة<br/><br/>
+                <strong>اسألني أي شيء!</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Input area -->
+          <div style="border-top:1px solid var(--br);padding:1rem;display:flex;gap:.75rem;align-items:flex-end">
+            <textarea id="ai-input" rows="2" placeholder="اسأل AI Coach... مثلاً: خطة تمرين لخسارة 10 كيلو" style="flex:1;resize:none;border-radius:12px;font-size:.875rem;line-height:1.5"
+              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAIMessage()}"></textarea>
+            <button class="btn bp" onclick="sendAIMessage()" id="ai-send-btn" style="height:fit-content;padding:.65rem 1.25rem;border-radius:12px">
+              <span id="ai-send-label">إرسال ↑</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- No API key warning -->
+        <div id="ai-no-key-warn" style="display:none;margin-top:1rem">
+          <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.3);border-radius:var(--r);padding:1rem;display:flex;align-items:center;gap:.75rem">
+            <span style="font-size:1.5rem">⚠️</span>
+            <div>
+              <div style="font-weight:700;margin-bottom:.25rem">API Key غير مضبوط</div>
+              <div style="font-size:.82rem;color:var(--t2)">روح <strong>الإعدادات → AI Coach</strong> وحط الـ API Key الخاص بك</div>
+            </div>
+            <button class="btn bp btn-sm" style="margin-inline-start:auto" onclick="nav('settings')">إعدادات AI</button>
+          </div>
+        </div>
+      </div>
+
       <!-- SETTINGS -->
       <div id="pg-settings" class="pg2">
         <div class="pg-hdr">
@@ -1442,6 +1503,7 @@ body.rtl .trial-banner{left:auto;right:0}
           <div class="tab" data-tab="st-pricing">💰 الأسعار</div>
           <div class="tab" data-tab="st-branches">🗺️ الفروع</div>
           <div class="tab" data-tab="st-notif">🔔 الإشعارات</div>
+          <div class="tab" data-tab="st-ai">🤖 AI Coach</div>
         </div>
 
         <!-- Gym Info Tab -->
@@ -1536,6 +1598,46 @@ body.rtl .trial-banner{left:auto;right:0}
                 <label>رسالة الترحيب للأعضاء الجدد</label>
                 <textarea id="st-welcome-msg" rows="4" placeholder="مرحباً {name}! يسعدنا انضمامك لجيمنا 🏋️&#10;اشتراكك مفعّل حتى {end_date}&#10;نتمنى لك رحلة رياضية ممتعة 💪"></textarea>
                 <div style="font-size:.72rem;color:var(--tm);margin-top:.25rem">متغيرات: {name} {end_date} {phone}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Coach Settings Tab -->
+        <div id="tab-st-ai" class="tab-content">
+          <div class="card">
+            <div class="ch"><h3 class="ct">🤖 إعدادات AI Coach</h3></div>
+            <div style="background:var(--inl);border:1px solid rgba(33,150,243,0.2);border-radius:var(--rs);padding:.875rem;margin-bottom:1.25rem;font-size:.83rem;color:var(--in)">
+              ℹ️ AI Coach مدعوم بـ Google Gemini — مجاني تماماً. احصل على API Key من <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--p);font-weight:700">aistudio.google.com</a>
+            </div>
+            <div class="fg" style="grid-template-columns:1fr">
+              <div class="f2">
+                <label>Gemini API Key</label>
+                <div style="display:flex;gap:.5rem">
+                  <input type="password" id="st-gemini-key" placeholder="AIza..." style="flex:1;font-family:var(--mono);font-size:.85rem"/>
+                  <button class="btn bs2 btn-sm" onclick="toggleGeminiKeyVisibility()">👁️</button>
+                </div>
+                <div style="font-size:.72rem;color:var(--tm);margin-top:.25rem">يتم حفظه محلياً في المتصفح فقط</div>
+              </div>
+              <div class="f2">
+                <label>شخصية الـ AI Coach</label>
+                <select id="st-ai-persona">
+                  <option value="coach">🏋️ مدرب رياضي محترف</option>
+                  <option value="nutritionist">🥗 أخصائي تغذية</option>
+                  <option value="both">💪 مدرب + أخصائي تغذية</option>
+                </select>
+              </div>
+              <div class="f2">
+                <label>لغة الإجابات</label>
+                <select id="st-ai-lang">
+                  <option value="ar">🇸🇦 عربي</option>
+                  <option value="en">🇺🇸 English</option>
+                  <option value="both">🌐 عربي + English</option>
+                </select>
+              </div>
+              <div class="f2 full">
+                <button class="btn bp" style="width:100%;justify-content:center" onclick="saveAISettings()">💾 حفظ الإعدادات</button>
+                <button class="btn bs2 btn-sm" style="width:100%;justify-content:center;margin-top:.5rem" onclick="testGeminiKey()">🧪 اختبار الاتصال</button>
               </div>
             </div>
           </div>
@@ -2007,6 +2109,175 @@ async function loadGymBranches(){
     }
     renderBranchSwitcher();
   }catch(e){ GYM_BRANCHES = []; }
+}
+
+// ── AI COACH ──
+let _aiHistory = [];
+
+function getAISettings(){
+  return {
+    key: localStorage.getItem('gemini_key')||'',
+    persona: localStorage.getItem('ai_persona')||'both',
+    lang: localStorage.getItem('ai_lang')||'ar'
+  };
+}
+
+function saveAISettings(){
+  const key = document.getElementById('st-gemini-key')?.value.trim();
+  const persona = document.getElementById('st-ai-persona')?.value;
+  const lang = document.getElementById('st-ai-lang')?.value;
+  if(key) localStorage.setItem('gemini_key', key);
+  if(persona) localStorage.setItem('ai_persona', persona);
+  if(lang) localStorage.setItem('ai_lang', lang);
+  toast('✅ تم حفظ إعدادات AI Coach');
+}
+
+function toggleGeminiKeyVisibility(){
+  const inp = document.getElementById('st-gemini-key');
+  if(!inp) return;
+  inp.type = inp.type==='password' ? 'text' : 'password';
+}
+
+async function testGeminiKey(){
+  const {key} = getAISettings();
+  if(!key){ toast('أدخل الـ API Key أولاً','error'); return; }
+  toast('⏳ جاري الاختبار...');
+  try{
+    const res = await callGemini('قل "الاتصال يعمل بشكل صحيح" فقط', []);
+    if(res) toast('✅ الاتصال يعمل! '+res.substring(0,50));
+    else toast('❌ خطأ في الاتصال','error');
+  }catch(e){ toast('❌ '+e.message,'error'); }
+}
+
+async function callGemini(prompt, history=[]){
+  const {key} = getAISettings();
+  if(!key) throw new Error('API Key غير موجود');
+
+  const contents = [
+    ...history.map(m=>({role:m.role, parts:[{text:m.text}]})),
+    {role:'user', parts:[{text:prompt}]}
+  ];
+
+  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      contents,
+      systemInstruction:{parts:[{text: getAISystemPrompt()}]},
+      generationConfig:{temperature:0.7, maxOutputTokens:1000}
+    })
+  });
+  if(!res.ok){
+    const err = await res.json();
+    throw new Error(err?.error?.message||'API Error');
+  }
+  const data = await res.json();
+  return data?.candidates?.[0]?.content?.parts?.[0]?.text||'';
+}
+
+function getAISystemPrompt(){
+  const {persona, lang} = getAISettings();
+  const gymName = GYM_INFO?.name||'Nexora Gym';
+  const langInstr = lang==='ar'?'أجب دائماً باللغة العربية':lang==='en'?'Always answer in English':'أجب بالعربية بشكل رئيسي';
+  const personaInstr = persona==='coach'?'أنت مدرب رياضي محترف متخصص في التمارين وبناء الجسم':
+    persona==='nutritionist'?'أنت أخصائي تغذية متخصص في الأنظمة الغذائية الصحية':
+    'أنت مدرب رياضي وأخصائي تغذية متخصص في اللياقة البدنية والتغذية الصحية';
+  return `${personaInstr} تعمل في جيم ${gymName}. ${langInstr}. أجب بشكل مختصر وعملي. استخدم emoji بشكل معتدل. لا تذكر أنك AI أو Gemini.`;
+}
+
+function addAIMessage(role, text, isLoading=false){
+  const container = document.getElementById('ai-messages');
+  if(!container) return;
+  const isUser = role==='user';
+  const div = document.createElement('div');
+  div.style.cssText = `display:flex;align-items:flex-start;gap:.75rem;${isUser?'flex-direction:row-reverse':''}`;
+  div.innerHTML = `
+    <div style="width:36px;height:36px;background:${isUser?'linear-gradient(135deg,#FF5722,#7C3AED)':'linear-gradient(135deg,#3B82F6,#60A5FA)'};border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">
+      ${isUser?'👤':'🤖'}
+    </div>
+    <div style="background:${isUser?'linear-gradient(135deg,#FF5722,#7C3AED)':'var(--bg)'};color:${isUser?'white':'var(--t1)'};border:${isUser?'none':'1px solid var(--br)'};border-radius:12px;${isUser?'border-top-left-radius':'border-top-right-radius'}:4px;padding:.875rem 1rem;max-width:80%;font-size:.875rem;line-height:1.7;white-space:pre-wrap" id="${isLoading?'ai-loading-bubble':''}">
+      ${isLoading?'<span class="spn" style="width:16px;height:16px;margin:0"></span>':text.replace(/\n/g,'<br/>')}
+    </div>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+  return div;
+}
+
+async function sendAIMessage(){
+  const {key} = getAISettings();
+  const noKeyWarn = document.getElementById('ai-no-key-warn');
+
+  if(!key){
+    if(noKeyWarn) noKeyWarn.style.display='block';
+    toast('أضف API Key من الإعدادات أولاً','error');
+    return;
+  }
+  if(noKeyWarn) noKeyWarn.style.display='none';
+
+  const inp = document.getElementById('ai-input');
+  const msg = inp?.value.trim();
+  if(!msg) return;
+
+  inp.value='';
+  addAIMessage('user', msg);
+  _aiHistory.push({role:'user', text:msg});
+
+  const btn = document.getElementById('ai-send-btn');
+  const lbl = document.getElementById('ai-send-label');
+  if(btn) btn.disabled=true;
+  if(lbl) lbl.textContent='⏳';
+
+  const loadingDiv = addAIMessage('model','',true);
+
+  try{
+    const reply = await callGemini(msg, _aiHistory.slice(-10));
+    // Remove loading bubble
+    loadingDiv?.remove();
+    addAIMessage('model', reply);
+    _aiHistory.push({role:'model', text:reply});
+  }catch(e){
+    loadingDiv?.remove();
+    addAIMessage('model', '❌ خطأ: '+e.message);
+    toast('خطأ في AI: '+e.message,'error');
+  }finally{
+    if(btn) btn.disabled=false;
+    if(lbl) lbl.textContent='إرسال ↑';
+  }
+}
+
+function sendQuickPrompt(prompt){
+  const inp = document.getElementById('ai-input');
+  if(inp){ inp.value=prompt; sendAIMessage(); }
+}
+
+function clearAIChat(){
+  _aiHistory = [];
+  const container = document.getElementById('ai-messages');
+  if(container){
+    container.innerHTML = `
+      <div style="display:flex;align-items:flex-start;gap:.75rem">
+        <div style="width:36px;height:36px;background:linear-gradient(135deg,#3B82F6,#60A5FA);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0">🤖</div>
+        <div style="background:var(--bg);border:1px solid var(--br);border-radius:12px;border-top-right-radius:4px;padding:.875rem 1rem;max-width:80%;font-size:.875rem;line-height:1.7">
+          تم مسح المحادثة! 🗑️ ابدأ محادثة جديدة 💪
+        </div>
+      </div>`;
+  }
+  toast('تم مسح المحادثة');
+}
+
+function loadAICoachPage(){
+  // Load saved settings into form
+  const {key, persona, lang} = getAISettings();
+  const keyInp = document.getElementById('st-gemini-key');
+  if(keyInp && key) keyInp.value=key;
+  const personaSel = document.getElementById('st-ai-persona');
+  if(personaSel) personaSel.value=persona;
+  const langSel = document.getElementById('st-ai-lang');
+  if(langSel) langSel.value=lang;
+
+  // Show warning if no key
+  const noKeyWarn = document.getElementById('ai-no-key-warn');
+  if(noKeyWarn) noKeyWarn.style.display = key?'none':'block';
 }
 
 // ── SESSION (حصة فردية / خدمة) ──
@@ -3200,6 +3471,7 @@ function nav(page){
   else if(page==='payments')loadPays();
   else if(page==='report')initReport();
   else if(page==='measurements')initMeas();
+  else if(page==='aicoach')loadAICoachPage();
   else if(page==='schedule')loadSchedule();
   else if(page==='exercises'){loadExercises();setupPlanAc();}
   else if(page==='whatsapp'){loadRetentionCampaigns();loadWaLog();loadWaMembers();}
