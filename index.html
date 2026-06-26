@@ -440,24 +440,41 @@ textarea{resize:vertical;min-height:75px}
 .qr-wrap canvas{border-radius:var(--rs);background:white;padding:.75rem;box-shadow:var(--sh1)}
 
 /* Receipt */
-/* ── ONBOARDING ── */
-.ob-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:99999;display:flex;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(4px)}
-.ob-card{background:var(--bc);border-radius:var(--r);max-width:520px;width:100%;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.3);animation:obIn .4s cubic-bezier(.34,1.56,.64,1)}
-@keyframes obIn{from{opacity:0;transform:translateY(24px) scale(.96)}to{opacity:1;transform:none}}
-.ob-header{background:linear-gradient(135deg,var(--p),#7C3AED);padding:2rem;text-align:center;position:relative}
-.ob-icon{font-size:3rem;margin-bottom:.75rem}
-.ob-title{color:white;font-size:1.3rem;font-weight:900;margin-bottom:.35rem}
-.ob-sub{color:rgba(255,255,255,0.8);font-size:.85rem}
-.ob-steps{display:flex;justify-content:center;gap:.4rem;margin-top:1rem}
-.ob-step-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.35);transition:all .3s}
-.ob-step-dot.active{background:white;width:20px;border-radius:4px}
-.ob-body{padding:1.5rem}
-.ob-feature{display:flex;align-items:flex-start;gap:1rem;padding:.75rem;border-radius:var(--rs);margin-bottom:.5rem;background:var(--bg);border:1px solid var(--br)}
-.ob-feature-ic{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
-.ob-feature-title{font-weight:800;font-size:.9rem;margin-bottom:.2rem}
-.ob-feature-desc{font-size:.78rem;color:var(--t2);line-height:1.5}
-.ob-footer{padding:1rem 1.5rem;border-top:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;gap:.75rem}
-.ob-progress{font-size:.75rem;color:var(--tm);font-weight:600}
+/* ── ONBOARDING PREMIUM ── */
+.ob-overlay{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:1rem}
+.ob-bg{position:absolute;inset:0;background:linear-gradient(135deg,#060B18 0%,#0D1B3E 50%,#060B18 100%);overflow:hidden}
+.ob-bg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(96,165,250,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(96,165,250,0.04) 1px,transparent 1px);background-size:40px 40px}
+.ob-bg-glow{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none}
+.ob-card{position:relative;z-index:1;width:100%;max-width:560px;background:rgba(15,25,50,0.85);border:1px solid rgba(96,165,250,0.15);border-radius:24px;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,.6);backdrop-filter:blur(20px);animation:obIn .5s cubic-bezier(.34,1.56,.64,1)}
+@keyframes obIn{from{opacity:0;transform:translateY(28px) scale(.95)}to{opacity:1;transform:none}}
+@keyframes obSlideLeft{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
+@keyframes obFadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes obPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+@keyframes obScan{0%{transform:translateY(-100%)}100%{transform:translateY(300%)}}
+.ob-progress-bar{height:3px;background:rgba(96,165,250,0.1)}
+.ob-progress-fill{height:100%;background:linear-gradient(90deg,#3B82F6,#60A5FA);transition:width .5s cubic-bezier(.4,0,.2,1);box-shadow:0 0 8px rgba(96,165,250,.5)}
+.ob-header{padding:2rem 2.5rem 1.25rem;position:relative}
+.ob-step-num{font-family:var(--mono);font-size:.68rem;color:#60A5FA;letter-spacing:.15em;font-weight:600;margin-bottom:.875rem;display:flex;align-items:center;gap:.5rem}
+.ob-step-line{flex:1;height:1px;background:rgba(96,165,250,0.15)}
+.ob-icon-wrap{width:64px;height:64px;background:rgba(96,165,250,0.08);border:1px solid rgba(96,165,250,0.2);border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:1rem;position:relative;overflow:hidden}
+.ob-icon-scan{position:absolute;inset:0;background:linear-gradient(transparent,rgba(96,165,250,0.12) 50%,transparent);animation:obScan 2.5s linear infinite}
+.ob-title{font-size:1.4rem;font-weight:900;color:#F1F5F9;letter-spacing:-.02em;margin-bottom:.35rem;line-height:1.25}
+.ob-sub{font-size:.82rem;color:#64748B;line-height:1.5}
+.ob-body{padding:1.25rem 2.5rem 1.5rem}
+.ob-feature{display:flex;align-items:flex-start;gap:.875rem;padding:.875rem;border-radius:12px;margin-bottom:.5rem;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.05);animation:obFadeUp .4s ease both}
+.ob-feature:hover{background:rgba(96,165,250,0.05);border-color:rgba(96,165,250,0.12);transform:translateX(-2px)}
+.ob-feature-ic{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.25rem;flex-shrink:0}
+.ob-feature-title{font-weight:700;font-size:.875rem;color:#E2E8F0;margin-bottom:.2rem}
+.ob-feature-desc{font-size:.76rem;color:#64748B;line-height:1.55}
+.ob-footer{padding:1rem 2.5rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.ob-dots{display:flex;gap:.35rem;align-items:center}
+.ob-dot{width:6px;height:6px;border-radius:50%;background:rgba(96,165,250,0.2);transition:all .3s;cursor:pointer}
+.ob-dot.active{width:20px;border-radius:3px;background:#60A5FA;box-shadow:0 0 8px rgba(96,165,250,.5)}
+.ob-skip{font-size:.76rem;color:#475569;cursor:pointer;font-family:var(--font);background:none;border:none;padding:.25rem .5rem;transition:color .2s;border-radius:6px}
+.ob-skip:hover{color:#94A3B8}
+.ob-btn-next{display:flex;align-items:center;gap:.4rem;padding:.6rem 1.2rem;background:linear-gradient(135deg,#2563EB,#3B82F6);color:white;border:none;border-radius:10px;font-size:.85rem;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .2s;box-shadow:0 4px 14px rgba(59,130,246,.3)}
+.ob-btn-next:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(59,130,246,.4)}
+.ob-btn-next.final{background:linear-gradient(135deg,#059669,#10B981)!important;box-shadow:0 4px 14px rgba(16,185,129,.3)!important}
 /* Tooltip tour */
 .tt-overlay{position:fixed;inset:0;z-index:88888;pointer-events:none}
 .tt-highlight{position:fixed;border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,.55);z-index:88889;pointer-events:none;transition:all .4s cubic-bezier(.4,0,.2,1)}
@@ -1370,8 +1387,8 @@ body.rtl .trial-banner{left:auto;right:0}
             <div class="fg">
               <div class="f2"><label>اسم الجيم (عربي) <span class="req">*</span></label><input type="text" id="st-name" placeholder="جيم الرياضة"/></div>
               <div class="f2"><label>اسم الجيم (إنجليزي)</label><input type="text" id="st-name-en" placeholder="Sport Gym"/></div>
-              <div class="f2"><label>رقم الهاتف</label><input type="tel" id="st-phone" placeholder="+96550000000"/></div>
-              <div class="f2"><label>رقم واتساب</label><input type="tel" id="st-wa" placeholder="+96550000000"/></div>
+              <div class="f2"><label>رقم الهاتف</label><input type="tel" id="st-phone" placeholder="+96596607951"/></div>
+              <div class="f2"><label>رقم واتساب</label><input type="tel" id="st-wa" placeholder="+96596607951"/></div>
               <div class="f2 full"><label>العنوان</label><input type="text" id="st-address" placeholder="المنطقة، المدينة"/></div>
               <div class="f2"><label>ساعة الفتح</label><input type="time" id="st-open" value="06:00"/></div>
               <div class="f2"><label>ساعة الغلق</label><input type="time" id="st-close" value="23:00"/></div>
@@ -1487,7 +1504,7 @@ body.rtl .trial-banner{left:auto;right:0}
         </div>
         <div class="f2" id="sess-walkin-phone-wrap" style="display:none">
           <label>رقم الهاتف</label>
-          <input type="tel" id="sess-walkin-phone" placeholder="+96550000000"/>
+          <input type="tel" id="sess-walkin-phone" placeholder="+96596607951"/>
         </div>
         <!-- الخدمة -->
         <div class="f2 full">
@@ -1581,7 +1598,7 @@ body.rtl .trial-banner{left:auto;right:0}
       <input type="hidden" id="branch-id"/>
       <div class="fg">
         <div class="f2"><label>اسم الفرع <span class="req">*</span></label><input type="text" id="branch-name" placeholder="مثال: الفرع الرئيسي، فرع السالمية"/></div>
-        <div class="f2"><label>رقم الهاتف <span class="req">*</span></label><input type="tel" id="branch-phone" placeholder="+96550000000"/></div>
+        <div class="f2"><label>رقم الهاتف <span class="req">*</span></label><input type="tel" id="branch-phone" placeholder="+96596607951"/></div>
         <div class="f2 full"><label>العنوان <span class="req">*</span></label><input type="text" id="branch-address" placeholder="المنطقة، الشارع، المبنى"/></div>
         <div class="f2 full"><label>ملاحظات</label><textarea id="branch-notes" placeholder="ساعات العمل أو أي تفاصيل إضافية..." rows="2"></textarea></div>
       </div>
@@ -1609,7 +1626,7 @@ body.rtl .trial-banner{left:auto;right:0}
       </div>
       <div class="fg">
         <div class="f2"><label>الاسم <span class="req">*</span></label><input type="text" id="m-nm" placeholder="الاسم الكامل"/></div>
-        <div class="f2"><label>رقم الهاتف <span class="req">*</span></label><input type="tel" id="m-ph" placeholder="+96550000000"/></div>
+        <div class="f2"><label>رقم الهاتف <span class="req">*</span></label><input type="tel" id="m-ph" placeholder="+96596607951"/></div>
         <div class="f2"><label>البريد الإلكتروني</label><input type="email" id="m-em" placeholder="email@example.com"/></div>
         <div class="f2"><label>نوع الاشتراك <span class="req">*</span></label>
           <select id="m-ty">
@@ -4985,7 +5002,7 @@ document.getElementById('qr-manual-input')?.addEventListener('keydown', e=>{if(e
         </div>
         <div class="f2"><label>اسم الجيم (عربي) <span class="req">*</span></label><input type="text" id="gs-name" placeholder="مثال: جيم الرياضة"/></div>
         <div class="f2"><label>اسم الجيم (إنجليزي)</label><input type="text" id="gs-name-en" placeholder="Sport Gym"/></div>
-        <div class="f2"><label>رقم الهاتف</label><input type="tel" id="gs-phone" placeholder="+96550000000"/></div>
+        <div class="f2"><label>رقم الهاتف</label><input type="tel" id="gs-phone" placeholder="+96596607951"/></div>
         <div class="f2"><label>العنوان</label><input type="text" id="gs-address" placeholder="المنطقة، المدينة"/></div>
         <div class="f2">
           <label>اللون الرئيسي</label>
@@ -6011,7 +6028,7 @@ function generateCode(planKey, months){
 // ADMIN PANEL
 // ══════════════════════════════════════════════
 // Change this password to something secret!
-const ADMIN_PASSWORD = 'GymPro@2025';
+const ADMIN_PASSWORD = 'Nexora Gym@2025';
 
 function openAdminPanel(){
   document.getElementById('admin-lock').style.display = 'block';
@@ -6155,99 +6172,171 @@ async function loadAdminGyms(){
 // ══════════════════════════════════════════════
 const OB_STEPS = [
   {
-    icon:'🎉', title:'أهلاً بك في Nexora Gym!', sub:'خلي ندلك على أهم المميزات في دقيقتين',
+    icon:'🚀', stepColor:'#3B82F6',
+    title:'أهلاً بك في Nexora Gym', sub:'نظام إدارة الجيم الاحترافي — كل أدواتك في مكان واحد',
     features:[
-      {ic:'👥', bg:'rgba(255,87,34,0.12)', color:'#FF5722', title:'إدارة الأعضاء', desc:'أضف وتابع كل أعضاء جيمك — الاشتراكات، الحضور، والمدفوعات في مكان واحد'},
-      {ic:'📱', bg:'rgba(124,58,237,0.12)', color:'#7C3AED', title:'تسجيل الحضور بـ QR', desc:'كل عضو عنده QR خاص — يمسحه ويتسجل تلقائي بدون أي تدخل منك'},
-      {ic:'💰', bg:'rgba(0,137,123,0.12)', color:'#00897B', title:'تتبع المدفوعات', desc:'سجّل كل دفعة واشوف تقارير الإيرادات يومياً وشهرياً'},
+      {ic:'👥', bg:'rgba(96,165,250,0.12)', color:'#60A5FA', title:'إدارة الأعضاء الكاملة', desc:'أضف وتابع كل أعضائك — الاشتراكات، الحضور، المدفوعات، والتاريخ الكامل'},
+      {ic:'⚡', bg:'rgba(16,185,129,0.12)', color:'#10B981', title:'سريع ومتجاوب', desc:'يعمل على أي جهاز — موبايل أو كمبيوتر — بدون تنزيل أي تطبيق'},
+      {ic:'🔒', bg:'rgba(168,85,247,0.12)', color:'#A855F7', title:'بيانات آمنة ومنفصلة', desc:'كل جيم عنده قاعدة بيانات مستقلة — بياناتك لا يراها أحد غيرك'},
     ]
   },
   {
-    icon:'👥', title:'إضافة أعضاء', sub:'إزاي تضيف عضو جديد بسرعة',
+    icon:'👥', stepColor:'#10B981',
+    title:'إدارة الأعضاء', sub:'أضف أعضاء وتابعهم بسهولة تامة',
     features:[
-      {ic:'➕', bg:'rgba(255,87,34,0.12)', color:'#FF5722', title:'من صفحة الأعضاء', desc:'اضغط "إضافة عضو" واملأ الاسم والهاتف ونوع الاشتراك — خلاص!'},
-      {ic:'📅', bg:'rgba(124,58,237,0.12)', color:'#7C3AED', title:'أنواع الاشتراكات', desc:'شهري، ربع سنوي، سنوي — والسيستم يحسب تاريخ الانتهاء تلقائي'},
-      {ic:'🔔', bg:'rgba(0,137,123,0.12)', color:'#00897B', title:'تنبيهات الانتهاء', desc:'لوحة التحكم تظهرلك الأعضاء اللي اشتراكهم هينتهي خلال 10 أيام'},
+      {ic:'➕', bg:'rgba(96,165,250,0.12)', color:'#60A5FA', title:'إضافة عضو في ثواني', desc:'اسم، هاتف، نوع الاشتراك — السيستم يحسب تاريخ الانتهاء ويسجل الدفعة تلقائياً'},
+      {ic:'🔔', bg:'rgba(251,191,36,0.12)', color:'#F59E0B', title:'تنبيهات انتهاء الاشتراك', desc:'اللوحة الرئيسية تبين الأعضاء اللي اشتراكهم قرب ينتهي — ابعتلهم تذكير على واتساب'},
+      {ic:'📊', bg:'rgba(168,85,247,0.12)', color:'#A855F7', title:'فلاتر وتصنيفات', desc:'فلتر الأعضاء حسب الحالة ونوع الاشتراك — صدّر بيانات بـ CSV'},
     ]
   },
   {
-    icon:'📱', title:'كشك الحضور QR', sub:'الطريقة الأسهل لتسجيل الحضور',
+    icon:'📱', stepColor:'#A855F7',
+    title:'كشك الحضور بـ QR', sub:'الطريقة الأذكى لتسجيل الحضور',
     features:[
-      {ic:'🖨️', bg:'rgba(255,87,34,0.12)', color:'#FF5722', title:'اطبع كارت لكل عضو', desc:'من بروفايل العضو اضغط QR ← طباعة كارت — كارت أنيق بالاسم والـ QR'},
-      {ic:'📲', bg:'rgba(124,58,237,0.12)', color:'#7C3AED', title:'تابلت على المكتب', desc:'افتح "كشك الحضور QR" على تابلت المكتب — العضو يقرّب كارته والسيستم يسجله'},
-      {ic:'💬', bg:'rgba(37,211,102,0.12)', color:'#25D366', title:'ابعت QR على واتساب', desc:'من بروفايل العضو اضغط QR ← إرسال واتساب — العضو يحفظ الصورة على موبايله'},
+      {ic:'🎴', bg:'rgba(96,165,250,0.12)', color:'#60A5FA', title:'كارت QR لكل عضو', desc:'اطبع كارت بالاسم والـ QR أو ابعته على واتساب — العضو يحفظه على موبايله'},
+      {ic:'📲', bg:'rgba(16,185,129,0.12)', color:'#10B981', title:'مسح فوري بالكاميرا', desc:'افتح كشك الحضور على تابلت المكتب — العضو يقرّب كارته والسيستم يسجله في ثانية'},
+      {ic:'✅', bg:'rgba(168,85,247,0.12)', color:'#A855F7', title:'تحقق ذكي', desc:'السيستم يتحقق من الاشتراك تلقائياً — يمنع الدخول لو الاشتراك منتهٍ أو مجمّد'},
     ]
   },
   {
-    icon:'💰', title:'المدفوعات والتقارير', sub:'تتبع إيرادات جيمك بسهولة',
+    icon:'💰', stepColor:'#F59E0B',
+    title:'المدفوعات والتقارير', sub:'تتبع إيرادات جيمك بدقة',
     features:[
-      {ic:'💳', bg:'rgba(255,87,34,0.12)', color:'#FF5722', title:'تسجيل الدفعات', desc:'من صفحة المدفوعات أو من بروفايل العضو مباشرة — سجّل أي دفعة بثواني'},
-      {ic:'📊', bg:'rgba(124,58,237,0.12)', color:'#7C3AED', title:'تقارير شهرية', desc:'شوف إجمالي الإيرادات والأعضاء الجدد لأي فترة زمنية'},
-      {ic:'🧾', bg:'rgba(0,137,123,0.12)', color:'#00897B', title:'إيصالات تلقائية', desc:'كل دفعة بتولد إيصال جاهز للطباعة أو المشاركة'},
+      {ic:'💳', bg:'rgba(96,165,250,0.12)', color:'#60A5FA', title:'تسجيل دفعات مرن', desc:'كاش، كنت، تحويل — سجّل أي دفعة من بروفايل العضو أو صفحة المدفوعات مباشرة'},
+      {ic:'🧾', bg:'rgba(16,185,129,0.12)', color:'#10B981', title:'إيصالات فورية', desc:'كل دفعة بتولد إيصال احترافي جاهز للطباعة أو المشاركة'},
+      {ic:'📈', bg:'rgba(251,191,36,0.12)', color:'#F59E0B', title:'تقارير متقدمة', desc:'تقارير مفصّلة بالإيرادات، الأعضاء، الحضور — صدّرها CSV أو PDF'},
     ]
   },
   {
-    icon:'🚀', title:'جاهز تبدأ!', sub:'جيمك جاهز — ابدأ بإضافة أول عضو',
+    icon:'🎯', stepColor:'#10B981',
+    title:'جاهز تبدأ!', sub:'كل حاجة جاهزة — خطواتك الأولى',
     features:[
-      {ic:'⚙️', bg:'rgba(255,87,34,0.12)', color:'#FF5722', title:'الإعدادات', desc:'غيّر اسم الجيم، الشعار، الألوان، وأسعار الاشتراكات من صفحة الإعدادات'},
-      {ic:'🏢', bg:'rgba(124,58,237,0.12)', color:'#7C3AED', title:'فروع متعددة', desc:'لو عندك أكتر من فرع أضفهم من الإعدادات ← الفروع وإدارة كل فرع لوحده'},
-      {ic:'💪', bg:'rgba(0,137,123,0.12)', color:'#00897B', title:'ابدأ دلوقتي!', desc:'كل حاجة جاهزة — اضغط "ابدأ" وأضف أول عضو في جيمك'},
+      {ic:'⚙️', bg:'rgba(96,165,250,0.12)', color:'#60A5FA', title:'ابدأ بالإعدادات', desc:'حط اسم الجيم، لوجو، واسعار الاشتراكات من صفحة الإعدادات'},
+      {ic:'👤', bg:'rgba(16,185,129,0.12)', color:'#10B981', title:'أضف أول عضو', desc:'اضغط "الأعضاء" من القايمة ← "إضافة عضو" — وسجّل الدفعة مع بعض'},
+      {ic:'🏆', bg:'rgba(251,191,36,0.12)', color:'#F59E0B', title:'عندك 15 يوم مجاناً', desc:'جرّب كل الميزات بحرية — بعد 15 يوم، الاشتراك بـ 25 KWD/شهر فقط'},
     ]
   }
 ];
 
 let _obStep = 0;
+let _obParticleAnim = null;
 
 function showOnboarding(){
-  if(localStorage.getItem('ob_done')) return;
   _obStep = 0;
   renderObStep();
-  document.getElementById('ob-overlay').style.display = 'flex';
+  const overlay = document.getElementById('ob-overlay');
+  overlay.style.display = 'flex';
+  overlay.style.opacity = '0';
+  overlay.style.transition = 'opacity .3s';
+  requestAnimationFrame(()=>{ overlay.style.opacity = '1'; });
+  startObParticles();
 }
 
 function renderObStep(){
   const s = OB_STEPS[_obStep];
   const total = OB_STEPS.length;
-  document.getElementById('ob-icon').textContent = s.icon;
-  document.getElementById('ob-title').textContent = s.title;
-  document.getElementById('ob-sub').textContent = s.sub;
-  document.getElementById('ob-progress').textContent = `${_obStep+1} / ${total}`;
-  // Dots
-  document.getElementById('ob-dots').innerHTML = OB_STEPS.map((_,i)=>
-    `<div class="ob-step-dot ${i===_obStep?'active':''}"></div>`
+  const pct = ((_obStep + 1) / total * 100).toFixed(0);
+
+  const fill = document.getElementById('ob-prog-fill');
+  if(fill){ fill.style.width = pct + '%'; fill.style.background = `linear-gradient(90deg,${s.stepColor},${s.stepColor}BB)`; }
+
+  const lbl = document.getElementById('ob-step-label');
+  if(lbl) lbl.textContent = `STEP 0${_obStep+1}`;
+  const tot = document.getElementById('ob-step-total');
+  if(tot) tot.textContent = `OF 0${total}`;
+
+  const ic = document.getElementById('ob-icon');
+  if(ic){ ic.textContent = s.icon; ic.style.animation='obPulse 2s ease-in-out infinite'; }
+
+  // Animate card content
+  const body = document.getElementById('ob-card');
+  if(body && _obStep > 0){ body.style.animation='none'; body.offsetHeight; body.style.animation='obSlideLeft .3s ease'; }
+
+  const titleEl = document.getElementById('ob-title');
+  if(titleEl) titleEl.textContent = s.title;
+  const subEl = document.getElementById('ob-sub');
+  if(subEl) subEl.textContent = s.sub;
+
+  const dots = document.getElementById('ob-dots');
+  if(dots) dots.innerHTML = OB_STEPS.map((_,i)=>
+    `<div class="ob-dot ${i===_obStep?'active':''}" style="${i===_obStep?`background:${s.stepColor};box-shadow:0 0 8px ${s.stepColor}60`:''}" onclick="_obStep=${i};renderObStep()"></div>`
   ).join('');
-  // Features
-  document.getElementById('ob-body').innerHTML = s.features.map(f=>`
-    <div class="ob-feature">
+
+  const obBody = document.getElementById('ob-body');
+  if(obBody) obBody.innerHTML = s.features.map((f,fi)=>`
+    <div class="ob-feature" style="animation-delay:${fi*0.07}s">
       <div class="ob-feature-ic" style="background:${f.bg};color:${f.color}">${f.ic}</div>
       <div>
         <div class="ob-feature-title">${f.title}</div>
         <div class="ob-feature-desc">${f.desc}</div>
       </div>
-    </div>
-  `).join('');
-  // Next button
+    </div>`).join('');
+
   const btn = document.getElementById('ob-next');
-  btn.textContent = _obStep === total-1 ? '🚀 ابدأ!' : 'التالي ←';
+  const nextLbl = document.getElementById('ob-next-label');
+  const nextArrow = document.getElementById('ob-next-arrow');
+  if(btn){
+    const isFinal = _obStep === total-1;
+    btn.className = isFinal ? 'ob-btn-next final' : 'ob-btn-next';
+    if(!isFinal){ btn.style.background = `linear-gradient(135deg,${s.stepColor}DD,${s.stepColor})`; btn.style.boxShadow = `0 4px 14px ${s.stepColor}40`; }
+    if(nextLbl) nextLbl.textContent = isFinal ? 'ابدأ الآن' : 'التالي';
+    if(nextArrow) nextArrow.textContent = isFinal ? '🚀' : '→';
+  }
 }
 
 function obNext(){
   if(_obStep < OB_STEPS.length-1){
     _obStep++;
-    const card = document.getElementById('ob-card');
-    card.style.animation = 'none';
-    card.offsetHeight;
-    card.style.animation = 'obIn .3s ease';
     renderObStep();
   } else {
     skipOnboarding();
-    setTimeout(startTour, 500);
   }
 }
 
 function skipOnboarding(){
-  localStorage.setItem('ob_done','1');
-  document.getElementById('ob-overlay').style.display = 'none';
+  const overlay = document.getElementById('ob-overlay');
+  if(overlay){
+    overlay.style.opacity = '0';
+    overlay.style.transition = 'opacity .3s';
+    setTimeout(()=>{ overlay.style.display='none'; overlay.style.opacity='1'; },300);
+  }
+  stopObParticles();
+}
+
+function startObParticles(){
+  const canvas = document.getElementById('ob-particles');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const pts = Array.from({length:35},()=>({
+    x:Math.random()*canvas.width, y:Math.random()*canvas.height,
+    vx:(Math.random()-.5)*.25, vy:(Math.random()-.5)*.25,
+    r:Math.random()*1.5+.5, a:Math.random()*.4+.1
+  }));
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pts.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0)p.x=canvas.width; if(p.x>canvas.width)p.x=0;
+      if(p.y<0)p.y=canvas.height; if(p.y>canvas.height)p.y=0;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(96,165,250,${p.a})`; ctx.fill();
+    });
+    pts.forEach((p,i)=>{ pts.slice(i+1).forEach(q=>{
+      const d=Math.hypot(p.x-q.x,p.y-q.y);
+      if(d<100){ ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);
+        ctx.strokeStyle=`rgba(96,165,250,${.06*(1-d/100)})`;ctx.lineWidth=.5;ctx.stroke(); }
+    });});
+    _obParticleAnim = requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+function stopObParticles(){
+  if(_obParticleAnim) cancelAnimationFrame(_obParticleAnim);
+  const canvas = document.getElementById('ob-particles');
+  if(canvas) canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
 }
 
 // ── TOOLTIP TOUR ──
@@ -6313,22 +6402,37 @@ function skipTour(){
 }
 </script>
 
-<!-- ══ ONBOARDING ══ -->
+<!-- ══ ONBOARDING PREMIUM ══ -->
 <div class="ob-overlay" id="ob-overlay" style="display:none">
+  <div class="ob-bg">
+    <div class="ob-bg-grid"></div>
+    <div class="ob-bg-glow" style="width:500px;height:500px;top:-150px;left:-150px;background:radial-gradient(circle,rgba(59,130,246,0.12),transparent 70%)"></div>
+    <div class="ob-bg-glow" style="width:400px;height:400px;bottom:-100px;right:-100px;background:radial-gradient(circle,rgba(96,165,250,0.08),transparent 70%)"></div>
+    <canvas id="ob-particles" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.4"></canvas>
+  </div>
   <div class="ob-card" id="ob-card">
-    <div class="ob-header" id="ob-header">
-      <div class="ob-icon" id="ob-icon">🎉</div>
-      <div class="ob-title" id="ob-title">أهلاً بك في Nexora Gym!</div>
+    <div class="ob-progress-bar"><div class="ob-progress-fill" id="ob-prog-fill" style="width:20%"></div></div>
+    <div class="ob-header">
+      <div class="ob-step-num">
+        <span id="ob-step-label">STEP 01</span>
+        <div class="ob-step-line"></div>
+        <span id="ob-step-total" style="color:#475569">OF 05</span>
+      </div>
+      <div class="ob-icon-wrap">
+        <div class="ob-icon-scan"></div>
+        <span id="ob-icon" style="position:relative;z-index:1;font-size:2rem">🚀</span>
+      </div>
+      <div class="ob-title" id="ob-title">أهلاً بك في Nexora Gym</div>
       <div class="ob-sub" id="ob-sub">نظام إدارة الجيم الاحترافي</div>
-      <div class="ob-steps" id="ob-dots"></div>
     </div>
     <div class="ob-body" id="ob-body"></div>
     <div class="ob-footer">
-      <span class="ob-progress" id="ob-progress">1 / 5</span>
-      <div style="display:flex;gap:.5rem">
-        <button class="btn bs2 btn-sm" id="ob-skip" onclick="skipOnboarding()">تخطي</button>
-        <button class="btn bp btn-sm" id="ob-next" onclick="obNext()">التالي ←</button>
-      </div>
+      <div class="ob-dots" id="ob-dots"></div>
+      <button class="ob-skip" onclick="skipOnboarding()">تخطي</button>
+      <button class="ob-btn-next" id="ob-next" onclick="obNext()">
+        <span id="ob-next-label">التالي</span>
+        <span id="ob-next-arrow">→</span>
+      </button>
     </div>
   </div>
 </div>
